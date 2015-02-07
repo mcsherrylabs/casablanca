@@ -41,6 +41,11 @@ class Db(dbConfigName: String) extends Configure {
     			try {
     				val deleted =  st.executeUpdate(deleteSql)
     				println(s"${deleteSql} Deleted count ${deleted}")
+    			} catch {
+    			  case e: SQLException => {
+    			    println(s"${deleteSql} failed, maybe object doesn't exist?!")
+    			  }
+    			
     			} finally st.close
     		}
       }

@@ -5,26 +5,6 @@ import casablanca.db._
 import java.util.UUID
 import java.util.Date
 
-trait Task {
-  val id : String
-  val createTime : Date
-  val taskType : String
-  val status : Int
-  val attemptCount : Int
-  
-}
-
-class TaskImpl(row : Row) extends Task {
-   val id: String = row("taskId") 
-   val status: Int = row("status")
-   val taskType: String = row("taskType")
-   val createTime : Date = {
-     val asLong : Long = row("createTime")
-     new Date(asLong)
-   }
-   val attemptCount : Int  = row("attemptCount")
-} 
-
 class TaskManager(configName: String) extends Configure {
 	
   private val myConfig = config(configName)
@@ -69,10 +49,6 @@ class TaskManager(configName: String) extends Configure {
     res.map( new TaskImpl( _))
     
   }  
-  
-  def taskQueue(taskType: String, status: Int): TaskQueue = {
-    new TaskQueueImpl(this, taskType, status, myConfig.getInt("statusQueueSize"))
-  }
   
   def close = db.shutdown
   

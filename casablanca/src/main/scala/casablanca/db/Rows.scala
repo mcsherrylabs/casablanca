@@ -8,6 +8,10 @@ class Row {
   }
     
   var map: Map[String, Any] = Map()
+  
+  override def toString: String = {
+    map.foldLeft( ""){ case (a, (k,v)) => a + s" Key:${k}, Value: ${v}"}
+  }
 }
 
 class Rows(private val rs: ResultSet) {

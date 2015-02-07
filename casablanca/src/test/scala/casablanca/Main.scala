@@ -1,13 +1,15 @@
-package skyhook
+package casablanca
 
 import casablanca.task.TaskManager
+import casablanca.queues.GenericStatusHandlerFactory
+import casablanca.queues.StatusQueueManager
 
 object Main {
 
   def main(args: Array[String]): Unit = {
    
     val tm = new TaskManager("taskManager")
-    val sqm = new StatusHandlerFactory
+    val sqm = new GenericStatusHandlerFactory
     val statusQManager = new StatusQueueManager(sqm, tm) 
     
     val statusQueues = statusQManager.statusQueues

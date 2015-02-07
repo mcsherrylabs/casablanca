@@ -1,7 +1,8 @@
-package skyhook
+package casablanca.queues
 
 import casablanca.task.TaskManager
 import casablanca.task.Task
+import casablanca.handler.StatusHandlerFactory
 
 class StatusQueueManager(statusHandlerFactory: StatusHandlerFactory, tm: TaskManager) {
 
