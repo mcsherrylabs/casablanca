@@ -3,7 +3,17 @@ package casablanca.task
 import java.util.Date
 import casablanca.db.Row
 
-case class StatusUpdate(nextStatus: Int, scheduleAfter: Option[Date] = None)
+object StatusUpdate {
+  def apply(nextStatus: Int, minutesInFuture: Int): StatusUpdate = 
+    StatusUpdate(nextStatus, Some(createFutureDate(minutesInFuture)))
+  
+    private def createFutureDate(minutesInFuture: Int): Date = {
+    val now = new Date()
+    new Date(now.getTime + (minutesInFuture * 1000 * 60))
+  }
+}
+
+case class StatusUpdate(nextStatus: Int, scheduleAfter: Option[Date] = None) 
 
 trait Task {
   val id : String
