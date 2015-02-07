@@ -55,17 +55,22 @@ class Table(val name: String, val conn: Connection) {
         }
   }
   
+  private def mapToSql(value: Any): Any = {
+    value match {
+        case v: String => s"'${v}'"
+        case v: Date => v.getTime
+        case null => "null"
+        case Some(x) => mapToSql(x)
+        case None =>  "null"
+        case v => v
+    }
+  }
+  
   def insert(values: Any*): Int = {
     val st = conn.createStatement();         // statement objects can be reused with
         try {
-            val asStrs = values map { value =>
-              value match {
-                case v: String => s"'${v}'"
-                case v: Date => v.getTime
-                case null => s"null"
-                case v => v
-              }                
-            }
+            val asStrs = values map (mapToSql(_))    
+            
             val str = asStrs.mkString(", ")
             val sql = s"INSERT INTO ${name} VALUES ( ${str})"
 	        st.executeUpdate(sql);    // run the query

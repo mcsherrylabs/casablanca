@@ -12,9 +12,9 @@ class TaskManager(configName: String) extends Configure {
   private val db = new Db(myConfig.getString("db"))
   private val taskTable = db.table(myConfig.getString("taskTableName"))
   
-  def create(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0): Task = {
+  def create(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task = {
     val uuid  = UUID.randomUUID.toString
-    taskTable.insert(uuid, new Date(), taskType, status, 0)
+    taskTable.insert(uuid, new Date(), taskType, status, 0, scheduleTime)
     getTask(uuid)
   }
   
@@ -24,8 +24,12 @@ class TaskManager(configName: String) extends Configure {
     else new TaskImpl(results.rows(0))
   }
   
-  def pushTask(taskId: String, newStatus: Int): Task = {    
-    taskTable.update(s"status = ${newStatus}, attemptCount = 0, createTime = ${(new Date().getTime)}", s"taskId = '${taskId}'")
+  def updateTaskStatus(taskId: String, statusUpdate: StatusUpdate): Task = {    
+    val scheduleTimeUpdate = statusUpdate.scheduleAfter match {
+      case None => ""
+      case Some(schedule) => s", scheduleTime = ${schedule.getTime}"
+    }
+    taskTable.update(s"status = ${statusUpdate.nextStatus}, attemptCount = 0, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate}", s"taskId = '${taskId}' ")
     getTask(taskId)
   }
   
@@ -35,6 +39,12 @@ class TaskManager(configName: String) extends Configure {
     println(s"Count ${t.attemptCount}")
     t
   }
+
+  def findScheduledTasks(beforeWhen: Date): List[Task] = {
+    val res = taskTable.filter(s" scheduleTime <= ${beforeWhen.getTime} ORDER BY createTime ASC")
+    println(s"Finding tasks before ${beforeWhen}")    
+    res.map( new TaskImpl( _))
+  }
   
   def findTasks(taskType: String, status: Int, latestTaskTimestamp: Option[Date]): List[Task] = {  
 
@@ -43,8 +53,8 @@ class TaskManager(configName: String) extends Configure {
       case Some(dt) => s" AND createTime > ${dt.getTime} "
       case None => ""
     }
-    
-    val res = taskTable.filter(s" taskType = '${taskType}' AND status = ${status} ${createTimeClause} ORDER BY createTime ASC")
+        
+    val res = taskTable.filter(s" taskType = '${taskType}' AND status = ${status} ${createTimeClause} AND scheduleTime IS NULL ORDER BY createTime ASC")
     println(s"Finding tasks after ${latestTaskTimestamp map { _.getTime}}")    
     res.map( new TaskImpl( _))
     

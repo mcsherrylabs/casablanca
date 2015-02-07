@@ -1,16 +1,12 @@
 package casablanca.handler
 
 import casablanca.task.Task
-
-
-trait Schedule 
-
-object NoSchedule extends Schedule
+import java.util.Date
+import casablanca.task.StatusUpdate
 
 trait StatusHandler {
-	def handle(task: Task): Int
-	def getSchedule: Schedule
-	def reTry(task: Task): Int
+	def handle(task: Task): StatusUpdate	
+	def reTry(task: Task): StatusUpdate
 }
 
 

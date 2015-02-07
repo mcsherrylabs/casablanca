@@ -3,25 +3,22 @@ package casablanca.queues
 import casablanca.task.Task
 import casablanca.handler.StatusHandler
 import casablanca.handler.StatusHandlerFactory
-import casablanca.handler.Schedule
-import casablanca.handler.NoSchedule
+import casablanca.task.StatusUpdate
 
 
 class GenericStatusHandler(val status: Int) extends StatusHandler {
-  
-    def getSchedule: Schedule =  NoSchedule 
     
-	def handle(task: Task): Int = {
+	def handle(task: Task): StatusUpdate = {
 	  println(s"Consuming ${status} returning ${status + 1}, task.attemptCount is ${task.attemptCount}")
 	  Thread.sleep(1000)
 	  if(task.status == 4 && task.attemptCount < 3) {
 	    println("Throwing!")
 	    throw new RuntimeException("Whas goin on?")
 	  }
-	  status + 1
+	  StatusUpdate(status + 1)
 	}
 	
-	def reTry(task: Task): Int = {
+	def reTry(task: Task): StatusUpdate = {
 	  println(s"RETRY ${task.id} status ${task.status}, count ${task.attemptCount}  ")
 	  handle(task)
 	}

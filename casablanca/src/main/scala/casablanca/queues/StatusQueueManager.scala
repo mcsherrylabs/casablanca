@@ -3,6 +3,7 @@ package casablanca.queues
 import casablanca.task.TaskManager
 import casablanca.task.Task
 import casablanca.handler.StatusHandlerFactory
+import casablanca.task.StatusUpdate
 
 class StatusQueueManager(statusHandlerFactory: StatusHandlerFactory, tm: TaskManager) {
 
@@ -14,11 +15,11 @@ class StatusQueueManager(statusHandlerFactory: StatusHandlerFactory, tm: TaskMan
 
   def getHandler(status:Int) = statusHandlerFactory.getHandler(status)
   
-  def pushTask(task:Task , newStatus: Int) {
-    if(task.status != newStatus) {
-    	statusQueueMap.get(newStatus).map( _.push(tm.pushTask(task.id, newStatus)))
+  def pushTask(task:Task , handlerResult: StatusUpdate) {
+    if(task.status != handlerResult.nextStatus) {
+    	statusQueueMap.get(handlerResult.nextStatus).map( _.push(tm.updateTaskStatus(task.id, handlerResult)))
     } else {
-    	statusQueueMap.get(newStatus).map( _.push(task))  
+    	statusQueueMap.get(handlerResult.nextStatus).map( _.push(task))  
     }
     
   }
