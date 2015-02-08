@@ -4,6 +4,7 @@ import casablanca.task.TaskManager
 import casablanca.queues.GenericStatusHandlerFactory
 import casablanca.queues.StatusQueueManager
 import casablanca.queues.Scheduler
+import casablanca.handler.StatusUpdate
 
 object Main {
 
@@ -18,22 +19,16 @@ object Main {
     scheduler.start
     
     val statusQueues = statusQManager.statusQueues
-    val threads= statusQueues.map { q => 
-    	new Thread(new Runnable {
-    		def run() {
-    			println("Thread started")
-    			q.init
-    		}
-    	})    
-    }
+    val threads = statusQueues.map ( q => q.init)    	
    
-   tm.create("taskType", 0, "strPayload", 33)
+    val t = statusQManager.createTask("taskType", 0, "strPayload", 33)
+    statusQManager.pushTask(t)
+    
 //   tm.create("taskType", 2, "strPayload2", 33)
 //   tm.create("taskType", 2, "strPayload2", 33)
 //   tm.create("taskType", 2, "strPayload2", 33)
 //   tm.create("taskType", 2, "strPayload2", 33)
    
-    threads.foreach { t => t.start }
     
   }
 

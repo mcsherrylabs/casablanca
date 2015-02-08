@@ -20,7 +20,7 @@ class GenericStatusHandler(val status: Int) extends StatusHandler {
 	  StatusUpdate(status + 1)
 	}
 	
-	def reTry(task: Task): HandlerUpdate = {
+	override def reTry(task: Task): HandlerUpdate = {
 	  println(s"RETRY ${task.id} status ${task.status}, count ${task.attemptCount}  ")
 	  handle(task)
 	}
@@ -30,7 +30,7 @@ class GenericStatusHandlerFactory extends StatusHandlerFactory {
 
   def getSupportedStatuses: List[Int] = (0 to 9).toList
   
-  def getHandler(status:Int) : Option[StatusHandler] = {    
+  def getHandler[Task](status:Int) : Option[StatusHandler] = {    
     if(status < 10) Some(new GenericStatusHandler(status))
     else None
   } 

@@ -19,12 +19,18 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
 
   def getHandler(status:Int) = statusHandlerFactory.getHandler(status)
   
-  // Ignore result val here.
+  def createTask(taskType: String, initialStatus: Int, strPayload: String, intPayload: Int): Task  = {
+    tm.create(taskType, initialStatus, strPayload, intPayload)
+  }
+  
+  def pushTask(task:Task) {    
+    statusQueueMap.get(task.status).map( _.push(task))    
+  }
+  
   def pushTask(task:Task , handlerResult: HandlerUpdate) {
     
     handlerResult match {
       case StatusUpdate(nextStatus, attemptCount) => {
-        
         
         if(task.status == nextStatus && attemptCount == 0) {
           val msg = s"Will not create busy loop for task ${task.id} by pushing same status ${task.status}"

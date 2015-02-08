@@ -18,7 +18,7 @@ class StatusQueue(status: Int, statusQueueManager: StatusQueueManager) {
     }
   
     def poll: Task = {
-      val t = queue.poll(10000, TimeUnit.MILLISECONDS)
+      val t = queue.poll(20000, TimeUnit.MILLISECONDS)
       if(t != null) statusQueueManager.attemptTask(t)      
       else t
     }

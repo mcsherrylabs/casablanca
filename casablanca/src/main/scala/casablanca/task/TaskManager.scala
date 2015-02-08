@@ -12,9 +12,10 @@ class TaskManager(configName: String) extends Configure {
   private val db = new Db(myConfig.getString("db"))
   private val taskTable = db.table(myConfig.getString("taskTableName"))
   
+  //taskId , createTime taskType status attemptCount scheduleTime strPayload intValue 
   def create(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task = {
     val uuid  = UUID.randomUUID.toString
-    taskTable.insert(uuid, new Date(), taskType, status, 0, scheduleTime)
+    taskTable.insert(uuid, new Date(), taskType, status, 0, scheduleTime, strPayload , intPayload)
     getTask(uuid)
   }
   
@@ -37,7 +38,9 @@ class TaskManager(configName: String) extends Configure {
 
   def findScheduledTasks(beforeWhen: Date): List[Task] = {
     val res = taskTable.filter(s" scheduleTime <= ${beforeWhen.getTime} ORDER BY createTime ASC")
-    println(s"Finding tasks before ${beforeWhen.getTime}, num rows ${res.rows.size}")    
+    println(s"Finding tasks before ${beforeWhen.getTime}, num rows ${res.rows.size}")
+    // TODO, must change this to use task factory lookup to create 
+    // the correct instance of a task for a task type.... 
     res.map( new TaskImpl( _))
   }
   
@@ -50,7 +53,9 @@ class TaskManager(configName: String) extends Configure {
     }
         
     val res = taskTable.filter(s" taskType = '${taskType}' AND status = ${status} ${createTimeClause} AND scheduleTime IS NULL ORDER BY createTime ASC")
-    println(s"Finding tasks after ${latestTaskTimestamp map { _.getTime}}")    
+    println(s"Finding tasks after ${latestTaskTimestamp map { _.getTime}}")
+    // TODO, must change this to use task factory lookup to create 
+    // the correct instance of a task for a task type.... 
     res.map( new TaskImpl( _))
     
   }  

@@ -7,14 +7,14 @@ trait HandlerUpdate
 
 trait StatusHandler {
 	def handle(task: Task): HandlerUpdate	
-	def reTry(task: Task): HandlerUpdate
+	def reTry(task: Task): HandlerUpdate = handle(task)
 }
 
 
 trait StatusHandlerFactory {
 
   def getSupportedStatuses: List[Int]  
-  def getHandler(status:Int) : Option[StatusHandler]
+  def getHandler[T >: Task](status:Int) : Option[StatusHandler]
 }
 
 

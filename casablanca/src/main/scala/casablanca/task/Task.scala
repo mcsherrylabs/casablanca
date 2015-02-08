@@ -13,6 +13,8 @@ trait Task {
   val taskType : String
   val status : Int
   val attemptCount : Int
+  val strPayload : String
+  val intValue: Int
     
   override def equals(other: Any): Boolean = {
     other match {
@@ -43,6 +45,9 @@ class TaskImpl(row : Row) extends Task {
    }
    
    val attemptCount : Int  = row("attemptCount")
+   
+   val intValue : Int = row("intValue")
+   val strPayload : String = row("strPayload")
    
    override def toString: String = {
      s" ${id} ${status} ${taskType} ${attemptCount} ${createTime} ${schedule}"
