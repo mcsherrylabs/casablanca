@@ -24,25 +24,20 @@ class TaskManager(configName: String) extends Configure {
     else new TaskImpl(results.rows(0))
   }
   
-  def updateTaskStatus(taskId: String, statusUpdate: StatusUpdate): Task = {    
+  def updateTaskStatus(taskId: String, statusUpdate: TaskUpdate): Task = {    
     val scheduleTimeUpdate = statusUpdate.scheduleAfter match {
-      case None => ""
+      case None => s", scheduleTime = NULL"
       case Some(schedule) => s", scheduleTime = ${schedule.getTime}"
     }
-    taskTable.update(s"status = ${statusUpdate.nextStatus}, attemptCount = 0, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate}", s"taskId = '${taskId}' ")
+    val sql = s"status = ${statusUpdate.nextStatus}, attemptCount = ${statusUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate}"
+    println(s"Update task ${taskId} sql -> ${sql}")
+    taskTable.update(sql,  s"taskId = '${taskId}' ")
     getTask(taskId)
-  }
-  
-  def incAttempts(task: Task): Task = {
-    taskTable.update(s"attemptCount = ${task.attemptCount + 1}", s"taskId = '${task.id}'")
-    val t = getTask(task.id)
-    println(s"Count ${t.attemptCount}")
-    t
   }
 
   def findScheduledTasks(beforeWhen: Date): List[Task] = {
     val res = taskTable.filter(s" scheduleTime <= ${beforeWhen.getTime} ORDER BY createTime ASC")
-    println(s"Finding tasks before ${beforeWhen}")    
+    println(s"Finding tasks before ${beforeWhen.getTime}, num rows ${res.rows.size}")    
     res.map( new TaskImpl( _))
   }
   
