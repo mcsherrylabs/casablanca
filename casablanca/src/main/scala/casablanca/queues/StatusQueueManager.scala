@@ -8,11 +8,11 @@ import casablanca.handler.HandlerUpdate
 import casablanca.handler.ScheduledStatusUpdate
 import casablanca.handler.StatusUpdate
 
-
 class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFactory) {
 
   val statusQueueMap: Map[Int, StatusQueue] = {    
-    statusHandlerFactory.getSupportedStatuses.map( s => s -> new StatusQueue(s,this)).toMap
+    val taskType = statusHandlerFactory.getTaskType 
+    statusHandlerFactory.getSupportedStatuses.map( s => s -> new StatusQueue(s,taskType, this)).toMap
   }
   
   val statusQueues = statusQueueMap.values
@@ -41,7 +41,7 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
         val taskUpdate = TaskUpdate(nextStatus, None, attemptCount)
         try {
 	        val t = tm.updateTaskStatus(task.id, taskUpdate)
-	        println(s"Pushed task ${t}")
+	        //println(s"Pushed task ${t}")
 	        statusQueueMap.get(nextStatus).map( _.push(t))        
         } catch {
           case e: Exception => println(e.toString)
@@ -61,10 +61,7 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
     
   }
   
-  def findTasks(status: Int) : List[Task] = {
-    tm.findTasks("taskType", status, None)
-  }
-  
+  def findTasks(taskType: String, status: Int) : List[Task] = tm.findTasks(taskType, status)
   
   def attemptTask(task: Task): Task = {
     // inc attempts

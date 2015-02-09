@@ -12,7 +12,7 @@ trait StatusHandler {
 
 
 trait StatusHandlerFactory {
-
+  def getTaskType: String
   def getSupportedStatuses: List[Int]  
   def getHandler[T >: Task](status:Int) : Option[StatusHandler]
 }

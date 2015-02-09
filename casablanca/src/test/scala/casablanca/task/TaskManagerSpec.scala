@@ -36,7 +36,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
   
   it should " find the task (using get or find) " in {
-    val foundTasks = tmUnderTest.findTasks(taskType, status, None)
+    val foundTasks = tmUnderTest.findTasks(taskType, status)
     assert(foundTasks.size > 0)
     foundTasks map {
       t => {
@@ -84,7 +84,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   
   it should " not find a task with a schedule " in {
     val t = tmUnderTest.create(taskType, status, strPayload, intVal, Some(new Date()))
-    val foundTasks = tmUnderTest.findTasks(taskType, status, None)
+    val foundTasks = tmUnderTest.findTasks(taskType, status)
     assert(foundTasks.size > 0)
     foundTasks map {
       foundTask => {        

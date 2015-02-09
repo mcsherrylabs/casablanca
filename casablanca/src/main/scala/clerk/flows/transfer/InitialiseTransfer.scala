@@ -2,18 +2,19 @@ package clerk.flows.transfer
 
 import casablanca.queues.StatusQueueManager
 import casablanca.task.Task
+import casablanca.WorkflowManager
 
 
-class InitialiseTransfer(sqm: StatusQueueManager) {
+class InitialiseTransfer(wfm: WorkflowManager) {
 
   import DomainTransferConsts._
   
   def createTransferTask(domainName: String, aspirantId: String, ownerId: String): Task = {
-    sqm.createTask(domainTransferTaskType, initialiseTransfer, 
+    wfm.createTask(domainTransferTaskType, initialiseTransfer, 
         Seq(domainName, aspirantId, ownerId).mkString(","), 0)            
   }
   
   def initTransfer(task: Task)  {            
-    sqm.pushTask(task)    
+    wfm.pushTask(task)    
   }
 }

@@ -31,34 +31,26 @@ class TaskManager(configName: String) extends Configure {
       case Some(schedule) => s", scheduleTime = ${schedule.getTime}"
     }
     val sql = s"status = ${statusUpdate.nextStatus}, attemptCount = ${statusUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate}"
-    println(s"Update task ${taskId} sql -> ${sql}")
+    //println(s"Update task ${taskId} sql -> ${sql}")
     taskTable.update(sql,  s"taskId = '${taskId}' ")
     getTask(taskId)
   }
 
   def findScheduledTasks(beforeWhen: Date): List[Task] = {
-    val res = taskTable.filter(s" scheduleTime <= ${beforeWhen.getTime} ORDER BY createTime ASC")
-    println(s"Finding tasks before ${beforeWhen.getTime}, num rows ${res.rows.size}")
-    // TODO, must change this to use task factory lookup to create 
-    // the correct instance of a task for a task type.... 
-    res.map( new TaskImpl( _))
+    val sql = s" scheduleTime <= ${beforeWhen.getTime} ORDER BY createTime ASC"
+    findTasksImpl(sql)
   }
   
-  def findTasks(taskType: String, status: Int, latestTaskTimestamp: Option[Date]): List[Task] = {  
-
-    // use the last time received. 
-    val createTimeClause = latestTaskTimestamp match {
-      case Some(dt) => s" AND createTime > ${dt.getTime} "
-      case None => ""
-    }
-        
-    val res = taskTable.filter(s" taskType = '${taskType}' AND status = ${status} ${createTimeClause} AND scheduleTime IS NULL ORDER BY createTime ASC")
-    println(s"Finding tasks after ${latestTaskTimestamp map { _.getTime}}")
+  def findTasks(taskType: String, status: Int): List[Task] = {  
+     findTasksImpl(s" taskType = '${taskType}' AND status = ${status} AND scheduleTime IS NULL ORDER BY createTime ASC")
+  }  
+  
+  private def findTasksImpl(sql: String): List[Task] = {
+    val res = taskTable.filter(sql)    
     // TODO, must change this to use task factory lookup to create 
     // the correct instance of a task for a task type.... 
-    res.map( new TaskImpl( _))
-    
-  }  
+    res.map( new TaskImpl( _))  
+  }
   
   def close = db.shutdown
   

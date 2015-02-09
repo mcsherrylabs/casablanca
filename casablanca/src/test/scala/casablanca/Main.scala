@@ -19,7 +19,7 @@ object Main {
     scheduler.start
     
     val statusQueues = statusQManager.statusQueues
-    val threads = statusQueues.map ( q => q.init)    	
+    val threads = statusQueues.map ( q => q.start)    	
    
     val t = statusQManager.createTask("taskType", 0, "strPayload", 33)
     statusQManager.pushTask(t)

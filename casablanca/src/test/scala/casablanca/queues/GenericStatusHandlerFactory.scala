@@ -28,6 +28,8 @@ class GenericStatusHandler(val status: Int) extends StatusHandler {
 
 class GenericStatusHandlerFactory extends StatusHandlerFactory {
 
+  def getTaskType : String = "genericTask"
+  
   def getSupportedStatuses: List[Int] = (0 to 9).toList
   
   def getHandler[Task](status:Int) : Option[StatusHandler] = {    

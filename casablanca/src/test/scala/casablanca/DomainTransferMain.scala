@@ -15,27 +15,28 @@ object DomainTransferMain {
    
     val tm = new TaskManager("taskManager")
     val shf = new DomainTransferHandlerFactory
-    val statusQManager = new StatusQueueManager(tm, shf)
+    val statusQManager = new StatusQueueManager(tm, shf)   
+    val scheduler = new Scheduler(tm, statusQManager, 120)
     
-    val scheduler = new Scheduler(tm, statusQManager, 10)
-    
-    scheduler.start
-    
-    val statusQueues = statusQManager.statusQueues
-    statusQueues.map ( q => q.init)    	
+    val workflowManager = new WorkflowManagerImpl(tm,
+    statusQManager,
+    shf, 
+    scheduler)
    
-    val transferStarter = new InitialiseTransfer(statusQManager)
+    workflowManager.start
+    
+    val transferStarter = new InitialiseTransfer(workflowManager)
     
     val transferTask = transferStarter.createTransferTask("domainName", "aspirantId", "ownerId")
     transferStarter.initTransfer(transferTask)
     
-    println(s"Transfer Task Initialised ${transferTask}")
-    while(tm.getTask(transferTask.id).status != DomainTransferConsts.awaitOwnerReponse) {      
-      Thread.sleep(1000)
-    }
-    println(s"Now waiting for for onwer response... ")
-    statusQManager.pushTask(tm.getTask(transferTask.id), StatusUpdate(DomainTransferConsts.acceptTransfer));
-    println(s"Transfer Accepted ... ")
+    //println(s"Transfer Task Initialised ${transferTask}")
+    //while(tm.getTask(transferTask.id).status != DomainTransferConsts.awaitOwnerReponse) {      
+    //  Thread.sleep(1000)
+    //}
+    //println(s"Now waiting for for onwer response... ")
+    //statusQManager.pushTask(tm.getTask(transferTask.id), StatusUpdate(DomainTransferConsts.acceptTransfer));
+    //println(s"Transfer Accepted ... ")
     
   }
 

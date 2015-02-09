@@ -29,15 +29,19 @@ class DomainTransferHandlerFactory extends StatusHandlerFactory {
   import DomainTransferConsts._
   
   def getSupportedStatuses: List[Int] = {
-    List(initialiseTransfer, updateRegistry, acceptTransfer )
+    List(initialiseTransfer, updateRegistry, rejectTransfer, awaitOwnerReponse, acceptTransfer )
   }
   
+  def getTaskType: String = domainTransferTaskType
+    
   def getHandler[DomainTransferTask](status:Int) = {
     
     status match {
       case DomainTransferConsts.initialiseTransfer => Some(new InformOwnerHandler())
       case DomainTransferConsts.updateRegistry => Some(new UpdateRegistryHandler())
+      case DomainTransferConsts.awaitOwnerReponse => Some(new GetResponseHandler())
       case DomainTransferConsts.acceptTransfer => Some(new FinaliseTransferHandler())
+      case DomainTransferConsts.rejectTransfer => Some(new RejectTransferHandler())
       case _ => None
     }
     
