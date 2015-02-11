@@ -27,7 +27,7 @@ class DomainTransferSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     assert(task.status == DomainTransferConsts.initialiseTransfer)
     val initialiseTransferHndlr = domainTransferHandlerFactory.getHandler(task.status).get
     initialiseTransferHndlr.handle(task) match {
-      case StatusUpdate(DomainTransferConsts.awaitOwnerReponse, x) => //horray!
+      case StatusUpdate(DomainTransferConsts.awaitOwnerReponse, _, _, _) => //horray!
       case x => fail("Taint right")      
     }
     

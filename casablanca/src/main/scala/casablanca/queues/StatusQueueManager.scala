@@ -30,7 +30,7 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
   def pushTask(task:Task , handlerResult: HandlerUpdate) {
     
     handlerResult match {
-      case StatusUpdate(nextStatus, attemptCount) => {
+      case StatusUpdate(nextStatus, newStringPayload, newIntValue, attemptCount) => {
         
         if(task.status == nextStatus && attemptCount == 0) {
           val msg = s"Will not create busy loop for task ${task.id} by pushing same status ${task.status}"
@@ -38,7 +38,7 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
           throw new Error(msg)
         }
         
-        val taskUpdate = TaskUpdate(nextStatus, None, attemptCount)
+        val taskUpdate = TaskUpdate(nextStatus, newStringPayload, newIntValue, None, attemptCount)
         try {
 	        val t = tm.updateTaskStatus(task.id, taskUpdate)
 	        //println(s"Pushed task ${t}")
@@ -48,12 +48,12 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
         }
       }
       
-      case ScheduledStatusUpdate(nextStatus, schedule) => {
+      case ScheduledStatusUpdate(nextStatus, schedule, newStringPayload, newIntValue) => {
         
         val taskUpdate = if(task.status == nextStatus) {
-          TaskUpdate(nextStatus, Some(schedule), task.attemptCount)
+          TaskUpdate(nextStatus, newStringPayload, newIntValue, Some(schedule), task.attemptCount)
         } else {
-          TaskUpdate(nextStatus, Some(schedule), 0)
+          TaskUpdate(nextStatus, newStringPayload, newIntValue, Some(schedule), 0)
         }
         tm.updateTaskStatus(task.id, taskUpdate)
       }       
@@ -65,7 +65,7 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
   
   def attemptTask(task: Task): Task = {
     // inc attempts
-    val taskUpdate = TaskUpdate(task.status, None, task.attemptCount + 1) 
+    val taskUpdate = TaskUpdate(task.status, None, None, None, task.attemptCount + 1) 
     tm.updateTaskStatus(task.id, taskUpdate)
              
   }

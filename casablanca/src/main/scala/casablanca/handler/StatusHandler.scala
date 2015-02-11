@@ -3,7 +3,9 @@ package casablanca.handler
 import casablanca.task.Task
 import java.util.Date
 
-trait HandlerUpdate
+trait HandlerUpdate {
+  
+}
 
 trait StatusHandler {
 	def handle(task: Task): HandlerUpdate	
@@ -21,8 +23,8 @@ trait StatusHandlerFactory {
 
 object RelativeScheduledStatusUpdate {
     
-  def apply(nextStatus: Int, minutesInFuture: Int): ScheduledStatusUpdate = {
-    ScheduledStatusUpdate(nextStatus, createFutureDate(minutesInFuture))
+  def apply(nextStatus: Int, minutesInFuture: Int, newStringPayload: Option[String] = None, newIntValue: Option[Int] = None ): ScheduledStatusUpdate = {
+    ScheduledStatusUpdate(nextStatus, createFutureDate(minutesInFuture), newStringPayload, newIntValue)
   } 
   
   private def createFutureDate(minutesInFuture: Int): Date = {
@@ -31,6 +33,7 @@ object RelativeScheduledStatusUpdate {
   }
 }
 
-case class StatusUpdate(nextStatus: Int, attemptCount: Int = 0) extends HandlerUpdate 
-case class ScheduledStatusUpdate(nextStatus: Int, scheduleAfter: Date) extends HandlerUpdate
+case class StatusUpdate(nextStatus: Int, newStringPayload: Option[String] = None, newIntValue: Option[Int] = None,  attemptCount: Int = 0) extends HandlerUpdate 
+case class ScheduledStatusUpdate(nextStatus: Int, scheduleAfter: Date, newStringPayload: Option[String] = None, newIntValue: Option[Int] = None ) extends HandlerUpdate
+
 

@@ -24,7 +24,7 @@ class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeco
     tm.findScheduledTasks(beforeWhen) foreach {
       t => {
         println(s"Scheduler found task ${t}")
-        sqm.pushTask(t, StatusUpdate(t.status, t.attemptCount))
+        sqm.pushTask(t, StatusUpdate(t.status, None, None, t.attemptCount))
       }
     }
   }

@@ -30,7 +30,17 @@ class TaskManager(configName: String) extends Configure {
       case None => s", scheduleTime = NULL"
       case Some(schedule) => s", scheduleTime = ${schedule.getTime}"
     }
-    val sql = s"status = ${statusUpdate.nextStatus}, attemptCount = ${statusUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate}"
+    val intValueUpdate = statusUpdate.intValue match {
+      case None => ""
+      case Some(newIntValue) => s", intValue = ${newIntValue}"
+    }
+    
+    val strPayloadUpdate = statusUpdate.strPayload  match {
+      case None => ""
+      case Some(newPayload) => s", strPayload = '${newPayload}'"
+    }
+    
+    val sql = s"status = ${statusUpdate.nextStatus}, attemptCount = ${statusUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate} ${strPayloadUpdate} ${intValueUpdate}"
     //println(s"Update task ${taskId} sql -> ${sql}")
     taskTable.update(sql,  s"taskId = '${taskId}' ")
     getTask(taskId)

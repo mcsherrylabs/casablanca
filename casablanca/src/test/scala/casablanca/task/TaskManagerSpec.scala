@@ -31,7 +31,8 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     assert(t.schedule == None)
     assert(t.createTime.getTime >=  aroundNow.getTime)
     assert(t.createTime.getTime <  aroundNow.getTime + 500)
-    
+    assert(t.intValue == intVal)
+    assert(t.strPayload == strPayload)
     
   }
   
@@ -52,11 +53,13 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   
   it should " update the task status " in {
     val t = tmUnderTest.create(taskType, status, strPayload, intVal)
-    val taskUpdate = TaskUpdate(status + 1)
+    val taskUpdate = TaskUpdate(status + 1, Some("newStringPayload"), Some(7456))
     val updatedTask = tmUnderTest.updateTaskStatus(t.id, taskUpdate)
     assert(updatedTask.status == status + 1)
     val retrievedUpdatedTask = tmUnderTest.getTask(t.id)
     assert(retrievedUpdatedTask.status == status + 1)
+    assert(retrievedUpdatedTask.intValue == 7456)
+    assert(retrievedUpdatedTask.strPayload == "newStringPayload")
   }
  
    
@@ -64,7 +67,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     var task = tmUnderTest.create(taskType, status, strPayload, intVal)
     for(i <- 0 to 10) {
       assert(task.attemptCount == i)
-      val taskUpdate = TaskUpdate(task.status, None, task.attemptCount + 1)
+      val taskUpdate = TaskUpdate(task.status, None, None, None, task.attemptCount + 1)
       task = tmUnderTest.updateTaskStatus(task.id, taskUpdate)    	
     }
     
@@ -74,7 +77,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val t = tmUnderTest.create(taskType, status, strPayload, intVal)
     val scheduled = new Date(new Date().getTime + 100000)
     
-    val taskUpdate = TaskUpdate(status + 1, Some(scheduled))
+    val taskUpdate = TaskUpdate(status + 1, None, None, Some(scheduled))
     val updatedTask = tmUnderTest.updateTaskStatus(t.id, taskUpdate)
     assert(updatedTask.status == status + 1)
     val retrievedUpdatedTask = tmUnderTest.getTask(t.id)
@@ -130,7 +133,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should "  reset try count after status change " in {
     var task = tmUnderTest.create(taskType, status, strPayload, intVal)
     assert(task.attemptCount == 0)
-    var taskUpdate = TaskUpdate(task.status, None, task.attemptCount + 1)
+    var taskUpdate = TaskUpdate(task.status, None, None, None, task.attemptCount + 1)
     task = tmUnderTest.updateTaskStatus(task.id, taskUpdate)
     assert(task.attemptCount == 1)    
     taskUpdate = TaskUpdate(status + 1)
