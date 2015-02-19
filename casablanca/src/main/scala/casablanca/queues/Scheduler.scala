@@ -4,7 +4,7 @@ import java.util.Date
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import casablanca.task.TaskManager
-import casablanca.handler.StatusUpdate
+import casablanca.task.StatusUpdate
 
 
 class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeconds: Int) {

@@ -1,14 +1,15 @@
 package casablanca.queues
 
 import casablanca.task.Task
-import casablanca.handler.StatusHandler
-import casablanca.handler.StatusHandlerFactory
-import casablanca.handler.HandlerUpdate
-import casablanca.handler.StatusUpdate
+import casablanca.task.TaskHandler
+import casablanca.task.TaskHandlerFactory
+import casablanca.task.HandlerUpdate
+import casablanca.task.StatusUpdate
+import casablanca.task.TaskManager
 
 
 
-class GenericStatusHandler(val status: Int) extends StatusHandler {
+class GenericStatusHandler(val status: Int) extends TaskHandler {
     
 	def handle(task: Task): HandlerUpdate = {
 	  println(s"Consuming ${status} returning ${status + 1}, task.attemptCount is ${task.attemptCount}")
@@ -26,13 +27,13 @@ class GenericStatusHandler(val status: Int) extends StatusHandler {
 	}
 }
 
-class GenericStatusHandlerFactory extends StatusHandlerFactory {
+class GenericStatusHandlerFactory(val tm: TaskManager) extends TaskHandlerFactory {
 
   def getTaskType : String = "genericTask"
   
-  def getSupportedStatuses: List[Int] = (0 to 9).toList
+  def getSupportedStatuses: Set[Int] = (0 to 9).toSet
   
-  def getHandler[Task](status:Int) : Option[StatusHandler] = {    
+  def getHandler[T >: TaskHandler](status:Int) : Option[TaskHandler] = {    
     if(status < 10) Some(new GenericStatusHandler(status))
     else None
   } 

@@ -1,14 +1,14 @@
 package clerk.flows.transfer
 
-import casablanca.handler.StatusHandler
+import casablanca.task.TaskHandler
 import casablanca.task.Task
-import casablanca.handler.HandlerUpdate
-import casablanca.handler.StatusUpdate
+import casablanca.task.HandlerUpdate
+import casablanca.task.StatusUpdate
 import DomainTransferConsts._
-import casablanca.handler.StatusHandler
-import casablanca.handler.StatusUpdate
+import casablanca.task.TaskHandler
+import casablanca.task.StatusUpdate
 
-class UpdateRegistryHandler extends StatusHandler {
+class UpdateRegistryHandler extends TaskHandler {
 
   def handle(task: Task): HandlerUpdate	= {
      println("Updating EPP with domain details (takes a second)")

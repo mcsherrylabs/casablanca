@@ -1,16 +1,17 @@
 package clerk.flows.transfer
 
-import casablanca.handler.StatusHandlerFactory
-import casablanca.handler.StatusHandler
+import casablanca.task.TaskHandlerFactory
+import casablanca.task.TaskHandler
 import casablanca.task.Task
 import casablanca.task.TaskImpl
 import casablanca.db.Row
+import casablanca.task.TaskManager
+import casablanca.task.BaseTask
 
 /**
  * This will become a real boy ...
  */
-class DomainTransferTask(row : Row) extends TaskImpl(row)
-
+class DomainTransferTask(t : Task) extends BaseTask(t)
 
 object DomainTransferConsts {
 	val domainTransferTaskType = "domainTransfer" 
@@ -24,17 +25,17 @@ object DomainTransferConsts {
 	val transferTaskComplete = 8
 }
 
-class DomainTransferHandlerFactory extends StatusHandlerFactory {
+class DomainTransferHandlerFactory(val tm: TaskManager) extends TaskHandlerFactory {
 
   import DomainTransferConsts._
   
-  def getSupportedStatuses: List[Int] = {
-    List(initialiseTransfer, updateRegistry, rejectTransfer, awaitOwnerReponse, acceptTransfer )
+  def getSupportedStatuses: Set[Int] = {
+    Set(initialiseTransfer, updateRegistry, rejectTransfer, awaitOwnerReponse, acceptTransfer )
   }
   
   def getTaskType: String = domainTransferTaskType
     
-  def getHandler[DomainTransferTask](status:Int) = {
+  def getHandler[T >: TaskHandler](status:Int) = {
     
     status match {
       case DomainTransferConsts.initialiseTransfer => Some(new InformOwnerHandler())
@@ -47,6 +48,9 @@ class DomainTransferHandlerFactory extends StatusHandlerFactory {
     
   } 
 
-
+  def createInitTask(domainName: String, aspirantId: String, ownerId: String) : DomainTransferTask = {
+    new DomainTransferTask(create(domainTransferTaskType, initialiseTransfer, 
+        Seq(domainName, aspirantId, ownerId).mkString(","), 0))
+  }
 }
 

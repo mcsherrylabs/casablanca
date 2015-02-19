@@ -7,7 +7,11 @@ import java.util.Date
 
 class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
-  val tmUnderTest = new TaskManager("taskManager")
+  val tmUnderTest = new TaskManager("taskManager") {
+    def fromTask(t: Task): Task = {
+      t
+    }
+  }
   
   val status = 4
   val intVal = 99

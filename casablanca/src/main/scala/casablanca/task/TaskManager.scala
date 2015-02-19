@@ -22,10 +22,10 @@ class TaskManager(configName: String) extends Configure {
   def getTask(taskId: String): Task = {
     val results = taskTable.filter(s" taskId = '${taskId}'")
     if(results.size != 1) throw new Error("Too many taskIds ")
-    else new TaskImpl(results.rows(0))
+    else fromRow(results.rows(0))
   }
   
-  def updateTaskStatus(taskId: String, statusUpdate: TaskUpdate): Task = {    
+  def updateTaskStatus[T >: Task](taskId: String, statusUpdate: TaskUpdate): T = {    
     val scheduleTimeUpdate = statusUpdate.scheduleAfter match {
       case None => s", scheduleTime = NULL"
       case Some(schedule) => s", scheduleTime = ${schedule.getTime}"
@@ -59,9 +59,11 @@ class TaskManager(configName: String) extends Configure {
     val res = taskTable.filter(sql)    
     // TODO, must change this to use task factory lookup to create 
     // the correct instance of a task for a task type.... 
-    res.map( new TaskImpl( _))  
+    res.map( t => fromRow(t))  
   }
   
   def close = db.shutdown
+  
+  def fromRow(r: Row): Task = new TaskImpl(r)
   
 }

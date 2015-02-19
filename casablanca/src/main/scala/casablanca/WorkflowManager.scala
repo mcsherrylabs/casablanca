@@ -1,20 +1,24 @@
 package casablanca
 
 import casablanca.task.Task
-import casablanca.handler.HandlerUpdate
-import casablanca.handler.StatusHandler
+import casablanca.task.HandlerUpdate
+import casablanca.task.TaskHandler
 import casablanca.queues.StatusQueueManager
 import casablanca.queues.Scheduler
 import casablanca.task.TaskManager
-import casablanca.handler.StatusHandlerFactory
+import casablanca.task.TaskHandlerFactory
 import java.util.Date
+import casablanca.task.TaskHandlerFactoryFactory
+import casablanca.queues.StatusQueue
+import casablanca.queues.StatusQueueWorker
 
 /**
  * Facade 
  */
 trait WorkflowManager {
 
-  def getHandler(status:Int): Option[StatusHandler]
+  def getTaskFactory[T <: TaskHandlerFactory](taskType: String): Option[T]
+  def getHandler(taskType: String, status:Int): Option[TaskHandler]
   def createTask(taskType: String, initialStatus: Int, strPayload: String, intPayload: Int, schedule: Option[Date] = None): Task 
   def pushTask(task:Task)
   def pushTask(task:Task , handlerResult: HandlerUpdate)
@@ -24,7 +28,7 @@ trait WorkflowManager {
 
 class WorkflowManagerImpl(tm: TaskManager,
     statusQManager: StatusQueueManager,
-    statusHandlerFactory: StatusHandlerFactory, 
+    statusHandlerFactory: TaskHandlerFactoryFactory, 
     scheduler: Scheduler) extends WorkflowManager {
   
   def stop {
@@ -35,12 +39,20 @@ class WorkflowManagerImpl(tm: TaskManager,
   def start {
     
     val statusQueues = statusQManager.statusQueues
-    statusQueues.map ( q => q.start)
-    
+    statusQueues.map ( q => q.init)
+    val workerQueue = new java.util.concurrent.ArrayBlockingQueue[StatusQueue](statusQueues.size)
+    statusQueues.foreach { e => workerQueue.put(e)}
+    for(i <- 0 to 5) {
+      new StatusQueueWorker(workerQueue).start
+    }
     scheduler.start
   }
   
-  def getHandler(status:Int): Option[StatusHandler] = statusHandlerFactory.getHandler(status)    
+  def getTaskFactory[T <: TaskHandlerFactory](taskType: String): Option[T] = {
+    statusHandlerFactory.getTaskFactory[T](taskType)
+  }
+  
+  def getHandler(taskType: String, status:Int): Option[TaskHandler] = statusHandlerFactory.getHandler(taskType, status)    
   
   def createTask(taskType: String, 
       initialStatus: Int, 

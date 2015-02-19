@@ -4,24 +4,30 @@ import casablanca.task.TaskManager
 import casablanca.queues.GenericStatusHandlerFactory
 import casablanca.queues.StatusQueueManager
 import casablanca.queues.Scheduler
-import casablanca.handler.StatusUpdate
+import casablanca.task.StatusUpdate
+import casablanca.task.TaskHandlerFactoryFactory
 
 object Main {
 
   def main(args: Array[String]): Unit = {
    
     val tm = new TaskManager("taskManager")
-    val shf = new GenericStatusHandlerFactory
+    val gsf = new GenericStatusHandlerFactory(tm)
+    val shf = TaskHandlerFactoryFactory(gsf)
+    
+    
     val statusQManager = new StatusQueueManager(tm, shf)
     
     val scheduler = new Scheduler(tm, statusQManager, 10)
     
-    scheduler.start
-    
-    val statusQueues = statusQManager.statusQueues
-    val threads = statusQueues.map ( q => q.start)    	
+    val workflowManager = new WorkflowManagerImpl(tm,
+    statusQManager,
+    shf, 
+    scheduler)
    
-    val t = statusQManager.createTask("taskType", 0, "strPayload", 33)
+    workflowManager.start
+    
+    val t = statusQManager.createTask(gsf.getTaskType, 0, "strPayload", 33)
     statusQManager.pushTask(t)
     
 //   tm.create("taskType", 2, "strPayload2", 33)

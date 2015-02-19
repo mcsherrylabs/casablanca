@@ -1,13 +1,13 @@
 package clerk.flows.transfer
 
-import casablanca.handler.StatusHandler
+import casablanca.task.TaskHandler
 import casablanca.task.Task
-import casablanca.handler.HandlerUpdate
-import casablanca.handler.StatusUpdate
+import casablanca.task.HandlerUpdate
+import casablanca.task.StatusUpdate
 import DomainTransferConsts._
-import casablanca.handler.StatusHandler
+import casablanca.task.TaskHandler
 
-class GetResponseHandler extends StatusHandler {
+class GetResponseHandler extends TaskHandler {
 
   def handle(task: Task): HandlerUpdate	= {
      println("Accept Transfer yes/no?")

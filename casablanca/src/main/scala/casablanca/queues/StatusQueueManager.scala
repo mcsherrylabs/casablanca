@@ -3,28 +3,38 @@ package casablanca.queues
 import casablanca.task.TaskManager
 import casablanca.task.Task
 import casablanca.task.TaskUpdate
-import casablanca.handler.StatusHandlerFactory
-import casablanca.handler.HandlerUpdate
-import casablanca.handler.ScheduledStatusUpdate
-import casablanca.handler.StatusUpdate
+import casablanca.task.TaskHandlerFactory
+import casablanca.task.HandlerUpdate
+import casablanca.task.ScheduledStatusUpdate
+import casablanca.task.StatusUpdate
+import casablanca.task.TaskHandlerFactoryFactory
 
-class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFactory) {
+class StatusQueueManager( tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) {
 
-  val statusQueueMap: Map[Int, StatusQueue] = {    
-    val taskType = statusHandlerFactory.getTaskType 
-    statusHandlerFactory.getSupportedStatuses.map( s => s -> new StatusQueue(s,taskType, this)).toMap
+  val statusQueueMap: Map[String, Map[Int, StatusQueue]] = {    
+    
+    taskHandlerFactoryFactory.getSupportedFactories.map( f => {
+      val taskType = f.getTaskType
+      val statusMap: Map[Int, StatusQueue] = {
+        f.getSupportedStatuses.map( s => 
+        	s -> new StatusQueue(s,taskType, this)).toMap
+        
+      }
+      (taskType -> statusMap)
+    }).toMap
+    
   }
   
-  val statusQueues = statusQueueMap.values
+  val statusQueues = statusQueueMap.values.flatMap(_.values)
 
-  def getHandler(status:Int) = statusHandlerFactory.getHandler(status)
+  def getHandler(taskType: String, status:Int) = taskHandlerFactoryFactory.getHandler(taskType, status)
   
   def createTask(taskType: String, initialStatus: Int, strPayload: String, intPayload: Int): Task  = {
     tm.create(taskType, initialStatus, strPayload, intPayload)
   }
   
   def pushTask(task:Task) {    
-    statusQueueMap.get(task.status).map( _.push(task))    
+    statusQueueMap.get(task.taskType).map( _.get(task.status).map( _.push(task)))    
   }
   
   def pushTask(task:Task , handlerResult: HandlerUpdate) {
@@ -42,7 +52,7 @@ class StatusQueueManager( tm: TaskManager, statusHandlerFactory: StatusHandlerFa
         try {
 	        val t = tm.updateTaskStatus(task.id, taskUpdate)
 	        //println(s"Pushed task ${t}")
-	        statusQueueMap.get(nextStatus).map( _.push(t))        
+	        statusQueueMap.get(t.taskType).map(_.get(nextStatus).map( _.push(t)))        
         } catch {
           case e: Exception => println(e.toString)
         }

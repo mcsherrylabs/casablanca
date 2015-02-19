@@ -4,26 +4,21 @@ import org.scalatest._
 import java.util.Date
 import casablanca.task.TaskManager
 import casablanca.queues.StatusQueueManager
-import casablanca.handler.StatusUpdate
+import casablanca.task.StatusUpdate
 import casablanca.queues.Scheduler
-import casablanca.WorkflowManagerImpl
+import casablanca.task.TaskHandlerFactoryFactory
 
 class DomainTransferSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   
   "DomainTransferHandlerFactory " should " support all aspects of status sequentially " in {
     
     val tm = new TaskManager("taskManager")
-    val domainTransferHandlerFactory = new DomainTransferHandlerFactory
-    val statusQManager = new StatusQueueManager(tm, domainTransferHandlerFactory)
+    val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
+    val shf = TaskHandlerFactoryFactory(domainTransferHandlerFactory)
+    val statusQManager = new StatusQueueManager(tm, shf)
     val scheduler = new Scheduler(tm, statusQManager, 10)
     
-    val workflowManager = new WorkflowManagerImpl(tm,
-    statusQManager,
-    domainTransferHandlerFactory, 
-    scheduler)
-   
-    val initialiseTransfer = new InitialiseTransfer(workflowManager)
-    val task = initialiseTransfer.createTransferTask("domainName", "aspirantId", "ownerId")
+    val task = domainTransferHandlerFactory.createInitTask("domainName", "aspirantId", "ownerId")
     assert(task.status == DomainTransferConsts.initialiseTransfer)
     val initialiseTransferHndlr = domainTransferHandlerFactory.getHandler(task.status).get
     initialiseTransferHndlr.handle(task) match {

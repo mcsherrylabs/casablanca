@@ -4,17 +4,23 @@ import casablanca.task.TaskManager
 import casablanca.queues.GenericStatusHandlerFactory
 import casablanca.queues.StatusQueueManager
 import casablanca.queues.Scheduler
-import casablanca.handler.StatusUpdate
+import casablanca.task.StatusUpdate
 import clerk.flows.transfer.DomainTransferHandlerFactory
-import clerk.flows.transfer.InitialiseTransfer
 import clerk.flows.transfer.DomainTransferConsts
+import clerk.flows.transfer.DomainTransferTask
+import casablanca.task.Task
+import casablanca.db.Row
+import casablanca.task.TaskHandlerFactoryFactory
 
 object DomainTransferMain {
 
   def main(args: Array[String]): Unit = {
    
-    val tm = new TaskManager("taskManager")
-    val shf = new DomainTransferHandlerFactory
+    val tm = new TaskManager("taskManager") 
+    
+    val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
+    val shf = TaskHandlerFactoryFactory(domainTransferHandlerFactory)
+    
     val statusQManager = new StatusQueueManager(tm, shf)   
     val scheduler = new Scheduler(tm, statusQManager, 120)
     
@@ -25,10 +31,10 @@ object DomainTransferMain {
    
     workflowManager.start
     
-    val transferStarter = new InitialiseTransfer(workflowManager)
+    val transferStarter = domainTransferHandlerFactory.createInitTask("domainName", "aspirantId", "ownerId")
+   
+    workflowManager.pushTask(transferStarter)
     
-    val transferTask = transferStarter.createTransferTask("domainName", "aspirantId", "ownerId")
-    transferStarter.initTransfer(transferTask)
     
     //println(s"Transfer Task Initialised ${transferTask}")
     //while(tm.getTask(transferTask.id).status != DomainTransferConsts.awaitOwnerReponse) {      

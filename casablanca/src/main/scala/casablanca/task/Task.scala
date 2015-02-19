@@ -26,6 +26,22 @@ trait Task {
   override def hashCode: Int = {
     (17 + id.hashCode) * 32 
   }
+
+  override def toString: String = {
+     s" ${id} ${status} ${taskType} ${attemptCount} ${createTime} ${schedule} ${intValue} ${strPayload}"
+  }
+ 
+}
+
+abstract class BaseTask(t: Task) extends Task {
+  val id : String = t.id
+  val createTime : Date = t.createTime
+  val schedule : Option[Date] = t.schedule
+  val taskType : String = t.taskType
+  val status : Int = t.status
+  val attemptCount : Int = t.attemptCount 
+  val strPayload : String = t.strPayload 
+  val intValue: Int = t.intValue
 }
 
 class TaskImpl(row : Row) extends Task {
@@ -48,8 +64,5 @@ class TaskImpl(row : Row) extends Task {
    
    val intValue : Int = row("intValue")
    val strPayload : String = row("strPayload")
-   
-   override def toString: String = {
-     s" ${id} ${status} ${taskType} ${attemptCount} ${createTime} ${schedule} ${intValue} ${strPayload}"
-   }
+ 
 } 
