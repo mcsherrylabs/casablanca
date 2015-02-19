@@ -17,12 +17,12 @@ object DomainTransferMain {
   def main(args: Array[String]): Unit = {
    
     val tm = new TaskManager("taskManager") 
-    
+    val gsf = new GenericStatusHandlerFactory(tm)
     val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
-    val shf = TaskHandlerFactoryFactory(domainTransferHandlerFactory)
+    val shf = TaskHandlerFactoryFactory(domainTransferHandlerFactory, gsf)
     
     val statusQManager = new StatusQueueManager(tm, shf)   
-    val scheduler = new Scheduler(tm, statusQManager, 120)
+    val scheduler = new Scheduler(tm, statusQManager, 10)
     
     val workflowManager = new WorkflowManagerImpl(tm,
     statusQManager,
@@ -32,17 +32,11 @@ object DomainTransferMain {
     workflowManager.start
     
     val transferStarter = domainTransferHandlerFactory.createInitTask("domainName", "aspirantId", "ownerId")
-   
+    
     workflowManager.pushTask(transferStarter)
     
-    
-    //println(s"Transfer Task Initialised ${transferTask}")
-    //while(tm.getTask(transferTask.id).status != DomainTransferConsts.awaitOwnerReponse) {      
-    //  Thread.sleep(1000)
-    //}
-    //println(s"Now waiting for for onwer response... ")
-    //statusQManager.pushTask(tm.getTask(transferTask.id), StatusUpdate(DomainTransferConsts.acceptTransfer));
-    //println(s"Transfer Accepted ... ")
+    val t = statusQManager.createTask(gsf.getTaskType, 0, "strPayload", 33)
+    statusQManager.pushTask(t)
     
   }
 

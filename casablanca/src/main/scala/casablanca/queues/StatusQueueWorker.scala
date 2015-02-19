@@ -18,17 +18,14 @@ class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) {
   private val runnable = new Runnable {
   
     override def run {
-      
-	      val polled = queue.poll(2000, TimeUnit.MILLISECONDS)
+	      val polled = queue.take
 	      try {
-	        if(polled != null) {
 		      val t = polled.poll
 		      polled.run(t)
-	        }
       	  } catch {
 		        case e:Exception => println(e)
 		  } finally {
-		        if(polled != null) queue.put(polled)
+		    queue.put(polled)
 		  }
       
       run
