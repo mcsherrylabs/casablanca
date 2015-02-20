@@ -6,10 +6,11 @@ import casablanca.task.HandlerUpdate
 import casablanca.task.StatusUpdate
 import DomainTransferConsts._
 import casablanca.task.TaskHandler
+import casablanca.task.TaskHandlerContext
 
 class FinaliseTransferHandler extends TaskHandler {
 
-  def handle(task: Task): HandlerUpdate	= {
+  def handle(taskContext: TaskHandlerContext,task: Task): HandlerUpdate	= {
      println("Transfer accepted and complete! ")
      StatusUpdate(transferTaskComplete)
   }

@@ -5,18 +5,25 @@ import java.util.Date
 trait HandlerUpdate 
 
 trait TaskHandler {
-	def handle(task: Task): HandlerUpdate	
-	def reTry(task: Task): HandlerUpdate = handle(task)
+	def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate	
+	def reTry(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = handle(taskHandlerContext, task)
 }
 
 
+trait TaskHandlerContext {
+  
+  val tm : TaskManager
+  
+  def createTask(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task = {
+    tm.create(taskType, status, strPayload, intPayload, scheduleTime)
+  }
+  
+  def startTask(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task 
+}
+
 trait TaskHandlerFactory {
   
-  val tm: TaskManager
-  
-  def create(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task = {
-    tm.create(taskType, status, strPayload, intPayload, scheduleTime)
-  } 
+  def init(taskHandlerContext: TaskHandlerContext, status: Int = 0, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None) : Option[Task] 
   
   def getTaskType: String
   def getSupportedStatuses: Set[Int]  

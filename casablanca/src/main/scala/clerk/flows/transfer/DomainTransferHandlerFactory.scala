@@ -7,6 +7,8 @@ import casablanca.task.TaskImpl
 import casablanca.db.Row
 import casablanca.task.TaskManager
 import casablanca.task.BaseTask
+import casablanca.task.TaskHandlerContext
+import java.util.Date
 
 /**
  * This will become a real boy ...
@@ -29,6 +31,14 @@ class DomainTransferHandlerFactory(val tm: TaskManager) extends TaskHandlerFacto
 
   import DomainTransferConsts._
   
+   def init(taskHandlerContext: TaskHandlerContext, 
+       status: Int = 0, 
+       strPayload: String = "", 
+       intPayload: Int = 0, 
+       scheduleTime: Option[Date] = None) : Option[Task] = {
+    Some(taskHandlerContext.startTask(domainTransferTaskType, status, strPayload, intPayload, scheduleTime))
+  }
+    
   def getSupportedStatuses: Set[Int] = {
     Set(initialiseTransfer, updateRegistry, rejectTransfer, awaitOwnerReponse, acceptTransfer )
   }
@@ -48,9 +58,9 @@ class DomainTransferHandlerFactory(val tm: TaskManager) extends TaskHandlerFacto
     
   } 
 
-  def createInitTask(domainName: String, aspirantId: String, ownerId: String) : DomainTransferTask = {
-    new DomainTransferTask(create(domainTransferTaskType, initialiseTransfer, 
-        Seq(domainName, aspirantId, ownerId).mkString(","), 0))
+  def createInitTask(taskHandlerContext: TaskHandlerContext, domainName: String, aspirantId: String, ownerId: String) : DomainTransferTask = {
+    val t = init(taskHandlerContext, initialiseTransfer, Seq(domainName, aspirantId, ownerId).mkString(","), 0)
+    new DomainTransferTask(t.get)
   }
 }
 

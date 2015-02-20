@@ -3,8 +3,9 @@ package casablanca.queues
 import casablanca.task.Task
 import java.util.concurrent.TimeUnit
 import casablanca.task.RelativeScheduledStatusUpdate
+import casablanca.task.TaskHandlerContext
 
-class StatusQueue(status: Int, val taskType: String, statusQueueManager: StatusQueueManager) {
+class StatusQueue(taskContext: TaskHandlerContext, status: Int, val taskType: String, statusQueueManager: StatusQueueManager) {
 
   private val maxRetries = 5
   private val statusHandler = statusQueueManager.getHandler(taskType , status).getOrElse( throw new Error(s"No handler exists for status ${status}"))
@@ -35,11 +36,11 @@ class StatusQueue(status: Int, val taskType: String, statusQueueManager: StatusQ
 	        
 	          if(t.attemptCount > 1) {
 	            if(t.attemptCount <= maxRetries) {
-	              val handlerResult = statusHandler.reTry(t)
+	              val handlerResult = statusHandler.reTry(taskContext, t)
 	              statusQueueManager.pushTask(t, handlerResult)
 	            } else println(s"Giving up on task ${t}, max try count exceeded (${maxRetries})")
 	          } else {
-	            val handlerResult = statusHandler.handle(t)
+	            val handlerResult = statusHandler.handle(taskContext, t)
 	            statusQueueManager.pushTask(t, handlerResult)
 	          }
 	          

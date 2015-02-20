@@ -8,8 +8,9 @@ import casablanca.task.HandlerUpdate
 import casablanca.task.ScheduledStatusUpdate
 import casablanca.task.StatusUpdate
 import casablanca.task.TaskHandlerFactoryFactory
+import casablanca.task.TaskHandlerContext
 
-class StatusQueueManager( tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) {
+class StatusQueueManager(taskContext: TaskHandlerContext, tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) {
 
   val statusQueueMap: Map[String, Map[Int, StatusQueue]] = {    
     
@@ -17,7 +18,7 @@ class StatusQueueManager( tm: TaskManager, taskHandlerFactoryFactory: TaskHandle
       val taskType = f.getTaskType
       val statusMap: Map[Int, StatusQueue] = {
         f.getSupportedStatuses.map( s => 
-        	s -> new StatusQueue(s,taskType, this)).toMap
+        	s -> new StatusQueue(taskContext, s,taskType, this)).toMap
         
       }
       (taskType -> statusMap)
