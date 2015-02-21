@@ -9,9 +9,24 @@ import casablanca.task.ScheduledStatusUpdate
 import casablanca.task.StatusUpdate
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskHandlerContext
+import java.util.Date
 
-class StatusQueueManager(taskContext: TaskHandlerContext, tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) {
+class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) {
 
+  lazy val taskContext: TaskHandlerContext = new TaskHandlerContext {
+       override def createTask(taskType: String, status: Int, strPayload: String = "", 
+           intPayload: Int = 0, scheduleTime: Option[Date] = None): Task = {
+    		   tm.create(taskType, status, strPayload, intPayload, scheduleTime)
+       }
+  
+       override def startTask(taskType: String, status: Int, strPayload: String = "", 
+           intPayload: Int = 0, scheduleTime: Option[Date] = None): Task = {
+         val t = createTask(taskType, status, strPayload, intPayload, scheduleTime)
+         pushTask(t)
+         t
+       } 
+  }
+  
   val statusQueueMap: Map[String, Map[Int, StatusQueue]] = {    
     
     taskHandlerFactoryFactory.getSupportedFactories.map( f => {

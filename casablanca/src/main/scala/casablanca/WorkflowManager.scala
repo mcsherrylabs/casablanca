@@ -17,12 +17,14 @@ import casablanca.queues.StatusQueueWorker
  */
 trait WorkflowManager {
 
-  def getTaskFactory[T <: TaskHandlerFactory](taskType: String): Option[T]
+  def start 
+  def stop 
+  /*def getTaskFactory[T <: TaskHandlerFactory](taskType: String): Option[T]
   def getHandler(taskType: String, status:Int): Option[TaskHandler]
   def createTask(taskType: String, initialStatus: Int, strPayload: String, intPayload: Int, schedule: Option[Date] = None): Task 
   def pushTask(task:Task)
   def pushTask(task:Task , handlerResult: HandlerUpdate)
-  def findTasks(taskType: String, status: Int) : List[Task]
+  def findTasks(taskType: String, status: Int) : List[Task]*/
 }
 
 

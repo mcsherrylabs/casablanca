@@ -11,6 +11,8 @@ import clerk.flows.transfer.DomainTransferTask
 import casablanca.task.Task
 import casablanca.db.Row
 import casablanca.task.TaskHandlerFactoryFactory
+import casablanca.task.TaskHandlerContext
+import java.util.Date
 
 object DomainTransferMain {
 
@@ -18,22 +20,21 @@ object DomainTransferMain {
    
     val tm = new TaskManager("taskManager") 
     val gsf = new GenericStatusHandlerFactory(tm)
-    val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
-    val shf = TaskHandlerFactoryFactory(domainTransferHandlerFactory, gsf)
+    //val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
+    val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, gsf)
     
     val statusQManager = new StatusQueueManager(tm, shf)   
     val scheduler = new Scheduler(tm, statusQManager, 10)
     
-    val workflowManager = new WorkflowManagerImpl(tm,
+    val workflowManager: WorkflowManager = new WorkflowManagerImpl(tm,
     statusQManager,
     shf, 
     scheduler)
    
     workflowManager.start
     
-    val transferStarter = domainTransferHandlerFactory.createInitTask("domainName", "aspirantId", "ownerId")
+    val transferStarter = DomainTransferHandlerFactory.createInitTask(statusQManager.taskContext, "domainName", "aspirantId", "ownerId")
     
-    workflowManager.pushTask(transferStarter)
     
     val t = statusQManager.createTask(gsf.getTaskType, 0, "strPayload", 33)
     statusQManager.pushTask(t)

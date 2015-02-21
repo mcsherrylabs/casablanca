@@ -11,19 +11,13 @@ trait TaskHandler {
 
 
 trait TaskHandlerContext {
-  
-  val tm : TaskManager
-  
-  def createTask(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task = {
-    tm.create(taskType, status, strPayload, intPayload, scheduleTime)
-  }
-  
+  def createTask(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task 
   def startTask(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None): Task 
 }
 
 trait TaskHandlerFactory {
   
-  def init(taskHandlerContext: TaskHandlerContext, status: Int = 0, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None) : Option[Task] 
+  //def init(taskHandlerContext: TaskHandlerContext, status: Int = 0, strPayload: String = "", intPayload: Int = 0, scheduleTime: Option[Date] = None) : Option[Task] 
   
   def getTaskType: String
   def getSupportedStatuses: Set[Int]  

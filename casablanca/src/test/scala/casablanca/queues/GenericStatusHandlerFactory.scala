@@ -6,12 +6,13 @@ import casablanca.task.TaskHandlerFactory
 import casablanca.task.HandlerUpdate
 import casablanca.task.StatusUpdate
 import casablanca.task.TaskManager
+import casablanca.task.TaskHandlerContext
 
 
 
 class GenericStatusHandler(val status: Int) extends TaskHandler {
     
-	def handle(task: Task): HandlerUpdate = {
+	def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 	  println(s"Consuming ${status} returning ${status + 1}, task.attemptCount is ${task.attemptCount}")
 	  Thread.sleep(1000)
 	  if(task.status == 4 && task.attemptCount < 3) {
@@ -21,9 +22,9 @@ class GenericStatusHandler(val status: Int) extends TaskHandler {
 	  StatusUpdate(status + 1)
 	}
 	
-	override def reTry(task: Task): HandlerUpdate = {
+	override def reTry(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 	  println(s"RETRY ${task.id} status ${task.status}, count ${task.attemptCount}  ")
-	  handle(task)
+	  handle(taskContext, task)
 	}
 }
 
