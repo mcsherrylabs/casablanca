@@ -13,15 +13,16 @@ import casablanca.db.Row
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskHandlerContext
 import java.util.Date
+import sss.micro.mailer.RemoteMailerTaskFactory
 
-object DomainTransferMain {
+object RemoteMailerMain {
 
   def main(args: Array[String]): Unit = {
 
     val tm = new TaskManager("taskManager")
     val gsf = new GenericStatusHandlerFactory(tm)
     //val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
-    val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, gsf)
+    val shf = TaskHandlerFactoryFactory(RemoteMailerTaskFactory)
 
     val statusQManager = new StatusQueueManager(tm, shf)
     val scheduler = new Scheduler(tm, statusQManager, 10)
@@ -33,10 +34,7 @@ object DomainTransferMain {
 
     workflowManager.start
 
-    val transferStarter = DomainTransferHandlerFactory.createInitTask(statusQManager.taskContext, "domainName", "aspirantId", "ownerId")
-
-    val t = statusQManager.createTask(gsf.getTaskType, 0, "strPayload", 33)
-    statusQManager.pushTask(t)
+    val mail = RemoteMailerTaskFactory.startRemoteTask(statusQManager.taskContext, "MAIL THIS")
 
   }
 

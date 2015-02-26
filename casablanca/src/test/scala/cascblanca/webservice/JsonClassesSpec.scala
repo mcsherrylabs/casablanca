@@ -4,15 +4,7 @@ import org.scalatest._
 import java.util.Date
 import spray.json._
 import DefaultJsonProtocol._
-
-case class RemoteTaskWithPayload(node: String, taskType: String, strPayload: String)
-case class Payload(some: String)
-
-object RemoteTaskWithPayloadJsonProtocol extends DefaultJsonProtocol {
-  implicit val remoteTaskWithPayloadFormat = jsonFormat3(RemoteTaskWithPayload)
-  implicit val payloadFormat = jsonFormat1(Payload)
-
-}
+import casablanca.webservice.remotetasks._
 
 class JsonClassesSpec extends FlatSpec with Matchers {
 
@@ -39,10 +31,7 @@ class JsonClassesSpec extends FlatSpec with Matchers {
         println("Payload " + payload)
         val parsed = payload.parseJson
         println("Parsed " + parsed)
-        parsed.convertTo[Payload] match {
-          case Payload("valid") =>
-          case x => fail("")
-        }
+
       }
       case x => fail(s"Didnt match ${x}")
     }

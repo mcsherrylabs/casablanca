@@ -46,10 +46,5 @@ object RemoteMailerTaskFactory extends RemoteTaskHandlerFactory {
     case x => super.getHandler(status)
   }
 
-  override def startRemoteTask(taskHandler: TaskHandlerContext, strPayload: String): Task = {
-    // add remote details
-    taskHandler.startTask(remoteTaskType, taskStarted, strPayload)
-  }
-
-  val remoteTask: RemoteTask = RemoteTask("localhost:7070", "mailerTask")
+  val remoteTask: RemoteTask = RemoteTask("http://localhost:7070", "mailerTask")
 }

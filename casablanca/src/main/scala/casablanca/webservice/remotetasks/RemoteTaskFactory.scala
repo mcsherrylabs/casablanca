@@ -27,6 +27,20 @@ import java.net.URL
 import casablanca.task.RemoteTask
 import com.typesafe.config.ConfigFactory
 import casablanca.util.Configure
+import spray.json._
+import DefaultJsonProtocol._
+
+object NodeConfig {
+  def toUrl(node: String): URL = new URL("http://localhost:8282")
+}
+
+case class RemoteTaskWithPayload(node: String, taskType: String, strPayload: String)
+
+object RemoteTaskWithPayloadJsonProtocol extends DefaultJsonProtocol {
+  implicit val remoteTaskWithPayloadFormat = jsonFormat3(RemoteTaskWithPayload)
+}
+
+import RemoteTaskWithPayloadJsonProtocol._
 
 object RemoteRestHandler extends TaskHandler with Configure {
 
@@ -35,10 +49,15 @@ object RemoteRestHandler extends TaskHandler with Configure {
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
+    val str = task.strPayload
+    val js = str.parseJson
+    println("IS " + js)
+    val remoteTaskCase = js.convertTo[RemoteTaskWithPayload]
     //execute a GET request
-    //config.getString(emoteTask.)
-    val myUrl = new URL("http://google.com")
-    val response = Await.result(GET(myUrl).apply, 10.second) //this will throw if the response doesn't return within 1 second
+
+    val myUrl = new URL(remoteTaskCase.node + "/task/" + remoteTaskCase.taskType)
+    val p = POST(myUrl).addBody(remoteTaskCase.strPayload)
+    val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
     StatusUpdate(awaitRepsonse)
   }
 }
@@ -57,7 +76,9 @@ trait RemoteTaskHandlerFactory extends TaskHandlerFactory {
   }
 
   def startRemoteTask(taskHandler: TaskHandlerContext, strPayload: String): Task = {
-    taskHandler.startTask(remoteTaskType, taskStarted, strPayload)
+    // add remote details
+    val json = RemoteTaskWithPayload(remoteTask.node, remoteTask.taskType, strPayload).toJson
+    taskHandler.startTask(remoteTaskType, taskStarted, json.compactPrint)
   }
 
 }

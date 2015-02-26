@@ -30,8 +30,8 @@ object MailHandler extends TaskHandler {
 
     val f = mailer(Envelope.from("alanmcsherry" at "gmail.com")
       .to("alan" `@` "mcsherrylabs.com")
-      .subject("miss you")
-      .content(Text("hi mom")))
+      .subject("MAiler Task")
+      .content(Text("Hello there business task in progress")))
 
     Await.result(f, Duration(60, TimeUnit.SECONDS))
     StatusUpdate(taskFinished)
