@@ -8,17 +8,38 @@ import DefaultJsonProtocol._
 import casablanca.WorkflowManager
 import sss.micro.mailer.MailerTaskFactory
 import casablanca.task.TaskHandlerContext
+import casablanca.webservice.remotetasks.RemoteTaskDecorator
+
+import casablanca.webservice.remotetasks.RemoteTaskWithPayloadJsonProtocol._
 
 class Endpoint(taskContext: TaskHandlerContext) extends Controller {
 
   /**
-   * Uploading files
+   *
    */
   post(s"/task/${MailerTaskFactory.getTaskType}") { request =>
 
     println(s"REQ: ${request.contentString}")
-    MailerTaskFactory.startTask(taskContext, request.contentString)
+    val str = request.contentString
+    val js = str.parseJson
+    println("IS " + js)
+    val remoteTaskCase = js.convertTo[RemoteTaskDecorator]
+
+    MailerTaskFactory.startTask(taskContext, Some(remoteTaskCase.node), remoteTaskCase.taskId, request.contentString)
     render.status(200).toFuture //.json(json.compactPrint).toFuture
+
+  }
+
+  post(s"/event/:taskId") { request =>
+
+    println(s"EVENT: ${request.contentString}")
+    request.routeParams.get("taskId") match {
+      case None => render.body("No task id! ").status(400).toFuture
+      case Some(tId) => {
+        taskContext.handleEvent(tId, request.contentString)
+        render.status(200).toFuture
+      }
+    }
 
   }
 

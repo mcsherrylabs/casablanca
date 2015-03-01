@@ -45,6 +45,7 @@ class StatusQueue(taskContext: TaskHandlerContext, status: Int, val taskType: St
 
       } catch {
         case ex: Exception => {
+
           println("Puked handling task, retry in 0 minutes")
           println(ex)
           statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, 0))

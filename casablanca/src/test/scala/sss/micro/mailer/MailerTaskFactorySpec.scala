@@ -19,7 +19,7 @@ class MailerTaskFactoySpec extends FlatSpec with Matchers with BeforeAndAfterAll
     val statusQManager = new StatusQueueManager(tm, shf)
     val scheduler = new Scheduler(tm, statusQManager, 10)
     val tc = statusQManager.taskContext
-    val task = mailerTaskFactory.startTask(tc, "")
+    val task = mailerTaskFactory.startTask(tc, None, None, "")
     assert(task.status == mailerTaskFactory.taskStarted)
     val mailer = mailerTaskFactory.getHandler(task.status)
     mailer.get.handle(tc, task) match {

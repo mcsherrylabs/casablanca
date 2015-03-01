@@ -34,9 +34,7 @@ object DomainTransferMain {
     workflowManager.start
 
     val transferStarter = DomainTransferHandlerFactory.createInitTask(statusQManager.taskContext, "domainName", "aspirantId", "ownerId")
-
-    val t = statusQManager.createTask(gsf.getTaskType, 0, "strPayload", 33)
-    statusQManager.pushTask(t)
+    val t = statusQManager.taskContext.startTask(gsf.getTaskType, 0, "strPayload", 33)
 
   }
 

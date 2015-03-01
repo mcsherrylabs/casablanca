@@ -31,35 +31,64 @@ import spray.json._
 import DefaultJsonProtocol._
 
 object NodeConfig {
+  val thisNode = "http://localhost:7070"
   def toUrl(node: String): URL = new URL("http://localhost:8282")
 }
 
-case class RemoteTaskWithPayload(node: String, taskType: String, strPayload: String)
+case class RemoteTaskDecorator(strPayload: String, node: String,
+  taskId: Option[String] = None,
+  taskType: Option[String] = None)
 
 object RemoteTaskWithPayloadJsonProtocol extends DefaultJsonProtocol {
-  implicit val remoteTaskWithPayloadFormat = jsonFormat3(RemoteTaskWithPayload)
+  implicit val remoteTaskWithPayloadFormat = jsonFormat4(RemoteTaskDecorator)
 }
 
 import RemoteTaskWithPayloadJsonProtocol._
 
-object RemoteRestHandler extends TaskHandler with Configure {
+trait RemoteRestHandler extends TaskHandler with Configure {
+  protected implicit val httpClient = new ApacheHttpClient
+  protected val awaitRepsonse = 1000
 
-  private implicit val httpClient = new ApacheHttpClient
-  val awaitRepsonse = 1000
+}
+
+object RemoteRestRequestHandler extends RemoteRestHandler {
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
     val str = task.strPayload
     val js = str.parseJson
     println("IS " + js)
-    val remoteTaskCase = js.convertTo[RemoteTaskWithPayload]
-    //execute a GET request
+    val remoteTaskCase = js.convertTo[RemoteTaskDecorator]
 
-    val myUrl = new URL(remoteTaskCase.node + "/task/" + remoteTaskCase.taskType)
-    val p = POST(myUrl).addBody(remoteTaskCase.strPayload)
+    val json = RemoteTaskDecorator(remoteTaskCase.strPayload, NodeConfig.thisNode, Some(task.id), None).toJson
+
+    val myUrl = new URL(remoteTaskCase.node + "/task/" + remoteTaskCase.taskType.get)
+    val p = POST(myUrl).addBody(json.prettyPrint)
     val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
     StatusUpdate(awaitRepsonse)
   }
+}
+
+object RemoteRestResponseHandler extends RemoteRestHandler {
+
+  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+
+    val myUrl = new URL(task.parentNode.get + "/event/" + task.id)
+    println("Firing back " + myUrl)
+    val p = POST(myUrl).addBody(task.strPayload)
+    val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
+    StatusUpdate(systemSuccess)
+  }
+}
+
+trait RemotedTaskHandlerFactory extends TaskHandlerFactory {
+
+  def getSupportedStatuses: Set[Int] = Set(taskFinished)
+  def getHandler[T >: TaskHandler](status: Int): Option[T] = status match {
+    case `taskFinished` => Some(RemoteRestResponseHandler)
+    case unsupported => None
+  }
+
 }
 
 trait RemoteTaskHandlerFactory extends TaskHandlerFactory {
@@ -69,15 +98,16 @@ trait RemoteTaskHandlerFactory extends TaskHandlerFactory {
   val remoteTaskType = "remoteTask"
   def getTaskType: String = remoteTaskType
 
-  def getSupportedStatuses: Set[Int] = Set(taskStarted)
+  def getSupportedStatuses: Set[Int] = Set(taskStarted, taskFinished)
   def getHandler[T >: TaskHandler](status: Int): Option[T] = status match {
-    case `taskStarted` => Some(RemoteRestHandler)
+    case `taskStarted` => Some(RemoteRestRequestHandler)
+    case `taskFinished` => Some(RemoteRestResponseHandler)
     case unsupported => None
   }
 
   def startRemoteTask(taskHandler: TaskHandlerContext, strPayload: String): Task = {
     // add remote details
-    val json = RemoteTaskWithPayload(remoteTask.node, remoteTask.taskType, strPayload).toJson
+    val json = RemoteTaskDecorator(strPayload, remoteTask.node, None, Some(remoteTask.taskType)).toJson
     taskHandler.startTask(remoteTaskType, taskStarted, json.compactPrint)
   }
 

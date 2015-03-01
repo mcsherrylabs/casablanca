@@ -14,8 +14,8 @@ class JsonClassesSpec extends FlatSpec with Matchers {
     val str = "{ \"node\" : \"localhost:7070\", \"taskType\" : \"mailerTask\", \"strPayload\" : \" { \\\"some\\\": \\\"valid\\\" } \" }"
     val js = str.parseJson
     println("IS " + js)
-    js.convertTo[RemoteTaskWithPayload] match {
-      case RemoteTaskWithPayload("localhost:7070", "mailerTask", " { \"some\": \"valid\" } ") =>
+    js.convertTo[RemoteTaskDecorator] match {
+      case RemoteTaskDecorator(" { \"some\": \"valid\" } ", "localhost:7070", None, Some("mailerTask")) =>
       case x => fail(s"Didnt match ${x}")
     }
 
@@ -26,8 +26,8 @@ class JsonClassesSpec extends FlatSpec with Matchers {
 
     val js2 = str.parseJson
     println("IS2 " + js2)
-    js2.convertTo[RemoteTaskWithPayload] match {
-      case RemoteTaskWithPayload("localhost:7070", "mailerTask", payload) => {
+    js2.convertTo[RemoteTaskDecorator] match {
+      case RemoteTaskDecorator(payload, "localhost:7070", None, Some("mailerTask")) => {
         println("Payload " + payload)
         val parsed = payload.parseJson
         println("Parsed " + parsed)
@@ -39,11 +39,11 @@ class JsonClassesSpec extends FlatSpec with Matchers {
   }
   it should " be able to json case class " in {
     //val str = "{ \"node\" : \"localhost:7070\", \"taskType\" : \"mailerTask\", \"strPayload\" : \"\" }"
-    val cc = RemoteTaskWithPayload("localhost:7070", "mailerTask", "{ \"some\": \"valid\" }")
+    val cc = RemoteTaskDecorator("{ \"some\": \"valid\" }", "localhost:7070", None, Some("mailerTask"))
     val asStr = cc.toJson
 
-    asStr.convertTo[RemoteTaskWithPayload] match {
-      case RemoteTaskWithPayload("localhost:7070", "mailerTask", "{ \"some\": \"valid\" }") =>
+    asStr.convertTo[RemoteTaskDecorator] match {
+      case RemoteTaskDecorator("{ \"some\": \"valid\" }", "localhost:7070", None, Some("mailerTask")) =>
       case x => fail(s"Didnt match ${x}")
     }
   }

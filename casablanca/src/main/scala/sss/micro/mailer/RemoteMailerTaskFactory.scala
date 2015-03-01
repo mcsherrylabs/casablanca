@@ -46,5 +46,10 @@ object RemoteMailerTaskFactory extends RemoteTaskHandlerFactory {
     case x => super.getHandler(status)
   }
 
+  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
+    println(s"Got something back from mailer: ${event}")
+    Some(StatusUpdate(onRepsonse))
+  }
+
   val remoteTask: RemoteTask = RemoteTask("http://localhost:7070", "mailerTask")
 }
