@@ -17,6 +17,8 @@ import scala.util.Failure
 import casablanca.task.TaskStatus
 import scala.language.reflectiveCalls
 import casablanca.webservice.remotetasks.RemotedTaskHandlerFactory
+import casablanca.task.TaskDescriptor
+import casablanca.task.TaskParent
 
 object MailHandler extends TaskHandler {
 
@@ -55,12 +57,12 @@ object MailerTaskFactory extends RemotedTaskHandlerFactory {
     case _ => super.getHandler(status)
   }
 
-  def startTask(taskHandler: TaskHandlerContext,
+  /*def startTask(taskContext: TaskHandlerContext,
     parentNode: Option[String],
     parentTaskId: Option[String],
     strPayload: String): Task = {
-    taskHandler.startTask(mailerTaskType, taskStarted, strPayload, 0, parentTaskId, parentNode)
-  }
+    taskContext.startTask(TaskDescriptor(mailerTaskType, taskStarted, strPayload), TaskParent(parentTaskId, parentNode))
+  }*/
 
   override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
     println(s"MailerTaskFactory Got something back from mailer: ${event}")

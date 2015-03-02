@@ -13,6 +13,7 @@ import casablanca.db.Row
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskHandlerContext
 import java.util.Date
+import casablanca.task.TaskDescriptor
 
 object DomainTransferMain {
 
@@ -34,7 +35,8 @@ object DomainTransferMain {
     workflowManager.start
 
     val transferStarter = DomainTransferHandlerFactory.createInitTask(statusQManager.taskContext, "domainName", "aspirantId", "ownerId")
-    val t = statusQManager.taskContext.startTask(gsf.getTaskType, 0, "strPayload", 33)
+    val t = statusQManager.taskContext.startTask(
+      TaskDescriptor(gsf.getTaskType, 0, "strPayload"))
 
   }
 

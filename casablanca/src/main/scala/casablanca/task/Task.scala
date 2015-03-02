@@ -3,8 +3,12 @@ package casablanca.task
 import java.util.Date
 import casablanca.db.Row
 
-case class TaskUpdate(val nextStatus: Int, strPayload: Option[String] = None, intValue: Option[Int] = None, scheduleAfter: Option[Date] = None,
+case class TaskUpdate(val nextStatus: Int, strPayload: Option[String] = None, scheduleAfter: Option[Date] = None,
   numAttempts: Int = 0)
+
+case class TaskParent(taskId: String, node: Option[String] = None)
+case class TaskDescriptor(taskType: String, status: Int, strPayload: String) extends TaskStatus
+case class TaskSchedule(when: Date)
 
 trait Task {
   val parentNode: Option[String]
@@ -16,7 +20,6 @@ trait Task {
   val status: Int
   val attemptCount: Int
   val strPayload: String
-  val intValue: Int
 
   override def equals(other: Any): Boolean = {
     other match {
@@ -30,7 +33,7 @@ trait Task {
   }
 
   override def toString: String = {
-    s" ${id} ${status} ${taskType} ${attemptCount} ${createTime} ${schedule} ${intValue} ${strPayload}"
+    s" ${id} ${status} ${taskType} ${attemptCount} ${createTime} ${schedule} ${strPayload}"
   }
 
 }
@@ -43,7 +46,7 @@ abstract class BaseTask(t: Task) extends Task {
   val status: Int = t.status
   val attemptCount: Int = t.attemptCount
   val strPayload: String = t.strPayload
-  val intValue: Int = t.intValue
+
   val parentNode: Option[String] = t.parentNode
   val parentTaskId: Option[String] = t.parentTaskId
 }
@@ -66,7 +69,6 @@ class TaskImpl(row: Row) extends Task {
 
   val attemptCount: Int = row("attemptCount")
 
-  val intValue: Int = row("intValue")
   val strPayload: String = row("strPayload")
 
   val parentNode: Option[String] = row[String]("parentNode") match {

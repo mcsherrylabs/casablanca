@@ -29,17 +29,11 @@ trait TaskHandler extends TaskStatus {
   def reTry(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = handle(taskHandlerContext, task)
 }
 
-trait TaskHandlerContext {
-  def createTask(taskType: String, status: Int, strPayload: String = "",
-    intPayload: Int = 0,
-    parentTaskId: Option[String] = None,
-    parentNode: Option[String] = None,
-    scheduleTime: Option[Date] = None): Task
+trait TaskHandlerContext extends CreateTask with TaskStatus {
 
-  def startTask(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0,
-    parentTaskId: Option[String] = None,
-    parentNode: Option[String] = None,
-    scheduleTime: Option[Date] = None): Task
+  def startTask(descriptor: TaskDescriptor,
+    schedule: Option[TaskSchedule] = None,
+    parent: Option[TaskParent] = None): Task
 
   def handleEvent(taskId: String, ev: String)
   def pushTask(task: Task, update: StatusUpdate)
@@ -85,21 +79,21 @@ trait TaskHandlerFactory extends TaskStatus {
 
 trait TaskHandlerFactoryFactory {
   def getTaskFactory[T <: TaskHandlerFactory](taskType: String): Option[T]
-  def getSupportedFactories: List[TaskHandlerFactory]
+  val supportedFactories: List[TaskHandlerFactory]
   def getHandler(taskType: String, status: Int): Option[TaskHandler]
 }
 
 object TaskHandlerFactoryFactory {
   def apply(factories: TaskHandlerFactory*): TaskHandlerFactoryFactory = new TaskHandlerFactoryFactory {
 
-    def getSupportedFactories: List[TaskHandlerFactory] = factories.toList
+    val supportedFactories: List[TaskHandlerFactory] = factories.toList
 
     def getTaskFactory[T <: TaskHandlerFactory](taskType: String): Option[T] = {
       factories.find(tf => tf.getTaskType == taskType).map(_.asInstanceOf[T])
     }
 
     def getHandler(taskType: String, status: Int): Option[TaskHandler] = {
-      val f = getSupportedFactories.find(tf => tf.getTaskType == taskType)
+      val f = supportedFactories.find(tf => tf.getTaskType == taskType)
       f.flatMap(_.getHandler(status))
     }
   }
@@ -108,8 +102,8 @@ object TaskHandlerFactoryFactory {
 
 object RelativeScheduledStatusUpdate {
 
-  def apply(nextStatus: Int, minutesInFuture: Int, newStringPayload: Option[String] = None, newIntValue: Option[Int] = None): ScheduledStatusUpdate = {
-    ScheduledStatusUpdate(nextStatus, createFutureDate(minutesInFuture), newStringPayload, newIntValue)
+  def apply(nextStatus: Int, minutesInFuture: Int, newStringPayload: Option[String] = None): ScheduledStatusUpdate = {
+    ScheduledStatusUpdate(nextStatus, createFutureDate(minutesInFuture), newStringPayload)
   }
 
   private def createFutureDate(minutesInFuture: Int): Date = {
@@ -118,6 +112,6 @@ object RelativeScheduledStatusUpdate {
   }
 }
 
-case class StatusUpdate(nextStatus: Int, newStringPayload: Option[String] = None, newIntValue: Option[Int] = None, attemptCount: Int = 0) extends HandlerUpdate
-case class ScheduledStatusUpdate(nextStatus: Int, scheduleAfter: Date, newStringPayload: Option[String] = None, newIntValue: Option[Int] = None) extends HandlerUpdate
+case class StatusUpdate(nextStatus: Int, newStringPayload: Option[String] = None, attemptCount: Int = 0) extends HandlerUpdate
+case class ScheduledStatusUpdate(nextStatus: Int, scheduleAfter: Date, newStringPayload: Option[String] = None) extends HandlerUpdate
 

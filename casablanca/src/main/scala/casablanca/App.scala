@@ -18,7 +18,6 @@ object App extends FinatraServer {
 
   val tm = new TaskManager("taskManager")
 
-  //val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
   val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, MailerTaskFactory)
 
   val statusQManager = new StatusQueueManager(tm, shf)

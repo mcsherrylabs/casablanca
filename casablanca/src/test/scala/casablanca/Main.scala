@@ -6,6 +6,7 @@ import casablanca.queues.StatusQueueManager
 import casablanca.queues.Scheduler
 import casablanca.task.StatusUpdate
 import casablanca.task.TaskHandlerFactoryFactory
+import casablanca.task.TaskDescriptor
 
 object Main {
 
@@ -26,7 +27,7 @@ object Main {
 
     workflowManager.start
 
-    val t = statusQManager.taskContext.startTask(gsf.getTaskType, 0, "strPayload", 33)
+    val t = statusQManager.taskContext.startTask(TaskDescriptor(gsf.getTaskType, 0, "strPayload"))
 
     //   tm.create("taskType", 2, "strPayload2", 33)
     //   tm.create("taskType", 2, "strPayload2", 33)

@@ -9,25 +9,35 @@ import casablanca.WorkflowManager
 import sss.micro.mailer.MailerTaskFactory
 import casablanca.task.TaskHandlerContext
 import casablanca.webservice.remotetasks.RemoteTaskDecorator
-
 import casablanca.webservice.remotetasks.RemoteTaskWithPayloadJsonProtocol._
+import casablanca.task.TaskParent
+import casablanca.task.TaskDescriptor
 
 class Endpoint(taskContext: TaskHandlerContext) extends Controller {
 
   /**
    *
    */
-  post(s"/task/${MailerTaskFactory.getTaskType}") { request =>
+  post(s"/task/:taskType") { request =>
 
     println(s"REQ: ${request.contentString}")
-    val str = request.contentString
-    val js = str.parseJson
-    println("IS " + js)
-    val remoteTaskCase = js.convertTo[RemoteTaskDecorator]
+    request.routeParams.get("taskId") match {
+      case None => render.body("No task type! ").status(400).toFuture
+      case Some(tType) => {
+        val str = request.contentString
+        val js = str.parseJson
+        println("IS " + js)
+        val remoteTaskCase = js.convertTo[RemoteTaskDecorator]
+        taskContext.startTask(
+          TaskDescriptor(tType, taskContext.taskStarted, remoteTaskCase.strPayload),
+          None,
+          Some(TaskParent(remoteTaskCase.taskId.get, Some(remoteTaskCase.node))))
 
-    MailerTaskFactory.startTask(taskContext, Some(remoteTaskCase.node), remoteTaskCase.taskId, request.contentString)
-    render.status(200).toFuture //.json(json.compactPrint).toFuture
+        render.status(200).toFuture
 
+      }
+
+    }
   }
 
   post(s"/event/:taskId") { request =>

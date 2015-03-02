@@ -5,37 +5,48 @@ import casablanca.db._
 import java.util.UUID
 import java.util.Date
 
-class TaskManager(configName: String) extends Configure {
+trait CreateTask {
+  def create(descriptor: TaskDescriptor,
+    scheduleTime: Option[TaskSchedule] = None,
+    parent: Option[TaskParent] = None): Task
+}
+
+class TaskManager(configName: String) extends Configure with CreateTask {
 
   private val myConfig = config(configName)
 
   private val db = new Db(myConfig.getString("db"))
   private val taskTable = db.table(myConfig.getString("taskTableName"))
 
-  //taskId , createTime taskType status attemptCount scheduleTime strPayload intValue 
-  def create(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0,
+  override def create(descriptor: TaskDescriptor,
+    schedule: Option[TaskSchedule] = None,
+    parent: Option[TaskParent]): Task = {
+
+    val uuid = UUID.randomUUID.toString
+    taskTable.insert(parent.map(_.node), parent.map(_.taskId), uuid, new Date(), descriptor.taskType, descriptor.status, 0, schedule.map(_.when), descriptor.strPayload)
+    getTask(uuid)
+  }
+
+  /*def create(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0,
     scheduleTime: Option[Date] = None,
     parentNode: Option[String] = None,
     parentTaskId: Option[String] = None): Task = {
     val uuid = UUID.randomUUID.toString
     taskTable.insert(parentNode, parentTaskId, uuid, new Date(), taskType, status, 0, scheduleTime, strPayload, intPayload)
     getTask(uuid)
-  }
+  }*/
 
   def getTask(taskId: String): Task = {
     val results = taskTable.filter(s" taskId = '${taskId}'")
-    if (results.size != 1) throw new Error("Too many taskIds ")
+    if (results.size != 1) throw new Error(s"Too many taskIds for ${taskId}")
     else fromRow(results.rows(0))
   }
 
-  def updateTaskStatus[T >: Task](taskId: String, statusUpdate: TaskUpdate): T = {
+  def updateTaskStatus(taskId: String, statusUpdate: TaskUpdate): Task = {
+
     val scheduleTimeUpdate = statusUpdate.scheduleAfter match {
       case None => s", scheduleTime = NULL"
       case Some(schedule) => s", scheduleTime = ${schedule.getTime}"
-    }
-    val intValueUpdate = statusUpdate.intValue match {
-      case None => ""
-      case Some(newIntValue) => s", intValue = ${newIntValue}"
     }
 
     val strPayloadUpdate = statusUpdate.strPayload match {
@@ -43,7 +54,7 @@ class TaskManager(configName: String) extends Configure {
       case Some(newPayload) => s", strPayload = '${newPayload}'"
     }
 
-    val sql = s"status = ${statusUpdate.nextStatus}, attemptCount = ${statusUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate} ${strPayloadUpdate} ${intValueUpdate}"
+    val sql = s"status = ${statusUpdate.nextStatus}, attemptCount = ${statusUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate} ${strPayloadUpdate} "
     //println(s"Update task ${taskId} sql -> ${sql}")
     taskTable.update(sql, s"taskId = '${taskId}' ")
     getTask(taskId)
@@ -60,8 +71,6 @@ class TaskManager(configName: String) extends Configure {
 
   private def findTasksImpl(sql: String): List[Task] = {
     val res = taskTable.filter(sql)
-    // TODO, must change this to use task factory lookup to create 
-    // the correct instance of a task for a task type.... 
     res.map(t => fromRow(t))
   }
 

@@ -30,6 +30,8 @@ import casablanca.util.Configure
 import spray.json._
 import DefaultJsonProtocol._
 
+import casablanca.task.TaskDescriptor
+
 object NodeConfig {
   val thisNode = "http://localhost:7070"
   def toUrl(node: String): URL = new URL("http://localhost:8282")
@@ -43,15 +45,16 @@ object RemoteTaskWithPayloadJsonProtocol extends DefaultJsonProtocol {
   implicit val remoteTaskWithPayloadFormat = jsonFormat4(RemoteTaskDecorator)
 }
 
-import RemoteTaskWithPayloadJsonProtocol._
-
 trait RemoteRestHandler extends TaskHandler with Configure {
+
   protected implicit val httpClient = new ApacheHttpClient
   protected val awaitRepsonse = 1000
 
 }
 
 object RemoteRestRequestHandler extends RemoteRestHandler {
+
+  import RemoteTaskWithPayloadJsonProtocol._
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
@@ -93,6 +96,7 @@ trait RemotedTaskHandlerFactory extends TaskHandlerFactory {
 
 trait RemoteTaskHandlerFactory extends TaskHandlerFactory {
 
+  import RemoteTaskWithPayloadJsonProtocol._
   val remoteTask: RemoteTask
 
   val remoteTaskType = "remoteTask"
@@ -105,10 +109,10 @@ trait RemoteTaskHandlerFactory extends TaskHandlerFactory {
     case unsupported => None
   }
 
-  def startRemoteTask(taskHandler: TaskHandlerContext, strPayload: String): Task = {
+  def startRemoteTask(taskContext: TaskHandlerContext, strPayload: String): Task = {
     // add remote details
     val json = RemoteTaskDecorator(strPayload, remoteTask.node, None, Some(remoteTask.taskType)).toJson
-    taskHandler.startTask(remoteTaskType, taskStarted, json.compactPrint)
+    taskContext.startTask(TaskDescriptor(remoteTaskType, taskStarted, json.compactPrint))
   }
 
 }
