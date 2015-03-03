@@ -1,6 +1,6 @@
 package clerk.flows.transfer
 
-import casablanca.task.TaskHandlerFactory
+import casablanca.task.BaseTaskHandlerFactory
 import casablanca.task.TaskHandler
 import casablanca.task.Task
 import casablanca.task.TaskImpl
@@ -28,7 +28,7 @@ object DomainTransferConsts {
   val transferTaskComplete = 8
 }
 
-object DomainTransferHandlerFactory extends TaskHandlerFactory {
+object DomainTransferHandlerFactory extends BaseTaskHandlerFactory {
 
   import DomainTransferConsts._
 

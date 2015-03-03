@@ -1,5 +1,6 @@
 package casablanca.webservice.remotetasks
 
+import casablanca.task.BaseTaskHandlerFactory
 import casablanca.task.TaskHandlerFactory
 import casablanca.task.TaskHandlerContext
 import casablanca.task.Task
@@ -84,7 +85,7 @@ object RemoteRestResponseHandler extends RemoteRestHandler {
   }
 }
 
-trait RemotedTaskHandlerFactory extends TaskHandlerFactory {
+trait RemotedTaskHandlerFactory extends BaseTaskHandlerFactory {
 
   def getSupportedStatuses: Set[Int] = Set(taskFinished)
   def getHandler[T >: TaskHandler](status: Int): Option[T] = status match {
@@ -94,7 +95,7 @@ trait RemotedTaskHandlerFactory extends TaskHandlerFactory {
 
 }
 
-trait RemoteTaskHandlerFactory extends TaskHandlerFactory {
+trait RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
 
   import RemoteTaskWithPayloadJsonProtocol._
   val remoteTask: RemoteTask

@@ -3,6 +3,7 @@ package casablanca.queues
 import casablanca.task.Task
 import casablanca.task.TaskHandler
 import casablanca.task.TaskHandlerFactory
+import casablanca.task.BaseTaskHandlerFactory
 import casablanca.task.HandlerUpdate
 import casablanca.task.StatusUpdate
 import casablanca.task.TaskManager
@@ -28,7 +29,7 @@ class GenericStatusHandler(val status: Int) extends TaskHandler {
 	}
 }
 
-class GenericStatusHandlerFactory(val tm: TaskManager) extends TaskHandlerFactory {
+class GenericStatusHandlerFactory(val tm: TaskManager) extends BaseTaskHandlerFactory {
 
   def getTaskType : String = "genericTask"
   

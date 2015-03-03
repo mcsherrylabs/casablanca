@@ -1,6 +1,6 @@
-import NativePackagerKeys._
+//import NativePackagerKeys._
 
-packageArchetype.java_application
+//packageArchetype.java_application
 
 scalaVersion := "2.10.4"
 

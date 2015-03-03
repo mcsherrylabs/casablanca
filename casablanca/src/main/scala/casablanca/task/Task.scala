@@ -6,9 +6,6 @@ import casablanca.db.Row
 case class TaskUpdate(val nextStatus: Int, strPayload: Option[String] = None, scheduleAfter: Option[Date] = None,
   numAttempts: Int = 0)
 
-case class TaskParent(taskId: String, node: Option[String] = None)
-case class TaskDescriptor(taskType: String, status: Int, strPayload: String) extends TaskStatus
-case class TaskSchedule(when: Date)
 
 trait Task {
   val parentNode: Option[String]
