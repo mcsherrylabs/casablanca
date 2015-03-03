@@ -8,10 +8,9 @@ import DefaultJsonProtocol._
 import casablanca.WorkflowManager
 import sss.micro.mailer.MailerTaskFactory
 import casablanca.task.TaskHandlerContext
-import casablanca.webservice.remotetasks.RemoteTaskDecorator
-import casablanca.webservice.remotetasks.RemoteTaskWithPayloadJsonProtocol._
 import casablanca.task.TaskParent
 import casablanca.task.TaskDescriptor
+import casablanca.webservice.remotetasks.RemoteTaskHelper._
 
 class Endpoint(taskContext: TaskHandlerContext) extends Controller {
 
@@ -21,13 +20,11 @@ class Endpoint(taskContext: TaskHandlerContext) extends Controller {
   post(s"/task/:taskType") { request =>
 
     println(s"REQ: ${request.contentString}")
-    request.routeParams.get("taskId") match {
+    request.routeParams.get("taskType") match {
       case None => render.body("No task type! ").status(400).toFuture
       case Some(tType) => {
         val str = request.contentString
-        val js = str.parseJson
-        println("IS " + js)
-        val remoteTaskCase = js.convertTo[RemoteTaskDecorator]
+        val remoteTaskCase = toRemoteTaskDecorator(str)
         taskContext.startTask(
           TaskDescriptor(tType, taskContext.taskStarted, remoteTaskCase.strPayload),
           None,

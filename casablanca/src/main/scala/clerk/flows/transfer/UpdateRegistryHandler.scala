@@ -11,9 +11,9 @@ import casablanca.task.TaskHandlerContext
 
 class UpdateRegistryHandler extends TaskHandler {
 
-  def handle(taskContext: TaskHandlerContext,task: Task): HandlerUpdate	= {
-     println("Updating EPP with domain details (takes a second)")
-     Thread.sleep(1000)
-     StatusUpdate(acceptTransfer)
+  def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+    println("Updating EPP with domain details (takes a second)")
+    Thread.sleep(1000)
+    StatusUpdate(acceptTransfer.value)
   }
 }

@@ -10,35 +10,37 @@ import casablanca.task.BaseTask
 import casablanca.task.TaskHandlerContext
 import java.util.Date
 import casablanca.task.TaskDescriptor
+import casablanca.task.TaskStatus
+import casablanca.task.TaskStatuses
 
 /**
  * This will become a real boy ...
  */
 class DomainTransferTask(t: Task) extends BaseTask(t)
 
-object DomainTransferConsts {
-  val domainTransferTaskType = "domainTransfer"
-  val initialiseTransfer = 1
-  val informOwner = 2
-  val awaitOwnerReponse = 3
-  val updateRegistry = 4
-  val acceptTransfer = 5
-  val rejectTransfer = 6
-  val cancelTransfer = 7
-  val transferTaskComplete = 8
+object DomainTransferConsts extends TaskStatuses {
+
+  val initialiseTransfer = TaskStatus(1000)
+  val informOwner = TaskStatus(2000)
+  val awaitOwnerReponse = TaskStatus(3000)
+  val updateRegistry = TaskStatus(4000)
+  val acceptTransfer = TaskStatus(5000)
+  val rejectTransfer = TaskStatus(6000)
+  val cancelTransfer = TaskStatus(7000)
+  val transferTaskComplete = TaskStatus(8000)
 }
 
 object DomainTransferHandlerFactory extends BaseTaskHandlerFactory {
 
   import DomainTransferConsts._
 
-  def getSupportedStatuses: Set[Int] = {
-    Set(initialiseTransfer, updateRegistry, rejectTransfer, awaitOwnerReponse, acceptTransfer)
+  override def getSupportedStatuses: Set[TaskStatus] = {
+    Set(initialiseTransfer, updateRegistry, rejectTransfer, awaitOwnerReponse, acceptTransfer) ++ super.getSupportedStatuses
   }
 
-  def getTaskType: String = domainTransferTaskType
+  def getTaskType: String = "domainTransfer"
 
-  def getHandler[T >: TaskHandler](status: Int) = {
+  override def getHandler[T >: TaskHandler](status: TaskStatus) = {
 
     status match {
       case DomainTransferConsts.initialiseTransfer => Some(new InformOwnerHandler())
@@ -46,14 +48,14 @@ object DomainTransferHandlerFactory extends BaseTaskHandlerFactory {
       case DomainTransferConsts.awaitOwnerReponse => Some(new GetResponseHandler())
       case DomainTransferConsts.acceptTransfer => Some(new FinaliseTransferHandler())
       case DomainTransferConsts.rejectTransfer => Some(new RejectTransferHandler())
-      case _ => None
+      case _ => super.getHandler(status)
     }
 
   }
 
   def createInitTask(taskHandlerContext: TaskHandlerContext, domainName: String, aspirantId: String, ownerId: String): DomainTransferTask = {
     new DomainTransferTask(taskHandlerContext.startTask(
-      TaskDescriptor(domainTransferTaskType, initialiseTransfer, Seq(domainName, aspirantId, ownerId).mkString(","))))
+      TaskDescriptor(getTaskType, initialiseTransfer, Seq(domainName, aspirantId, ownerId).mkString(","))))
   }
 }
 

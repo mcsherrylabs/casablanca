@@ -13,6 +13,7 @@ import java.util.Date
 import casablanca.task.TaskDescriptor
 import casablanca.task.TaskSchedule
 import casablanca.task.TaskParent
+import casablanca.task.TaskStatus
 
 class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) {
 
@@ -52,7 +53,7 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
       val taskType = f.getTaskType
       val statusMap: Map[Int, StatusQueue] = {
         f.getSupportedStatuses.map(s =>
-          s -> new StatusQueue(taskContext, s, taskType, this)).toMap
+          s.value -> new StatusQueue(taskContext, s.value, taskType, this)).toMap
 
       }
       (taskType -> statusMap)
@@ -62,7 +63,7 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
 
   val statusQueues = statusQueueMap.values.flatMap(_.values)
 
-  def getHandler(taskType: String, status: Int) = taskHandlerFactoryFactory.getHandler(taskType, status)
+  def getHandler(taskType: String, status: Int) = taskHandlerFactoryFactory.getHandler(taskType, TaskStatus(status))
 
   def pushTask(task: Task) {
     statusQueueMap.get(task.taskType).map(_.get(task.status).map(_.push(task)))

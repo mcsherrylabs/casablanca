@@ -4,35 +4,41 @@ import java.util.LinkedHashMap
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.TimeUnit
+import casablanca.util.Lockable
+import casablanca.util.Logging
+import casablanca.webservice.remotetasks.TaskDoneHandler
 
-trait BaseTaskHandlerFactory extends TaskHandlerFactory {
+/*object TaskFinishedHandler extends TaskHandler with Logging {
+  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+    log.info(s"FINSHED(SUCCESS)${task}")
+    StatusUpdate(systemFinished.value)
+  }
+}
 
-  private def lruCache(maxSize: Int) = {
-    new LinkedHashMap[String, Lock](maxSize * 4 / 3, 0.75f, true) {
-      override def removeEldestEntry(eldest: java.util.Map.Entry[String, Lock]): Boolean = {
-        size() > maxSize
+object TaskFailedHandler extends TaskHandler with Logging {
+  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+    log.info(s"FINSHED(FAILED) ${task}")
+    StatusUpdate(systemFinished.value)
+  }
+}*/
+
+trait BaseTaskHandlerFactory extends TaskHandlerFactory with Lockable[String] with Logging {
+
+  override def getSupportedStatuses: Set[TaskStatus] = Set(taskFinished, taskFailed)
+
+  override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = {
+    status match {
+      case `taskFinished` => Some(TaskDoneHandler)
+      case `taskFailed` => Some(TaskDoneHandler)
+      case x => {
+        log.warn(s"No handler found for status ${x} in Base Factory ")
+        None
       }
     }
   }
 
-  private val taskLockCache = lruCache(12)
-  
-  def getSupportedStatuses: Set[Int]
-  def getHandler[T >: TaskHandler](status: Int): Option[T]
-
   def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: String) {
-    val l: Lock = taskLockCache.synchronized {
-      if (!taskLockCache.containsKey(task.id)) {
-        taskLockCache.put(task.id, new ReentrantLock)
-      }
-      taskLockCache.get(task.id)
-    }
-    try {
-      if (l.tryLock(1000, TimeUnit.MILLISECONDS)) {
-        println("GOING TO CONSUME")
-        consume(taskContext, task, ev) map { up => taskContext.pushTask(task, up) }
-      } else throw new RuntimeException(s"Could not lock task id ${task.id}")
-    } finally l.unlock
+    doLocked[Option[StatusUpdate]](task.id, () => consume(taskContext, task, ev)) map { up => taskContext.pushTask(task, up) }
   }
 
   def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {

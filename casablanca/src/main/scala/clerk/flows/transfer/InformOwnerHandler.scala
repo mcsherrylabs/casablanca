@@ -7,12 +7,11 @@ import casablanca.task.StatusUpdate
 import DomainTransferConsts._
 import casablanca.task.TaskHandlerContext
 
-
 class InformOwnerHandler extends TaskHandler {
 
-  def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate	= {
-     
+  def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+
     println(s"Informing owner ${task.strPayload}")
-    StatusUpdate(awaitOwnerReponse)
+    StatusUpdate(awaitOwnerReponse.value)
   }
 }

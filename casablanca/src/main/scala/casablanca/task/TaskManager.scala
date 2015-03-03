@@ -23,18 +23,9 @@ class TaskManager(configName: String) extends Configure with CreateTask {
     parent: Option[TaskParent]): Task = {
 
     val uuid = UUID.randomUUID.toString
-    taskTable.insert(parent.map(_.node), parent.map(_.taskId), uuid, new Date(), descriptor.taskType, descriptor.status, 0, schedule.map(_.when), descriptor.strPayload)
+    taskTable.insert(parent.map(_.node), parent.map(_.taskId), uuid, new Date(), descriptor.taskType, descriptor.status.value, 0, schedule.map(_.when), descriptor.strPayload)
     getTask(uuid)
   }
-
-  /*def create(taskType: String, status: Int, strPayload: String = "", intPayload: Int = 0,
-    scheduleTime: Option[Date] = None,
-    parentNode: Option[String] = None,
-    parentTaskId: Option[String] = None): Task = {
-    val uuid = UUID.randomUUID.toString
-    taskTable.insert(parentNode, parentTaskId, uuid, new Date(), taskType, status, 0, scheduleTime, strPayload, intPayload)
-    getTask(uuid)
-  }*/
 
   def getTask(taskId: String): Task = {
     val results = taskTable.filter(s" taskId = '${taskId}'")

@@ -10,8 +10,8 @@ import casablanca.task.TaskHandlerContext
 
 class FinaliseTransferHandler extends TaskHandler {
 
-  def handle(taskContext: TaskHandlerContext,task: Task): HandlerUpdate	= {
-     println("Transfer accepted and complete! ")
-     StatusUpdate(transferTaskComplete)
+  def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+    println("Transfer accepted and complete! ")
+    StatusUpdate(transferTaskComplete.value)
   }
 }

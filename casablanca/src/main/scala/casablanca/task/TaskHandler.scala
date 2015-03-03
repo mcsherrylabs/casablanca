@@ -6,19 +6,17 @@ import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.TimeUnit
 
-
-
 sealed case class TaskStatus(value: Int)
 
-trait SystemTaskStatuses {      
+trait SystemTaskStatuses {
   val systemFinished = TaskStatus(0)
-  val systemFailed = TaskStatus(1)     
+  val systemFailed = TaskStatus(1)
 }
 
 trait TaskStatuses extends SystemTaskStatuses {
   val taskFinished = TaskStatus(100)
   val taskFailed = TaskStatus(101)
-  val taskStarted = TaskStatus(102)         
+  val taskStarted = TaskStatus(102)
 }
 
 //object TaskStatus extends SystemTaskStatus {
@@ -36,23 +34,21 @@ trait TaskStatuses extends SystemTaskStatuses {
   val taskStarted = 101
 }*/
 
-case class RemoteTask(node: String, taskType: String)
+trait HandlerUpdate extends TaskStatuses
 
-trait HandlerUpdate
-
-trait TaskHandler extends TaskStatus {
+trait TaskHandler extends TaskStatuses {
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate
   def reTry(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = handle(taskHandlerContext, task)
 }
 
-trait TaskHandlerFactory extends TaskStatus {
+trait TaskHandlerFactory extends TaskStatuses {
 
   def getTaskType: String
   def getSupportedStatuses: Set[TaskStatus]
   def getHandler[T >: TaskHandler](status: TaskStatus): Option[T]
-  def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: String) 
-  def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] 
-    
+  def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: String)
+  def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate]
+
 }
 
 object RelativeScheduledStatusUpdate {
@@ -65,6 +61,14 @@ object RelativeScheduledStatusUpdate {
     val now = new Date()
     new Date(now.getTime + (minutesInFuture * 1000 * 60))
   }
+}
+
+case class SystemSuccess(newStringPayload: Option[String] = None, attemptCount: Int = 0) extends HandlerUpdate {
+  val nextStatus: Int = systemFinished.value
+}
+
+case class Success(newStringPayload: Option[String] = None, attemptCount: Int = 0) extends HandlerUpdate {
+  val nextStatus: Int = taskFinished.value
 }
 
 case class StatusUpdate(nextStatus: Int, newStringPayload: Option[String] = None, attemptCount: Int = 0) extends HandlerUpdate

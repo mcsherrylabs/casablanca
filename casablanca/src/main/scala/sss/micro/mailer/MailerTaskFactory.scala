@@ -16,9 +16,9 @@ import scala.util.Success
 import scala.util.Failure
 import casablanca.task.TaskStatus
 import scala.language.reflectiveCalls
-import casablanca.webservice.remotetasks.RemotedTaskHandlerFactory
 import casablanca.task.TaskDescriptor
 import casablanca.task.TaskParent
+import casablanca.task.BaseTaskHandlerFactory
 
 object MailHandler extends TaskHandler {
 
@@ -37,7 +37,7 @@ object MailHandler extends TaskHandler {
       .content(Text("Hello there business task in progress")))
 
     Await.result(f, Duration(60, TimeUnit.SECONDS))
-    StatusUpdate(taskFinished)
+    StatusUpdate(taskFinished.value)
   }
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
@@ -46,23 +46,16 @@ object MailHandler extends TaskHandler {
 
 }
 
-object MailerTaskFactory extends RemotedTaskHandlerFactory {
+object MailerTaskFactory extends BaseTaskHandlerFactory {
 
   val mailerTaskType = "mailerTask"
   def getTaskType: String = mailerTaskType
 
-  override def getSupportedStatuses: Set[Int] = super.getSupportedStatuses ++ Set(taskStarted)
-  override def getHandler[T >: TaskHandler](status: Int): Option[T] = status match {
+  override def getSupportedStatuses: Set[TaskStatus] = super.getSupportedStatuses ++ Set(taskStarted)
+  override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = status match {
     case `taskStarted` => Some(MailHandler)
     case _ => super.getHandler(status)
   }
-
-  /*def startTask(taskContext: TaskHandlerContext,
-    parentNode: Option[String],
-    parentTaskId: Option[String],
-    strPayload: String): Task = {
-    taskContext.startTask(TaskDescriptor(mailerTaskType, taskStarted, strPayload), TaskParent(parentTaskId, parentNode))
-  }*/
 
   override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
     println(s"MailerTaskFactory Got something back from mailer: ${event}")

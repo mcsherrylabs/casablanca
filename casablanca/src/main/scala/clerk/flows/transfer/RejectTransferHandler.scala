@@ -9,9 +9,9 @@ import casablanca.task.TaskHandlerContext
 
 class RejectTransferHandler extends TaskHandler {
 
-  def handle(taskContext: TaskHandlerContext,task: Task): HandlerUpdate	= {
-     
+  def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+
     println(s"Transfer rejected ")
-    StatusUpdate(transferTaskComplete)
+    StatusUpdate(transferTaskComplete.value)
   }
 }

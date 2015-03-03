@@ -7,7 +7,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val tmUnderTest = new TaskManager("taskManager")
 
-  val status = 4
+  val status = TaskStatus(4)
   val strPayload = "strPayload"
   val taskType = "type1"
 
@@ -23,7 +23,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val t = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload))
     assert(t.attemptCount == 0)
     assert(t.id != null)
-    assert(t.status == status)
+    assert(t.status == status.value)
     assert(t.schedule == None)
     assert(t.createTime.getTime >= aroundNow.getTime)
     assert(t.createTime.getTime < aroundNow.getTime + 500)
@@ -33,7 +33,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should " find the task (using get or find) " in {
-    val foundTasks = tmUnderTest.findTasks(taskType, status)
+    val foundTasks = tmUnderTest.findTasks(taskType, status.value)
     assert(foundTasks.size > 0)
     foundTasks map {
       t =>
@@ -51,11 +51,11 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should " update the task status " in {
     val t = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload))
 
-    val taskUpdate = TaskUpdate(status + 1, Some("newStringPayload"))
+    val taskUpdate = TaskUpdate(status.value + 1, Some("newStringPayload"))
     val updatedTask = tmUnderTest.updateTaskStatus(t.id, taskUpdate)
-    assert(updatedTask.status == status + 1)
+    assert(updatedTask.status == status.value + 1)
     val retrievedUpdatedTask = tmUnderTest.getTask(t.id)
-    assert(retrievedUpdatedTask.status == status + 1)
+    assert(retrievedUpdatedTask.status == status.value + 1)
 
     assert(retrievedUpdatedTask.strPayload == "newStringPayload")
   }
@@ -75,9 +75,9 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val scheduled = new Date(new Date().getTime + 100000)
 
-    val taskUpdate = TaskUpdate(status + 1, None, Some(scheduled))
+    val taskUpdate = TaskUpdate(status.value + 1, None, Some(scheduled))
     val updatedTask = tmUnderTest.updateTaskStatus(t.id, taskUpdate)
-    assert(updatedTask.status == status + 1)
+    assert(updatedTask.status == status.value + 1)
     val retrievedUpdatedTask = tmUnderTest.getTask(t.id)
     assert(retrievedUpdatedTask.schedule == Some(scheduled))
   }
@@ -85,7 +85,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should " not find a task with a schedule " in {
     val t = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload), Some(TaskSchedule(new Date())))
     //val t = tmUnderTest.create(taskType, status, strPayload, intVal, Some(new Date()))
-    val foundTasks = tmUnderTest.findTasks(taskType, status)
+    val foundTasks = tmUnderTest.findTasks(taskType, status.value)
     assert(foundTasks.size > 0)
     foundTasks map {
       foundTask =>
@@ -137,7 +137,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     var taskUpdate = TaskUpdate(task.status, None, None, task.attemptCount + 1)
     task = tmUnderTest.updateTaskStatus(task.id, taskUpdate)
     assert(task.attemptCount == 1)
-    taskUpdate = TaskUpdate(status + 1)
+    taskUpdate = TaskUpdate(status.value + 1)
     val updatedTask = tmUnderTest.updateTaskStatus(task.id, taskUpdate)
     assert(updatedTask.attemptCount == 0)
 

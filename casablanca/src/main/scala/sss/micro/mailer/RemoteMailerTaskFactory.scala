@@ -15,22 +15,22 @@ import java.util.concurrent.TimeUnit
 import scala.util.Success
 import scala.util.Failure
 import casablanca.task.TaskStatus
+import casablanca.webservice.remotetasks.RemoteTask
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import com.stackmob.newman.dsl._
 import com.stackmob.newman._
 import scala.concurrent._
 import scala.concurrent.duration._
 import java.net.URL
-import casablanca.task.RemoteTask
 
 object OnReponseHandler extends TaskHandler {
 
-  val onRepsonse = 1001
+  val onRepsonse = TaskStatus(1001)
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
     println(s"Got ${task.strPayload} from mailer returning done")
-    StatusUpdate(taskFinished)
+    StatusUpdate(taskFinished.value)
 
   }
 }
@@ -39,16 +39,16 @@ object RemoteMailerTaskFactory extends RemoteTaskHandlerFactory {
 
   import OnReponseHandler.onRepsonse
 
-  override def getSupportedStatuses: Set[Int] = super.getSupportedStatuses ++ Set(onRepsonse)
+  override def getSupportedStatuses: Set[TaskStatus] = super.getSupportedStatuses ++ Set(onRepsonse)
 
-  override def getHandler[T >: TaskHandler](status: Int): Option[T] = status match {
+  override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = status match {
     case `onRepsonse` => Some(OnReponseHandler)
     case x => super.getHandler(status)
   }
 
   override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
     println(s"Got something back from mailer: ${event}")
-    Some(StatusUpdate(onRepsonse))
+    Some(StatusUpdate(onRepsonse.value))
   }
 
   val remoteTask: RemoteTask = RemoteTask("http://localhost:7070", "mailerTask")

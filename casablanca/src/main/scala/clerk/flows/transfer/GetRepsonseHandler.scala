@@ -10,12 +10,12 @@ import casablanca.task.TaskHandlerContext
 
 class GetResponseHandler extends TaskHandler {
 
-  def handle(taskContext: TaskHandlerContext,task: Task): HandlerUpdate	= {
-     println("Accept Transfer yes/no?")
-     readBoolean match {
-       case true => StatusUpdate(updateRegistry)
-       case x => StatusUpdate(rejectTransfer) 
-     }
-     
+  def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+    println("Accept Transfer yes/no?")
+    readBoolean match {
+      case true => StatusUpdate(updateRegistry.value)
+      case x => StatusUpdate(rejectTransfer.value)
+    }
+
   }
 }

@@ -14,6 +14,7 @@ import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskHandlerContext
 import java.util.Date
 import casablanca.task.TaskDescriptor
+import casablanca.task.TaskStatus
 
 object DomainTransferMain {
 
@@ -36,7 +37,7 @@ object DomainTransferMain {
 
     val transferStarter = DomainTransferHandlerFactory.createInitTask(statusQManager.taskContext, "domainName", "aspirantId", "ownerId")
     val t = statusQManager.taskContext.startTask(
-      TaskDescriptor(gsf.getTaskType, 0, "strPayload"))
+      TaskDescriptor(gsf.getTaskType, TaskStatus(0), "strPayload"))
 
   }
 

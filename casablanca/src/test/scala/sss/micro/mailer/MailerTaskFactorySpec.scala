@@ -9,7 +9,8 @@ import casablanca.queues.Scheduler
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskStatus
 import casablanca.task.TaskDescriptor
-import casablanca.webservice.remotetasks.RemoteRestResponseHandler
+import casablanca.task.TaskStatus
+import casablanca.webservice.remotetasks.TaskDoneHandler
 
 class MailerTaskFactoySpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
@@ -22,10 +23,12 @@ class MailerTaskFactoySpec extends FlatSpec with Matchers with BeforeAndAfterAll
     val scheduler = new Scheduler(tm, statusQManager, 10)
     val tc = statusQManager.taskContext
     val task = tc.startTask(TaskDescriptor(mailerTaskFactory.getTaskType, tc.taskStarted, ""))
-    assert(task.status == mailerTaskFactory.taskStarted)
-    val mailer = mailerTaskFactory.getHandler(task.status)
+    assert(task.status == mailerTaskFactory.taskStarted.value)
+    val mailer = mailerTaskFactory.getHandler(TaskStatus(task.status))
     mailer.get.handle(tc, task) match {
-      case su: StatusUpdate => assert(mailerTaskFactory.getHandler(su.nextStatus) == Some(RemoteRestResponseHandler))
+      case su: StatusUpdate => assert(
+        mailerTaskFactory.getHandler(TaskStatus(su.nextStatus))
+          == Some(TaskDoneHandler))
       case x => fail("Wrong type")
     }
 

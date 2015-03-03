@@ -28,6 +28,8 @@ libraryDependencies += "javax.mail" % "mail" % "1.4"
 
 libraryDependencies += "me.lessis" %% "courier" % "0.1.3"
 
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
+
 resolvers += "Twitter" at "http://maven.twttr.com"
 
 resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven"

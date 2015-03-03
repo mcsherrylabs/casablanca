@@ -3,7 +3,7 @@ package casablanca.task
 trait TaskHandlerFactoryFactory {
   def getTaskFactory[T <: TaskHandlerFactory](taskType: String): Option[T]
   val supportedFactories: List[TaskHandlerFactory]
-  def getHandler(taskType: String, status: Int): Option[TaskHandler]
+  def getHandler(taskType: String, status: TaskStatus): Option[TaskHandler]
 }
 
 object TaskHandlerFactoryFactory {
@@ -15,7 +15,7 @@ object TaskHandlerFactoryFactory {
       factories.find(tf => tf.getTaskType == taskType).map(_.asInstanceOf[T])
     }
 
-    def getHandler(taskType: String, status: Int): Option[TaskHandler] = {
+    def getHandler(taskType: String, status: TaskStatus): Option[TaskHandler] = {
       val f = supportedFactories.find(tf => tf.getTaskType == taskType)
       f.flatMap(_.getHandler(status))
     }
