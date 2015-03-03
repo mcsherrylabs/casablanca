@@ -6,7 +6,27 @@ import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.TimeUnit
 
-trait TaskStatus {
+
+
+sealed case class TaskStatus(value: Int)
+
+trait SystemTaskStatuses {      
+  val systemFinished = TaskStatus(0)
+  val systemFailed = TaskStatus(1)     
+}
+
+trait TaskStatuses extends SystemTaskStatuses {
+  val taskFinished = TaskStatus(100)
+  val taskFailed = TaskStatus(101)
+  val taskStarted = TaskStatus(102)         
+}
+
+//object TaskStatus extends SystemTaskStatus {
+//      type TaskStatus = Value
+//      val taskFinished, taskStarted, taskFailed = Value  
+//}
+
+/*trait TaskStatus {
   val systemFinished = 0
   val systemFailed = 1
   val systemSuccess = 2
@@ -14,7 +34,7 @@ trait TaskStatus {
 
   val taskFinished = 100
   val taskStarted = 101
-}
+}*/
 
 case class RemoteTask(node: String, taskType: String)
 
@@ -28,13 +48,12 @@ trait TaskHandler extends TaskStatus {
 trait TaskHandlerFactory extends TaskStatus {
 
   def getTaskType: String
-  def getSupportedStatuses: Set[Int]
-  def getHandler[T >: TaskHandler](status: Int): Option[T]
+  def getSupportedStatuses: Set[TaskStatus]
+  def getHandler[T >: TaskHandler](status: TaskStatus): Option[T]
   def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: String) 
   def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] 
     
 }
-
 
 object RelativeScheduledStatusUpdate {
 

@@ -36,7 +36,7 @@ trait BaseTaskHandlerFactory extends TaskHandlerFactory {
   }
 
   def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
-    throw new UnsupportedOperationException
+    throw new UnsupportedOperationException("One must override 'consume' in order to consume events.")
   }
 
 }
