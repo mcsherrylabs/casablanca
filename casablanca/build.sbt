@@ -8,6 +8,8 @@ name := "casablanca"
 
 version := "1.0"
 
+EclipseKeys.withSource := true
+
 scalacOptions ++= Seq("-deprecation", "-feature")
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.2"

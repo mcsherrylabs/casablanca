@@ -11,6 +11,7 @@ import casablanca.task.TaskStatus
 import casablanca.task.TaskDescriptor
 import casablanca.task.TaskStatus
 import casablanca.webservice.remotetasks.TaskDoneHandler
+import casablanca.task.HandlerUpdate
 
 class MailerTaskFactoySpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
@@ -26,8 +27,8 @@ class MailerTaskFactoySpec extends FlatSpec with Matchers with BeforeAndAfterAll
     assert(task.status == mailerTaskFactory.taskStarted.value)
     val mailer = mailerTaskFactory.getHandler(TaskStatus(task.status))
     mailer.get.handle(tc, task) match {
-      case su: StatusUpdate => assert(
-        mailerTaskFactory.getHandler(TaskStatus(su.nextStatus))
+      case su: HandlerUpdate => assert(
+        mailerTaskFactory.getHandler(TaskStatus(su.nextStatus.get))
           == Some(TaskDoneHandler))
       case x => fail("Wrong type")
     }

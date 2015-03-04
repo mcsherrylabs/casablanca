@@ -33,20 +33,16 @@ class TaskManager(configName: String) extends Configure with CreateTask {
     else fromRow(results.rows(0))
   }
 
-  def updateTaskStatus(taskId: String, statusUpdate: TaskUpdate): Task = {
+  def updateTaskStatus(taskId: String, taskUpdate: TaskUpdate): Task = {
 
-    val scheduleTimeUpdate = statusUpdate.scheduleAfter match {
+    val scheduleTimeUpdate = taskUpdate.scheduleAfter match {
       case None => s", scheduleTime = NULL"
       case Some(schedule) => s", scheduleTime = ${schedule.getTime}"
     }
 
-    val strPayloadUpdate = statusUpdate.strPayload match {
-      case None => ""
-      case Some(newPayload) => s", strPayload = '${newPayload}'"
-    }
+    val strPayloadUpdate = s", strPayload = '${taskUpdate.strPayload}'"
 
-    val sql = s"status = ${statusUpdate.nextStatus}, attemptCount = ${statusUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate} ${strPayloadUpdate} "
-    //println(s"Update task ${taskId} sql -> ${sql}")
+    val sql = s"status = ${taskUpdate.nextStatus}, attemptCount = ${taskUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate} ${strPayloadUpdate} "
     taskTable.update(sql, s"taskId = '${taskId}' ")
     getTask(taskId)
   }

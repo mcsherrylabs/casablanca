@@ -38,10 +38,11 @@ trait BaseTaskHandlerFactory extends TaskHandlerFactory with Lockable[String] wi
   }
 
   def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: String) {
-    doLocked[Option[StatusUpdate]](task.id, () => consume(taskContext, task, ev)) map { up => taskContext.pushTask(task, up) }
+    //consume(taskContext, task, ev)
+    doLocked[Option[HandlerUpdate]](task.id, () => consume(taskContext, task, ev)) map { up => taskContext.pushTask(task, up) }
   }
 
-  def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
+  def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate] = {
     throw new UnsupportedOperationException("One must override 'consume' in order to consume events.")
   }
 

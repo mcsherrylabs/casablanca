@@ -16,7 +16,10 @@ object RemoteTaskHelper {
     js.convertTo[RemoteTaskDecorator]
   }
 
-  def fromRemoteTaskDecorator(decorator: RemoteTaskDecorator): String = {
+  def fromRemoteTaskDecorator(strPayload: String, node: String,
+    taskId: Option[String] = None,
+    taskType: Option[String] = None): String = {
+    val decorator = RemoteTaskDecorator(strPayload, node, taskId, taskType)
     val js = decorator.toJson
     js.compactPrint
   }

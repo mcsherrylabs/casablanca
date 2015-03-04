@@ -11,6 +11,9 @@ import java.util.Date
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.queues.StatusQueue
 import casablanca.queues.StatusQueueWorker
+import casablanca.webservice.RestServer
+import casablanca.util.Logging
+import scala.concurrent.Future
 
 /**
  *
@@ -24,7 +27,8 @@ trait WorkflowManager {
 class WorkflowManagerImpl(tm: TaskManager,
   statusQManager: StatusQueueManager,
   statusHandlerFactory: TaskHandlerFactoryFactory,
-  scheduler: Scheduler) extends WorkflowManager {
+  scheduler: Scheduler,
+  restServer: RestServer) extends WorkflowManager with Logging {
 
   def stop {
     // todo add other stops for threads
@@ -33,14 +37,26 @@ class WorkflowManagerImpl(tm: TaskManager,
 
   def start {
 
+    val when = new Date().getTime
+    log.info("Starting casablanca ... ")
     val statusQueues = statusQManager.statusQueues
     statusQueues.map(q => q.init)
     val workerQueue = new java.util.concurrent.ArrayBlockingQueue[StatusQueue](statusQueues.size)
     statusQueues.foreach { e => workerQueue.put(e) }
+
+    import scala.concurrent.ExecutionContext.Implicits.global
+
+    Future { restServer.start }
+    log.info("Started REST server ... ")
+
     for (i <- 0 to 5) {
       new StatusQueueWorker(workerQueue).start
+      log.info(s"Started task queue worker # ${i + 1} ... ")
     }
     scheduler.start
+    log.info("Started scheduler ... ")
+    val later = new Date().getTime
+    log.info(s"Casablanca startup sucessful in ${later - when} ms !")
   }
 
 }

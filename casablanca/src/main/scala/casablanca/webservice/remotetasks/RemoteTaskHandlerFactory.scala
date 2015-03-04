@@ -31,6 +31,8 @@ import casablanca.task.TaskDescriptor
 import casablanca.task.Success
 import casablanca.util.Logging
 import casablanca.task.SystemSuccess
+import casablanca.task.TaskParent
+import casablanca.task.AwaitEvent
 
 trait RemoteRestHandler extends TaskHandler with Configure with Logging {
 
@@ -47,16 +49,16 @@ object RemoteRestRequestHandler extends RemoteRestHandler {
 
     val remoteTaskCase = toRemoteTaskDecorator(str)
 
-    val newMsg = fromRemoteTaskDecorator(RemoteTaskDecorator(
+    val newMsg = fromRemoteTaskDecorator(
       remoteTaskCase.strPayload,
-      NodeConfig.thisNode,
+      NodeConfig.localNode,
       Some(task.id),
-      None))
+      None)
 
-    val myUrl = new URL(remoteTaskCase.node + "/task/" + remoteTaskCase.taskType.get)
+    val myUrl = new URL(NodeConfig.map(remoteTaskCase.node) + "/task/" + remoteTaskCase.taskType.get)
     val p = POST(myUrl).addBody(newMsg)
     val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
-    StatusUpdate(awaitRepsonse)
+    HandlerUpdate.awaitEvent
   }
 }
 
@@ -66,15 +68,15 @@ object TaskDoneHandler extends RemoteRestHandler {
 
     def callParentAsEvent: HandlerUpdate = {
       taskHandlerContext.handleEvent(task.parentTaskId.get, task.strPayload)
-      SystemSuccess()
+      SystemSuccess.apply
     }
 
     def callParentRemotely: HandlerUpdate = {
-      val myUrl = new URL(task.parentNode.get + "/event/" + task.id)
+      val myUrl = new URL(task.parentNode.get + "/event/" + task.parentTaskId.get)
       println("Firing back " + myUrl)
       val p = POST(myUrl).addBody(task.strPayload)
       val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
-      SystemSuccess()
+      HandlerUpdate.systemSuccess
     }
 
     (task.parentNode, task.parentTaskId) match {
@@ -82,7 +84,7 @@ object TaskDoneHandler extends RemoteRestHandler {
       case (None, Some(taskId)) => callParentAsEvent
       case x => {
         log.info("No parent, all Done ")
-        SystemSuccess()
+        HandlerUpdate.systemSuccess
       }
     }
   }
@@ -104,11 +106,15 @@ trait RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
     case unsupported => super.getHandler(status)
   }
 
-  def startRemoteTask(taskContext: TaskHandlerContext, strPayload: String): Task = {
+  def startRemoteTask(taskContext: TaskHandlerContext, strPayload: String, parent: Option[TaskParent] = None): Task = {
     // add remote details
-    val decorated = RemoteTaskDecorator(strPayload, remoteTask.node, None, Some(remoteTask.taskType))
+    val decorated = fromRemoteTaskDecorator(strPayload, remoteTask.node, None, Some(remoteTask.taskType))
+    taskContext.startTask(TaskDescriptor(remoteTaskType, taskStarted, decorated), None,
+      parent)
+  }
 
-    taskContext.startTask(TaskDescriptor(remoteTaskType, taskStarted, fromRemoteTaskDecorator(decorated)))
+  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate] = {
+    Some(HandlerUpdate.success)
   }
 
 }

@@ -5,8 +5,10 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import casablanca.task.TaskManager
 import casablanca.task.StatusUpdate
+import casablanca.task.HandlerUpdate
+import casablanca.util.Logging
 
-class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeconds: Int) {
+class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeconds: Int) extends Logging {
 
   private val runnable = new Runnable {
     def run {
@@ -23,8 +25,13 @@ class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeco
     tm.findScheduledTasks(beforeWhen) foreach {
       t =>
         {
-          println(s"Scheduler found task ${t}")
-          sqm.pushTask(t, StatusUpdate(t.status, None, t.attemptCount))
+          try {
+            log.debug(s"Scheduler found task ${t}")
+            sqm.pushTask(t, HandlerUpdate(None, None, Some(None)))
+          } catch {
+            case e: Exception => log.error(s"Scheduler failed to push task ${t}")
+          }
+
         }
     }
   }

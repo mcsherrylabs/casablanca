@@ -14,6 +14,7 @@ import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskHandlerContext
 import java.util.Date
 import sss.micro.mailer.RemoteMailerTaskFactory
+import casablanca.webservice.RestServer
 
 object RemoteMailerMain {
 
@@ -27,10 +28,13 @@ object RemoteMailerMain {
     val statusQManager = new StatusQueueManager(tm, shf)
     val scheduler = new Scheduler(tm, statusQManager, 10)
 
+    val restServer = new RestServer()
+
     val workflowManager: WorkflowManager = new WorkflowManagerImpl(tm,
       statusQManager,
       shf,
-      scheduler)
+      scheduler,
+      restServer)
 
     workflowManager.start
 

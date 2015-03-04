@@ -51,7 +51,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should " update the task status " in {
     val t = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload))
 
-    val taskUpdate = TaskUpdate(status.value + 1, Some("newStringPayload"))
+    val taskUpdate = TaskUpdate(status.value + 1, "newStringPayload", None, 0)
     val updatedTask = tmUnderTest.updateTaskStatus(t.id, taskUpdate)
     assert(updatedTask.status == status.value + 1)
     val retrievedUpdatedTask = tmUnderTest.getTask(t.id)
@@ -65,7 +65,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     //var task = tmUnderTest.create(taskType, status, strPayload, intVal)
     for (i <- 0 to 10) {
       assert(task.attemptCount == i)
-      val taskUpdate = TaskUpdate(task.status, None, None, task.attemptCount + 1)
+      val taskUpdate = TaskUpdate(task.status, task.strPayload, None, task.attemptCount + 1)
       task = tmUnderTest.updateTaskStatus(task.id, taskUpdate)
     }
   }
@@ -75,7 +75,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
     val scheduled = new Date(new Date().getTime + 100000)
 
-    val taskUpdate = TaskUpdate(status.value + 1, None, Some(scheduled))
+    val taskUpdate = TaskUpdate(status.value + 1, t.strPayload, Some(scheduled), 0)
     val updatedTask = tmUnderTest.updateTaskStatus(t.id, taskUpdate)
     assert(updatedTask.status == status.value + 1)
     val retrievedUpdatedTask = tmUnderTest.getTask(t.id)
@@ -134,10 +134,10 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     var task = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload))
 
     assert(task.attemptCount == 0)
-    var taskUpdate = TaskUpdate(task.status, None, None, task.attemptCount + 1)
+    var taskUpdate = TaskUpdate(task.status, task.strPayload, None, task.attemptCount + 1)
     task = tmUnderTest.updateTaskStatus(task.id, taskUpdate)
     assert(task.attemptCount == 1)
-    taskUpdate = TaskUpdate(status.value + 1)
+    taskUpdate = TaskUpdate(status.value + 1, task.strPayload, task.schedule, 0)
     val updatedTask = tmUnderTest.updateTaskStatus(task.id, taskUpdate)
     assert(updatedTask.attemptCount == 0)
 

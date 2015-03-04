@@ -23,33 +23,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import java.net.URL
 
-object OnReponseHandler extends TaskHandler {
-
-  val onRepsonse = TaskStatus(1001)
-
-  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-
-    println(s"Got ${task.strPayload} from mailer returning done")
-    StatusUpdate(taskFinished.value)
-
-  }
-}
-
 object RemoteMailerTaskFactory extends RemoteTaskHandlerFactory {
 
-  import OnReponseHandler.onRepsonse
-
-  override def getSupportedStatuses: Set[TaskStatus] = super.getSupportedStatuses ++ Set(onRepsonse)
-
-  override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = status match {
-    case `onRepsonse` => Some(OnReponseHandler)
-    case x => super.getHandler(status)
-  }
-
-  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
-    println(s"Got something back from mailer: ${event}")
-    Some(StatusUpdate(onRepsonse.value))
-  }
-
-  val remoteTask: RemoteTask = RemoteTask("http://localhost:7070", "mailerTask")
+  val remoteTask: RemoteTask = RemoteTask("mailerNode", "mailerTask")
 }

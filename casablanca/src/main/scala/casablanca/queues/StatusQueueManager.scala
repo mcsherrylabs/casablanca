@@ -14,8 +14,15 @@ import casablanca.task.TaskDescriptor
 import casablanca.task.TaskSchedule
 import casablanca.task.TaskParent
 import casablanca.task.TaskStatus
+import casablanca.util.Logging
+import casablanca.util.ProgrammingError
+import casablanca.util.Configure
+import casablanca.util.ProgrammingError
+import casablanca.task.RelativeScheduledStatusUpdate
 
-class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) {
+class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) extends Logging with Configure {
+
+  lazy val puntIntoFutureMinutes = config.getInt("puntIntoFutureMinutes")
 
   lazy val taskContext: TaskHandlerContext = new TaskHandlerContext {
 
@@ -42,7 +49,7 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
       }
     }
 
-    override def pushTask(task: Task, update: StatusUpdate) {
+    override def pushTask(task: Task, update: HandlerUpdate) {
       StatusQueueManager.this.pushTask(task, update)
     }
   }
@@ -66,40 +73,43 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
   def getHandler(taskType: String, status: Int) = taskHandlerFactoryFactory.getHandler(taskType, TaskStatus(status))
 
   def pushTask(task: Task) {
-    statusQueueMap.get(task.taskType).map(_.get(task.status).map(_.push(task)))
+    statusQueueMap.get(task.taskType).map(_.get(task.status).map(_.push(task)).map {
+      pushed =>
+        if (!pushed) {
+          log.warn(s"StatusQueue refused our task !!, punting ${task}")
+          pushTask(task, RelativeScheduledStatusUpdate(task.status, puntIntoFutureMinutes))
+        }
+    })
   }
 
   def pushTask(task: Task, handlerResult: HandlerUpdate) {
 
-    handlerResult match {
-      case StatusUpdate(nextStatus, newStringPayload, attemptCount) => {
-
-        if (task.status == nextStatus && attemptCount == 0) {
-          val msg = s"Will not create busy loop for task ${task.id} by pushing same status ${task.status}"
-          println(msg)
-          throw new Error(msg)
-        }
-
-        val taskUpdate = TaskUpdate(nextStatus, newStringPayload, None, attemptCount)
-        try {
-          val t = tm.updateTaskStatus(task.id, taskUpdate)
-          //println(s"Pushed task ${t}")
-          statusQueueMap.get(t.taskType).map(_.get(nextStatus).map(_.push(t)))
-        } catch {
-          case e: Exception => println(e.toString)
-        }
-      }
-
-      case ScheduledStatusUpdate(nextStatus, schedule, newStringPayload) => {
-
-        val taskUpdate = if (task.status == nextStatus) {
-          TaskUpdate(nextStatus, newStringPayload, Some(schedule), task.attemptCount)
-        } else {
-          TaskUpdate(nextStatus, newStringPayload, Some(schedule), 0)
-        }
-        tm.updateTaskStatus(task.id, taskUpdate)
-      }
+    val newStatus = handlerResult.nextStatus match {
+      case Some(newStatus) => newStatus // we are updating the status
+      case None => task.status
     }
+
+    val newPayload = handlerResult.newStringPayload match {
+      case Some(newStringPayload) => newStringPayload // we are updating the payload
+      case None => task.strPayload
+    }
+
+    val newSchedule = handlerResult.scheduleAfter match {
+      case Some(newSchedule) => newSchedule // we are updating the status
+      case None => task.schedule
+    }
+
+    if (newStatus == task.status && task.schedule.isEmpty && handlerResult.scheduleAfter.isEmpty) {
+      throw new ProgrammingError(s"Cannot push a task (${task}) with no update! ${handlerResult}")
+    }
+
+    // Reset the attempt count if this is a new status. 
+    val updatedAttemptCount = if (newStatus == task.status) task.attemptCount else 0
+
+    val taskUpdate = TaskUpdate(newStatus, newPayload, newSchedule, updatedAttemptCount)
+
+    val updatedTask = tm.updateTaskStatus(task.id, taskUpdate)
+    if (updatedTask.schedule.isEmpty) pushTask(updatedTask)
 
   }
 
@@ -107,7 +117,7 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
 
   def attemptTask(task: Task): Task = {
     // inc attempts
-    val taskUpdate = TaskUpdate(task.status, None, None, task.attemptCount + 1)
+    val taskUpdate = TaskUpdate(task.status, task.strPayload, task.schedule, task.attemptCount + 1)
     tm.updateTaskStatus(task.id, taskUpdate)
 
   }

@@ -16,16 +16,18 @@ class StatusQueue(taskContext: TaskHandlerContext, status: Int, val taskType: St
     //new StatusQueueWorker(status, this, statusQueueManager).start
   }
 
-  def push(t: Task) {
+  def push(t: Task): Boolean = {
     // check status?
-    if (!queue.offer(t, 10000, TimeUnit.MILLISECONDS)) println(s"StatusQueue refused our task !!, dropped ${t}")
+    queue.offer(t, 10000, TimeUnit.MILLISECONDS)
   }
 
   def poll: Task = {
-    val t = queue.poll(20000, TimeUnit.MILLISECONDS)
+    val t = queue.poll(1000, TimeUnit.MILLISECONDS)
     if (t != null) statusQueueManager.attemptTask(t)
     else t
   }
+
+  private var loopCount = 0
 
   def run(t: Task) {
 
@@ -53,7 +55,8 @@ class StatusQueue(taskContext: TaskHandlerContext, status: Int, val taskType: St
       }
 
     } else {
-      println(s"StatusQueueWorker status=${status} going around again...")
+      loopCount += 1
+      if (loopCount % 10 == 0) println(s"StatusQueueWorker status=${status} going around again...")
     }
 
   }

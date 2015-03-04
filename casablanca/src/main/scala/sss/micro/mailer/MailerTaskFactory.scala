@@ -29,7 +29,7 @@ object MailHandler extends TaskHandler {
     .as("alanmcsherry@gmail.com", "cuimuxmqnucnmiuh")
     .startTtls(true)()
 
-  private def mailIt(task: Task): StatusUpdate = {
+  private def mailIt(task: Task): HandlerUpdate = {
 
     val f = mailer(Envelope.from("alanmcsherry" at "gmail.com")
       .to("alan" `@` "mcsherrylabs.com")
@@ -57,7 +57,7 @@ object MailerTaskFactory extends BaseTaskHandlerFactory {
     case _ => super.getHandler(status)
   }
 
-  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate] = {
+  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate] = {
     println(s"MailerTaskFactory Got something back from mailer: ${event}")
     None
   }

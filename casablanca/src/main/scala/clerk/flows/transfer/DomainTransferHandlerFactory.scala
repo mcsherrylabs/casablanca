@@ -12,6 +12,8 @@ import java.util.Date
 import casablanca.task.TaskDescriptor
 import casablanca.task.TaskStatus
 import casablanca.task.TaskStatuses
+import casablanca.task.StatusUpdate
+import casablanca.task.HandlerUpdate
 
 /**
  * This will become a real boy ...
@@ -56,6 +58,11 @@ object DomainTransferHandlerFactory extends BaseTaskHandlerFactory {
   def createInitTask(taskHandlerContext: TaskHandlerContext, domainName: String, aspirantId: String, ownerId: String): DomainTransferTask = {
     new DomainTransferTask(taskHandlerContext.startTask(
       TaskDescriptor(getTaskType, initialiseTransfer, Seq(domainName, aspirantId, ownerId).mkString(","))))
+  }
+
+  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate] = {
+    println(s"Looks like ${task}")
+    None
   }
 }
 

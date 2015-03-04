@@ -3,9 +3,8 @@ package casablanca.task
 import java.util.Date
 import casablanca.db.Row
 
-case class TaskUpdate(val nextStatus: Int, strPayload: Option[String] = None, scheduleAfter: Option[Date] = None,
-  numAttempts: Int = 0)
-
+case class TaskUpdate(nextStatus: Int, strPayload: String, scheduleAfter: Option[Date] = None,
+  numAttempts: Int)
 
 trait Task {
   val parentNode: Option[String]
@@ -30,7 +29,7 @@ trait Task {
   }
 
   override def toString: String = {
-    s" ${id} ${status} ${taskType} ${attemptCount} ${createTime} ${schedule} ${strPayload}"
+    s" ${parentNode} ${parentTaskId} ${id} ${status} ${taskType} ${attemptCount} ${createTime} ${schedule} ${strPayload}"
   }
 
 }

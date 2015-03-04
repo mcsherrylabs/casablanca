@@ -15,6 +15,9 @@ import casablanca.task.TaskHandlerContext
 import java.util.Date
 import casablanca.task.TaskDescriptor
 import casablanca.task.TaskStatus
+import sss.micro.mailer.RemoteMailerTaskFactory
+import casablanca.webservice.RestServer
+import casablanca.webservice.Endpoint
 
 object DomainTransferMain {
 
@@ -23,21 +26,24 @@ object DomainTransferMain {
     val tm = new TaskManager("taskManager")
     val gsf = new GenericStatusHandlerFactory(tm)
     //val domainTransferHandlerFactory = new DomainTransferHandlerFactory(tm)
-    val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, gsf)
+    val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, RemoteMailerTaskFactory)
 
     val statusQManager = new StatusQueueManager(tm, shf)
     val scheduler = new Scheduler(tm, statusQManager, 10)
 
+    val restServer = new RestServer((new Endpoint(statusQManager.taskContext)))
+
     val workflowManager: WorkflowManager = new WorkflowManagerImpl(tm,
       statusQManager,
       shf,
-      scheduler)
+      scheduler,
+      restServer)
 
     workflowManager.start
 
-    val transferStarter = DomainTransferHandlerFactory.createInitTask(statusQManager.taskContext, "domainName", "aspirantId", "ownerId")
-    val t = statusQManager.taskContext.startTask(
-      TaskDescriptor(gsf.getTaskType, TaskStatus(0), "strPayload"))
+    DomainTransferHandlerFactory.createInitTask(statusQManager.taskContext, "domainName", "aspirantId", "ownerId")
+    //val t = statusQManager.taskContext.startTask(
+    //TaskDescriptor(gsf.getTaskType, TaskStatus(0), "strPayload"))
 
   }
 

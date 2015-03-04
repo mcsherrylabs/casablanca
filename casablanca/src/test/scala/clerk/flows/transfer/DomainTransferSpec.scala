@@ -8,6 +8,7 @@ import casablanca.task.StatusUpdate
 import casablanca.queues.Scheduler
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskStatus
+import casablanca.task.HandlerUpdate
 
 class DomainTransferSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
@@ -23,7 +24,7 @@ class DomainTransferSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     assert(task.status == DomainTransferConsts.initialiseTransfer.value)
     val initialiseTransferHndlr = domainTransferHandlerFactory.getHandler(TaskStatus(task.status)).get
     initialiseTransferHndlr.handle(statusQManager.taskContext, task) match {
-      case StatusUpdate(DomainTransferConsts.awaitOwnerReponse.value, _, _) => //horray!
+      case HandlerUpdate(Some(DomainTransferConsts.awaitOwnerReponse.value), _, _) => //horray!
       case x => fail(s"Taint right -> ${x}")
     }
 

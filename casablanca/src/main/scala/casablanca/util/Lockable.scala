@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 
 class LockTimeoutException(msg: String) extends RuntimeException(msg)
 
-trait Lockable[T] {
+trait Lockable[T] extends Logging {
 
   private def lruCache(maxSize: Int) = {
     new LinkedHashMap[T, Lock](maxSize * 4 / 3, 0.75f, true) {
@@ -29,9 +29,15 @@ trait Lockable[T] {
     try {
       if (l.tryLock(timeOutMillis, TimeUnit.MILLISECONDS)) {
         println("GOING TO CONSUME")
-        f()
-
+        val res = f()
+        println(s"CONSUMED ${res}")
+        res
       } else throw new LockTimeoutException(s"Could not lock ${lockable} in time ${timeOutMillis} (ms)")
+    } catch {
+      case e: Exception => {
+        log.error("Could not consume ", e)
+        throw e
+      }
     } finally l.unlock
   }
 

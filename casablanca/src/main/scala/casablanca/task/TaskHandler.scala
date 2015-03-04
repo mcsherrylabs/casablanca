@@ -17,24 +17,13 @@ trait TaskStatuses extends SystemTaskStatuses {
   val taskFinished = TaskStatus(100)
   val taskFailed = TaskStatus(101)
   val taskStarted = TaskStatus(102)
+  val awaitingEvent = TaskStatus(103)
 }
 
-//object TaskStatus extends SystemTaskStatus {
-//      type TaskStatus = Value
-//      val taskFinished, taskStarted, taskFailed = Value  
-//}
-
-/*trait TaskStatus {
-  val systemFinished = 0
-  val systemFailed = 1
-  val systemSuccess = 2
-  val systemStarted = 10
-
-  val taskFinished = 100
-  val taskStarted = 101
-}*/
-
-trait HandlerUpdate extends TaskStatuses
+case class HandlerUpdate(
+  nextStatus: Option[Int] = None,
+  newStringPayload: Option[String] = None,
+  scheduleAfter: Option[Option[Date]] = None) extends TaskStatuses
 
 trait TaskHandler extends TaskStatuses {
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate
@@ -47,13 +36,13 @@ trait TaskHandlerFactory extends TaskStatuses {
   def getSupportedStatuses: Set[TaskStatus]
   def getHandler[T >: TaskHandler](status: TaskStatus): Option[T]
   def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: String)
-  def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[StatusUpdate]
+  def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate]
 
 }
 
 object RelativeScheduledStatusUpdate {
 
-  def apply(nextStatus: Int, minutesInFuture: Int, newStringPayload: Option[String] = None): ScheduledStatusUpdate = {
+  def apply(nextStatus: Int, minutesInFuture: Int, newStringPayload: Option[String] = None): HandlerUpdate = {
     ScheduledStatusUpdate(nextStatus, createFutureDate(minutesInFuture), newStringPayload)
   }
 
@@ -63,14 +52,35 @@ object RelativeScheduledStatusUpdate {
   }
 }
 
-case class SystemSuccess(newStringPayload: Option[String] = None, attemptCount: Int = 0) extends HandlerUpdate {
-  val nextStatus: Int = systemFinished.value
+object HandlerUpdate extends TaskStatuses {
+  val systemSuccess = HandlerUpdate(Some(systemFinished.value))
+  val success = HandlerUpdate(Some(taskFinished.value))
+  val awaitEvent = HandlerUpdate(Some(awaitingEvent.value))
 }
 
-case class Success(newStringPayload: Option[String] = None, attemptCount: Int = 0) extends HandlerUpdate {
-  val nextStatus: Int = taskFinished.value
+object ScheduledStatusUpdate {
+  def apply(nextStatus: Int, scheduleAfter: Date, newStringPayload: Option[String] = None) = HandlerUpdate(Some(nextStatus), newStringPayload, Some(Some(scheduleAfter)))
 }
 
-case class StatusUpdate(nextStatus: Int, newStringPayload: Option[String] = None, attemptCount: Int = 0) extends HandlerUpdate
-case class ScheduledStatusUpdate(nextStatus: Int, scheduleAfter: Date, newStringPayload: Option[String] = None) extends HandlerUpdate
+object SystemSuccess extends TaskStatuses {
+  def apply(): HandlerUpdate = {
+    HandlerUpdate(Some(systemFinished.value))
+  }
+}
+
+object Success extends TaskStatuses {
+  def apply(): HandlerUpdate = {
+    HandlerUpdate(Some(taskFinished.value))
+  }
+}
+
+object AwaitEvent extends TaskStatuses {
+  def apply(): HandlerUpdate = {
+    HandlerUpdate(Some(awaitingEvent.value))
+  }
+}
+
+object StatusUpdate {
+  def apply(nextStatus: Int, newStringPayload: Option[String] = None) = HandlerUpdate(Some(nextStatus), newStringPayload)
+}
 

@@ -8,6 +8,7 @@ import casablanca.task.StatusUpdate
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.task.TaskDescriptor
 import casablanca.task.TaskStatus
+import casablanca.webservice.RestServer
 
 object Main {
 
@@ -21,10 +22,13 @@ object Main {
 
     val scheduler = new Scheduler(tm, statusQManager, 10)
 
+    val restServer = new RestServer
+
     val workflowManager = new WorkflowManagerImpl(tm,
       statusQManager,
       shf,
-      scheduler)
+      scheduler,
+      restServer)
 
     workflowManager.start
 

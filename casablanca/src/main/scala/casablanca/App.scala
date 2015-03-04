@@ -13,22 +13,30 @@ import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.queues.StatusQueueManager
 import casablanca.queues.Scheduler
 import sss.micro.mailer.MailerTaskFactory
+import casablanca.webservice.RestServer
+import casablanca.util.ConfigureFactory
+import casablanca.util.LogFactory
 
-object App extends FinatraServer {
+object App {
 
-  val tm = new TaskManager("taskManager")
+  def main(args: Array[String]): Unit = {
 
-  val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, MailerTaskFactory)
+    val tm = new TaskManager("taskManager")
 
-  val statusQManager = new StatusQueueManager(tm, shf)
-  val scheduler = new Scheduler(tm, statusQManager, 10)
+    val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, MailerTaskFactory)
 
-  val workflowManager: WorkflowManager = new WorkflowManagerImpl(tm,
-    statusQManager,
-    shf,
-    scheduler)
+    val statusQManager = new StatusQueueManager(tm, shf)
+    val scheduler = new Scheduler(tm, statusQManager, 10)
 
-  workflowManager.start
+    val restServer = new RestServer((new Endpoint(statusQManager.taskContext)))
 
-  register(new Endpoint(statusQManager.taskContext))
+    val workflowManager: WorkflowManager = new WorkflowManagerImpl(tm,
+      statusQManager,
+      shf,
+      scheduler,
+      restServer)
+
+    workflowManager.start
+
+  }
 }
