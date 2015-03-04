@@ -45,7 +45,6 @@ class Rows(private val rs: ResultSet) {
                 //System.out.print(o.toString() + " ");
             }
             rows = r :: rows 
-            //System.out.println(" ");
         }
     }
         

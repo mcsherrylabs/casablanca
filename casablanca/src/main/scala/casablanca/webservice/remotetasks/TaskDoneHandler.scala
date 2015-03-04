@@ -77,7 +77,7 @@ object TaskDoneHandler extends RemoteRestHandler {
 
     def callParentRemotely: HandlerUpdate = {
       val myUrl = new URL(task.parentNode.get + "/event/" + task.parentTaskId.get)
-      println("Firing back " + myUrl)
+      log.debug("Calling remote parent ..." + myUrl)
       val decorated = fromRemoteTaskDecorator(task.strPayload, NodeConfig.localNode, Some(task.id), Some(task.taskType))
       val p = POST(myUrl).addBody(decorated)
       val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds

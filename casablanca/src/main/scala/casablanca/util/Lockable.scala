@@ -26,16 +26,18 @@ trait Lockable[T] extends Logging {
       }
       lockCache.get(lockable)
     }
-    try {
-      if (l.tryLock(timeOutMillis, TimeUnit.MILLISECONDS)) {
+
+    if (l.tryLock(timeOutMillis, TimeUnit.MILLISECONDS)) {
+      try {
         f()
-      } else throw new LockTimeoutException(s"Could not lock ${lockable} in time ${timeOutMillis} (ms)")
-    } catch {
-      case e: Exception => {
-        log.error("Could not consume ", e)
-        throw e
-      }
-    } finally l.unlock
+      } catch {
+        case e: Exception => {
+          log.error("Do locked failed! ", e)
+          throw e
+        }
+      } finally l.unlock
+    } else throw new LockTimeoutException(s"Could not lock ${lockable} in time ${timeOutMillis} (ms)")
+
   }
 
 }

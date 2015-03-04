@@ -6,9 +6,10 @@ import casablanca.task.Task
 import casablanca.task.TaskHandler
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
+import casablanca.util.Logging
 
 
-class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) {
+class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) extends Logging {
   
   
   def start {
@@ -23,7 +24,9 @@ class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) {
 		      val t = polled.poll
 		      polled.run(t)
       	  } catch {
-		        case e:Exception => println(e)
+		        case e:Exception => {
+		          log.error("FATAL: A status queue has failed to process a message correctly. ", e)
+		        }
 		  } finally {
 		    queue.put(polled)
 		  }

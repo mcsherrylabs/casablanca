@@ -14,8 +14,5 @@ object LogFactory extends Logging {
     LoggerFactory.getLogger(category)
   }
 
-  def getLogger(clazz: Class[Any]): Logger = {
-    LoggerFactory.getLogger(clazz);
-  }
 
 }

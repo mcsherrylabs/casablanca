@@ -4,8 +4,12 @@ import casablanca.task.Task
 import java.util.concurrent.TimeUnit
 import casablanca.task.RelativeScheduledStatusUpdate
 import casablanca.task.TaskHandlerContext
+import casablanca.util.Logging
 
-class StatusQueue(taskContext: TaskHandlerContext, status: Int, val taskType: String, statusQueueManager: StatusQueueManager) {
+class StatusQueue(taskContext: TaskHandlerContext, 
+    status: Int, 
+    val taskType: String, 
+    statusQueueManager: StatusQueueManager) extends Logging {
 
   private val maxRetries = 5
   private val statusHandler = statusQueueManager.getHandler(taskType, status).getOrElse(throw new Error(s"No handler exists for status ${status}"))
@@ -32,14 +36,14 @@ class StatusQueue(taskContext: TaskHandlerContext, status: Int, val taskType: St
   def run(t: Task) {
 
     if (t != null) {
-      println(s"StatusQueueWorker ${status} on task ${t.id}")
+      log.debug(s"StatusQueueWorker for ${status} attempts to handle task ${t.taskType}:${t.id}")
       try {
 
         if (t.attemptCount > 1) {
           if (t.attemptCount <= maxRetries) {
             val handlerResult = statusHandler.reTry(taskContext, t)
             statusQueueManager.pushTask(t, handlerResult)
-          } else println(s"Giving up on task ${t}, max try count exceeded (${maxRetries})")
+          } else log.warn(s"Giving up on task ${t}, max try count exceeded (${maxRetries})")
         } else {
           val handlerResult = statusHandler.handle(taskContext, t)
           statusQueueManager.pushTask(t, handlerResult)
@@ -47,16 +51,14 @@ class StatusQueue(taskContext: TaskHandlerContext, status: Int, val taskType: St
 
       } catch {
         case ex: Exception => {
-
-          println("Puked handling task, retry in 0 minutes")
-          println(ex)
+          log.warn("Exception handling task, retry in 0 minutes", ex)          
           statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, 0))
         }
       }
 
     } else {
       loopCount += 1
-      if (loopCount % 10 == 0) println(s"StatusQueueWorker status=${status} going around again...")
+      if (loopCount % 20 == 0) log.debug(s"StatusQueueWorker for status=${status} is alive...")
     }
 
   }

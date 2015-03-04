@@ -14,15 +14,24 @@ import casablanca.webservice.remotetasks.RemoteTaskHelper._
 import casablanca.task.TaskEvent
 import casablanca.task.EventOrigin
 import casablanca.task.EventOrigin
+import casablanca.util.Logging
+import org.slf4j.Logger
+import casablanca.util.LogFactory
 
-class Endpoint(taskContext: TaskHandlerContext) extends Controller {
+class Endpoint(taskContext: TaskHandlerContext) extends Controller   {
 
+  private val myLog = LogFactory.getLogger(this.getClass.toString)
+  
   post(s"/task/:taskType") { request =>
 
-    println(s"REQ: ${request.contentString}")
+    
     request.routeParams.get("taskType") match {
-      case None => render.body("No task type! ").status(400).toFuture
+      case None => {
+        myLog.warn("No task type, cannot process task create!!")
+        render.body("No task type! ").status(400).toFuture
+      }
       case Some(tType) => {
+        myLog.debug(s"Starting task (${tType}) via endpoint... ")
         val str = request.contentString
         val remoteTaskCase = toRemoteTaskDecorator(str)
         taskContext.startTask(
@@ -39,13 +48,20 @@ class Endpoint(taskContext: TaskHandlerContext) extends Controller {
 
   post(s"/event/:taskId") { request =>
 
-    println(s"EVENT: ${request.contentString}")
+    
     request.routeParams.get("taskId") match {
-      case None => render.body("No task id! ").status(400).toFuture
+      case None => {
+        myLog.warn("No task id, cannot process event!")
+        render.body("No task id! ").status(400).toFuture
+      }
       case Some(tId) => {
+    	myLog.debug(s"Processing event (${tId}) via endpoint... ")
         val remoteTaskCase = toRemoteTaskDecorator(request.contentString)
         val origin = EventOrigin(remoteTaskCase.taskId.get, remoteTaskCase.taskType.get)
         val ev = TaskEvent(remoteTaskCase.strPayload, Some(origin))
+        myLog.debug(s"EVENT")
+        myLog.debug(s"${ev}")
+        myLog.debug(s"END EVENT")
         taskContext.handleEvent(tId, ev)
         render.status(200).toFuture
       }

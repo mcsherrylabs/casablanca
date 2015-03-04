@@ -30,6 +30,21 @@ class WorkflowManagerImpl(tm: TaskManager,
   scheduler: Scheduler,
   restServer: RestServer) extends WorkflowManager with Logging {
 
+  Runtime.getRuntime().addShutdownHook(new Thread() {
+
+    override def run {
+      log.info("Casablanca shutting down ... ")
+      try {
+        WorkflowManagerImpl.this.stop
+      } catch {
+        case e: Exception => log.error("Casablanca shut down error ... ", e)
+      }
+      log.info("Casablanca shut down complete ... ")
+    }
+  })
+
+  log.info("Shutdown hook installed ... ")
+
   def stop {
     // todo add other stops for threads
     tm.close
