@@ -9,11 +9,13 @@ import casablanca.task.TaskHandlerContext
 import sss.micro.mailer.RemoteMailerTaskFactory
 import casablanca.task.TaskParent
 
-class InformOwnerHandler extends TaskHandler {
+object InformOwnerHandler extends TaskHandler {
+
+  var callbackTask: String = ""
 
   def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-    RemoteMailerTaskFactory.startRemoteTask(taskContext, "strPayload Inform owner", Some(TaskParent(task.id)))
-    println(s"Informing owner ${task.strPayload}")
+    val t = RemoteMailerTaskFactory.startRemoteTask(taskContext, "strPayload Inform owner", Some(TaskParent(task.id)))
+    callbackTask = t.id
     StatusUpdate(awaitOwnerReponse.value)
   }
 }

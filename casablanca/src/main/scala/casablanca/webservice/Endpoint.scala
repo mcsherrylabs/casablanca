@@ -11,12 +11,12 @@ import casablanca.task.TaskHandlerContext
 import casablanca.task.TaskParent
 import casablanca.task.TaskDescriptor
 import casablanca.webservice.remotetasks.RemoteTaskHelper._
+import casablanca.task.TaskEvent
+import casablanca.task.EventOrigin
+import casablanca.task.EventOrigin
 
 class Endpoint(taskContext: TaskHandlerContext) extends Controller {
 
-  /**
-   *
-   */
   post(s"/task/:taskType") { request =>
 
     println(s"REQ: ${request.contentString}")
@@ -43,7 +43,10 @@ class Endpoint(taskContext: TaskHandlerContext) extends Controller {
     request.routeParams.get("taskId") match {
       case None => render.body("No task id! ").status(400).toFuture
       case Some(tId) => {
-        taskContext.handleEvent(tId, request.contentString)
+        val remoteTaskCase = toRemoteTaskDecorator(request.contentString)
+        val origin = EventOrigin(remoteTaskCase.taskId.get, remoteTaskCase.taskType.get)
+        val ev = TaskEvent(remoteTaskCase.strPayload, Some(origin))
+        taskContext.handleEvent(tId, ev)
         render.status(200).toFuture
       }
     }

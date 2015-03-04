@@ -24,6 +24,5 @@ import scala.concurrent.duration._
 import java.net.URL
 
 object RemoteMailerTaskFactory extends RemoteTaskHandlerFactory {
-
   val remoteTask: RemoteTask = RemoteTask("mailerNode", "mailerTask")
 }

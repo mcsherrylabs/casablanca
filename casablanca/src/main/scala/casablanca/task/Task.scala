@@ -6,6 +6,9 @@ import casablanca.db.Row
 case class TaskUpdate(nextStatus: Int, strPayload: String, scheduleAfter: Option[Date] = None,
   numAttempts: Int)
 
+case class EventOrigin(taskId: String, taskType: String)
+case class TaskEvent(eventPayload: String, origin: Option[EventOrigin] = None)
+
 trait Task {
   val parentNode: Option[String]
   val parentTaskId: Option[String]

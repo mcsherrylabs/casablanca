@@ -19,6 +19,7 @@ import scala.language.reflectiveCalls
 import casablanca.task.TaskDescriptor
 import casablanca.task.TaskParent
 import casablanca.task.BaseTaskHandlerFactory
+import casablanca.task.TaskEvent
 
 object MailHandler extends TaskHandler {
 
@@ -57,8 +58,4 @@ object MailerTaskFactory extends BaseTaskHandlerFactory {
     case _ => super.getHandler(status)
   }
 
-  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate] = {
-    println(s"MailerTaskFactory Got something back from mailer: ${event}")
-    None
-  }
 }

@@ -28,10 +28,7 @@ trait Lockable[T] extends Logging {
     }
     try {
       if (l.tryLock(timeOutMillis, TimeUnit.MILLISECONDS)) {
-        println("GOING TO CONSUME")
-        val res = f()
-        println(s"CONSUMED ${res}")
-        res
+        f()
       } else throw new LockTimeoutException(s"Could not lock ${lockable} in time ${timeOutMillis} (ms)")
     } catch {
       case e: Exception => {

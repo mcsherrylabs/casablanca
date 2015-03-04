@@ -35,8 +35,8 @@ trait TaskHandlerFactory extends TaskStatuses {
   def getTaskType: String
   def getSupportedStatuses: Set[TaskStatus]
   def getHandler[T >: TaskHandler](status: TaskStatus): Option[T]
-  def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: String)
-  def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate]
+  def handleEvent(taskContext: TaskHandlerContext, task: Task, ev: TaskEvent)
+  def consume(taskContext: TaskHandlerContext, task: Task, event: TaskEvent): Option[HandlerUpdate]
 
 }
 
@@ -56,6 +56,7 @@ object HandlerUpdate extends TaskStatuses {
   val systemSuccess = HandlerUpdate(Some(systemFinished.value))
   val success = HandlerUpdate(Some(taskFinished.value))
   val awaitEvent = HandlerUpdate(Some(awaitingEvent.value))
+  val failure = HandlerUpdate(Some(taskFailed.value))
 }
 
 object ScheduledStatusUpdate {

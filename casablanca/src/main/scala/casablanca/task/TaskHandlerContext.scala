@@ -12,7 +12,7 @@ trait TaskHandlerContext extends CreateTask with TaskStatuses {
     schedule: Option[TaskSchedule] = None,
     parent: Option[TaskParent] = None): Task
 
-  def handleEvent(taskId: String, ev: String)
+  def handleEvent(taskId: String, ev: TaskEvent)
   def pushTask(task: Task, update: HandlerUpdate)
 
 }

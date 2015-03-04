@@ -19,6 +19,7 @@ import casablanca.util.ProgrammingError
 import casablanca.util.Configure
 import casablanca.util.ProgrammingError
 import casablanca.task.RelativeScheduledStatusUpdate
+import casablanca.task.TaskEvent
 
 class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) extends Logging with Configure {
 
@@ -38,11 +39,8 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
       t
     }
 
-    override def handleEvent(taskId: String, event: String) {
-      println(s"Getting task ... " + taskId)
+    override def handleEvent(taskId: String, event: TaskEvent) {
       val task = tm.getTask(taskId)
-      println(s"Got task ... " + task)
-      println(s"Getting task ... ")
       taskHandlerFactoryFactory.getTaskFactory[TaskHandlerFactory](task.taskType) match {
         case None => throw new RuntimeException(s"No such task type factory ${task.taskType}")
         case Some(factory: TaskHandlerFactory) => factory.handleEvent(this, task, event)

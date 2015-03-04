@@ -14,6 +14,7 @@ import casablanca.task.TaskStatus
 import casablanca.task.TaskStatuses
 import casablanca.task.StatusUpdate
 import casablanca.task.HandlerUpdate
+import casablanca.task.TaskEvent
 
 /**
  * This will become a real boy ...
@@ -45,7 +46,7 @@ object DomainTransferHandlerFactory extends BaseTaskHandlerFactory {
   override def getHandler[T >: TaskHandler](status: TaskStatus) = {
 
     status match {
-      case DomainTransferConsts.initialiseTransfer => Some(new InformOwnerHandler())
+      case DomainTransferConsts.initialiseTransfer => Some(InformOwnerHandler)
       case DomainTransferConsts.updateRegistry => Some(new UpdateRegistryHandler())
       case DomainTransferConsts.awaitOwnerReponse => Some(new GetResponseHandler())
       case DomainTransferConsts.acceptTransfer => Some(new FinaliseTransferHandler())
@@ -60,9 +61,11 @@ object DomainTransferHandlerFactory extends BaseTaskHandlerFactory {
       TaskDescriptor(getTaskType, initialiseTransfer, Seq(domainName, aspirantId, ownerId).mkString(","))))
   }
 
-  override def consume(taskContext: TaskHandlerContext, task: Task, event: String): Option[HandlerUpdate] = {
-    println(s"Looks like ${task}")
-    None
+  override def consume(taskContext: TaskHandlerContext, task: Task, event: TaskEvent): Option[HandlerUpdate] = {
+    println(s"Consuming event ${event} in task ${task}")
+    if (InformOwnerHandler.callbackTask == event.origin.get.taskId) {
+      Some(HandlerUpdate.success)
+    } else Some(HandlerUpdate.failure)
   }
 }
 
