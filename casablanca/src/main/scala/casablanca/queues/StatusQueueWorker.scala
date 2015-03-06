@@ -13,25 +13,32 @@ class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) extends Logging {
   
   
   def start {
-    (new Thread(runnable, s"Worker ")).start
+    (new Thread(runnable, s"StatusQueueWorker")).start
   }
   
   private val runnable = new Runnable {
   
     override def run {
+      try {
 	      val polled = queue.take
 	      try {
+          
 		      val t = polled.poll
 		      polled.run(t)
       	  } catch {
 		        case e:Exception => {
 		          log.error("FATAL: A status queue has failed to process a message correctly. ", e)
 		        }
-		  } finally {
-		    queue.put(polled)
-		  }
+  		  } finally queue.put(polled)
+  		  
+      } catch {
+        case e :InterruptedException => {
+          log.warn("StatusQueueWorker interrupted, exiting ... ")
+          throw e
+        }        
+        run
+      }
       
-      run
     }
     	
   }

@@ -5,28 +5,28 @@ import java.util.concurrent.TimeUnit
 import casablanca.task.RelativeScheduledStatusUpdate
 import casablanca.task.TaskHandlerContext
 import casablanca.util.Logging
+import casablanca.task.StatusConfig
 
 class StatusQueue(taskContext: TaskHandlerContext, 
+    statusConfig: StatusConfig, 
     status: Int, 
     val taskType: String, 
     statusQueueManager: StatusQueueManager) extends Logging {
 
-  private val maxRetries = 5
   private val statusHandler = statusQueueManager.getHandler(taskType, status).getOrElse(throw new Error(s"No handler exists for status ${status}"))
-  private val queue = new java.util.concurrent.ArrayBlockingQueue[Task](100)
+  private val queue = new java.util.concurrent.ArrayBlockingQueue[Task](statusConfig.queueSize)
 
   def init {
     statusQueueManager.findTasks(taskType, status).foreach(t => queue.add(t))
-    //new StatusQueueWorker(status, this, statusQueueManager).start
   }
 
   def push(t: Task): Boolean = {
     // check status?
-    queue.offer(t, 10000, TimeUnit.MILLISECONDS)
+    queue.offer(t, statusConfig.offerTimeoutMs, TimeUnit.MILLISECONDS)
   }
 
   def poll: Task = {
-    val t = queue.poll(1000, TimeUnit.MILLISECONDS)
+    val t = queue.poll(statusConfig.pollTimeoutMs, TimeUnit.MILLISECONDS)
     if (t != null) statusQueueManager.attemptTask(t)
     else t
   }
@@ -40,10 +40,10 @@ class StatusQueue(taskContext: TaskHandlerContext,
       try {
 
         if (t.attemptCount > 1) {
-          if (t.attemptCount <= maxRetries) {
+          if (t.attemptCount <= statusConfig.maxRetryCount) {
             val handlerResult = statusHandler.reTry(taskContext, t)
             statusQueueManager.pushTask(t, handlerResult)
-          } else log.warn(s"Giving up on task ${t}, max try count exceeded (${maxRetries})")
+          } else log.warn(s"Giving up on task ${t}, max try count exceeded (${statusConfig.maxRetryCount})")
         } else {
           val handlerResult = statusHandler.handle(taskContext, t)
           statusQueueManager.pushTask(t, handlerResult)
@@ -52,7 +52,7 @@ class StatusQueue(taskContext: TaskHandlerContext,
       } catch {
         case ex: Exception => {
           log.warn("Exception handling task, retry in 0 minutes", ex)          
-          statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, 0))
+          statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, statusConfig.retryDelayMinutes))
         }
       }
 

@@ -26,7 +26,8 @@ object App {
     val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, MailerTaskFactory)
 
     val statusQManager = new StatusQueueManager(tm, shf)
-    val scheduler = new Scheduler(tm, statusQManager, 10)
+    val loopTime = ConfigureFactory.config.getInt("schedulerGranularityInSeconds")
+    val scheduler = new Scheduler(tm, statusQManager, loopTime)
 
     val restServer = new RestServer((new Endpoint(statusQManager.taskContext)))
 

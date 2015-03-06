@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit
 import casablanca.util.Lockable
 import casablanca.util.Logging
 import casablanca.webservice.remotetasks.TaskDoneHandler
+import casablanca.util.Configure
 
 /*object TaskFinishedHandler extends TaskHandler with Logging {
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
@@ -22,8 +23,27 @@ object TaskFailedHandler extends TaskHandler with Logging {
   }
 }*/
 
-trait BaseTaskHandlerFactory extends TaskHandlerFactory with Lockable[String] with Logging {
+trait BaseTaskHandlerFactory extends TaskHandlerFactory 
+            with Lockable[String] 
+            with Logging 
+            with Configure {
 
+  def getStatusConfig(status:Int): StatusConfig = {
+    
+    val configPath = s"${getTaskType}.${status}" 
+    if(config.hasPath(configPath)) {
+      val conf = config.getConfig(configPath)
+      StatusConfig(
+          conf.getInt("queueSize"),   
+          conf.getInt("offerTimeoutMs"),
+          conf.getInt("pollTimeoutMs"),
+          conf.getInt("maxRetryCount"),
+          conf.getInt("retryDelayMinutes")
+          )
+    } else StatusConfig()
+          
+  }
+  
   override def getSupportedStatuses: Set[TaskStatus] = Set(taskFinished, taskFailed)
 
   override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = {

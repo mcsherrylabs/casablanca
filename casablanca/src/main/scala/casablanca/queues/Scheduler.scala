@@ -12,8 +12,11 @@ class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeco
 
   private val runnable = new Runnable {
     def run {
-      reschedule()
-      start
+      try {
+        reschedule()
+      } catch {
+         case e: Exception => log.error(s"Scheduler failed to reschedule tasks", e)      
+      } finally start
     }
   }
 
@@ -31,7 +34,6 @@ class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeco
           } catch {
             case e: Exception => log.error(s"Scheduler failed to push task ${t}")
           }
-
         }
     }
   }

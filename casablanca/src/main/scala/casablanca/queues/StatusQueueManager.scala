@@ -23,7 +23,7 @@ import casablanca.task.TaskEvent
 
 class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) extends Logging with Configure {
 
-  lazy val puntIntoFutureMinutes = config.getInt("puntIntoFutureMinutes")
+  lazy val puntIntoFutureMinutes = config.getInt("queueOverloadRescheduleMinutes")
 
   lazy val taskContext: TaskHandlerContext = new TaskHandlerContext {
 
@@ -58,7 +58,7 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
       val taskType = f.getTaskType
       val statusMap: Map[Int, StatusQueue] = {
         f.getSupportedStatuses.map(s =>
-          s.value -> new StatusQueue(taskContext, s.value, taskType, this)).toMap
+          s.value -> new StatusQueue(taskContext, f.getStatusConfig(s.value), s.value, taskType, this)).toMap
 
       }
       (taskType -> statusMap)

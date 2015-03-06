@@ -14,6 +14,7 @@ import casablanca.queues.StatusQueueWorker
 import casablanca.webservice.RestServer
 import casablanca.util.Logging
 import scala.concurrent.Future
+import casablanca.util.Configure
 
 /**
  *
@@ -28,7 +29,9 @@ class WorkflowManagerImpl(tm: TaskManager,
   statusQManager: StatusQueueManager,
   statusHandlerFactory: TaskHandlerFactoryFactory,
   scheduler: Scheduler,
-  restServer: RestServer) extends WorkflowManager with Logging {
+  restServer: RestServer) extends WorkflowManager 
+  with Logging 
+  with Configure {
 
   Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -52,6 +55,7 @@ class WorkflowManagerImpl(tm: TaskManager,
 
   def start {
 
+    val numWorkers = config.getInt("sizeWorkerThreadPool")
     val when = new Date().getTime
     log.info("Starting casablanca ... ")
     val statusQueues = statusQManager.statusQueues
@@ -64,7 +68,7 @@ class WorkflowManagerImpl(tm: TaskManager,
     Future { restServer.start }
     log.info("Started REST server ... ")
 
-    for (i <- 0 to 5) {
+    for (i <- 0 to numWorkers) {
       new StatusQueueWorker(workerQueue).start
       log.info(s"Started task queue worker # ${i + 1} ... ")
     }
