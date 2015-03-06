@@ -4,6 +4,7 @@ import casablanca.util.Configure
 import casablanca.db._
 import java.util.UUID
 import java.util.Date
+import com.typesafe.config.Config
 
 trait CreateTask {
   def create(descriptor: TaskDescriptor,
@@ -11,9 +12,9 @@ trait CreateTask {
     parent: Option[TaskParent] = None): Task
 }
 
-class TaskManager(configName: String) extends Configure with CreateTask {
+class TaskManager(configIt: Config) extends CreateTask {
 
-  private val myConfig = config(configName)
+  private val myConfig = configIt.getConfig("TaskManager")
 
   private val db = new Db(myConfig.getString("db"))
   private val taskTable = db.table(myConfig.getString("taskTableName"))

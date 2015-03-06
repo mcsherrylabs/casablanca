@@ -21,23 +21,13 @@ object App {
 
   def main(args: Array[String]): Unit = {
 
-    val tm = new TaskManager("taskManager")
-
-    val shf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, MailerTaskFactory)
-
-    val statusQManager = new StatusQueueManager(tm, shf)
-    val loopTime = ConfigureFactory.config.getInt("schedulerGranularityInSeconds")
-    val scheduler = new Scheduler(tm, statusQManager, loopTime)
-
-    val restServer = new RestServer((new Endpoint(statusQManager.taskContext)))
-
-    val workflowManager: WorkflowManager = new WorkflowManagerImpl(tm,
-      statusQManager,
-      shf,
-      scheduler,
-      restServer)
-
-    workflowManager.start
+    val restConfigName = if(args.size > 0) {
+      args(0)
+    } else "main"
+      
+    val thf = TaskHandlerFactoryFactory(DomainTransferHandlerFactory, MailerTaskFactory)
+    new WorkflowManagerImpl(thf, restConfigName).start
+      
 
   }
 }

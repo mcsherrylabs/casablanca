@@ -28,7 +28,7 @@ class GenericStatusHandler(val status: Int) extends TaskHandler {
   }
 }
 
-class GenericStatusHandlerFactory(val tm: TaskManager) extends BaseTaskHandlerFactory {
+object GenericStatusHandlerFactory extends BaseTaskHandlerFactory {
 
   def getTaskType: String = "genericTask"
 

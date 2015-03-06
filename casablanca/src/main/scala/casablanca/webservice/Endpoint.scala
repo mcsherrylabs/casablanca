@@ -42,7 +42,6 @@ class Endpoint(taskContext: TaskHandlerContext) extends Controller   {
         render.status(200).toFuture
 
       }
-
     }
   }
 

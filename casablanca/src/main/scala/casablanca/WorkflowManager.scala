@@ -15,21 +15,20 @@ import casablanca.webservice.RestServer
 import casablanca.util.Logging
 import scala.concurrent.Future
 import casablanca.util.Configure
+import com.twitter.finatra.Controller
+import casablanca.webservice.Endpoint
 
 /**
  *
  */
 trait WorkflowManager {
-
   def start
   def stop
 }
 
-class WorkflowManagerImpl(tm: TaskManager,
-  statusQManager: StatusQueueManager,
-  statusHandlerFactory: TaskHandlerFactoryFactory,
-  scheduler: Scheduler,
-  restServer: RestServer) extends WorkflowManager 
+class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
+    configName: String) extends WorkflowManager
+    
   with Logging 
   with Configure {
 
@@ -47,6 +46,11 @@ class WorkflowManagerImpl(tm: TaskManager,
   })
 
   log.info("Shutdown hook installed ... ")
+
+  private val tm = new TaskManager(config.getConfig(configName))
+  private val statusQManager = new StatusQueueManager(tm, taskHandlerFactoryFactory)
+  private val scheduler = new Scheduler(tm, statusQManager, config.getInt("schedulerGranularityInSeconds"))
+  private val restServer = new RestServer(config.getConfig(configName), new Endpoint(statusQManager.taskContext))
 
   def stop {
     // todo add other stops for threads

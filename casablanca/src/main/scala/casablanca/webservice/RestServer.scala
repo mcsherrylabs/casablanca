@@ -1,8 +1,9 @@
 package casablanca.webservice
 import com.twitter.finatra._
 import casablanca.util.Configure
+import com.typesafe.config.Config
 
-class RestServer(controllers: Controller*) extends FinatraServer with Configure {
+class RestServer(config: Config, controllers: Controller*) extends FinatraServer {
 
   val finatraPackage: String = "com.twitter.finatra.config"
   val configPrefix: String = "restServer"

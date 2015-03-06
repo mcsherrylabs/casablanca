@@ -13,6 +13,9 @@ object NodeConfig extends Configure with Logging {
 
   lazy val localNode = nodes.getString(local)
 
-  def map(node: String): String = nodes.getString(node)
+  def map(node: String): String = {
+    // this could be jiggered to use a pool of nodes... 
+    nodes.getString(node)  
+  }
 
 }

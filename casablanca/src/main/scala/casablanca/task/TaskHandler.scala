@@ -5,6 +5,7 @@ import java.util.LinkedHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.TimeUnit
+import casablanca.util.Logging
 
 sealed case class TaskStatus(value: Int)
 
@@ -25,15 +26,18 @@ case class HandlerUpdate(
   newStringPayload: Option[String] = None,
   scheduleAfter: Option[Option[Date]] = None) extends TaskStatuses
 
-trait TaskHandler extends TaskStatuses {
+trait TaskHandler extends TaskStatuses with Logging {
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate
-  def reTry(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = handle(taskHandlerContext, task)
+  def reTry(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+    log.info(s"Default handler retrying task ${task}")
+   handle(taskHandlerContext, task) 
+  }
 }
 
 case class StatusConfig(
   queueSize: Int = 25,   
-  offerTimeoutMs: Int = 1000,
-  pollTimeoutMs: Int = 1000,
+  offerTimeoutMs: Int = 10000,
+  pollTimeoutMs: Int = 10000,
   maxRetryCount: Int = 5,
   retryDelayMinutes: Int = 0
 )
