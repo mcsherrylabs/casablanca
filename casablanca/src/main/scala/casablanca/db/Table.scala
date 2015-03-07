@@ -32,6 +32,16 @@ class Table(val name: String, val conn: Connection) {
   }
   
   
+  def delete(sql: String): Int = {
+    
+        val st = conn.createStatement();         // statement objects can be reused with
+        try {
+	        st.executeUpdate(s"DELETE FROM ${name} WHERE ${sql}");    // run the query	       
+        } finally {
+          st.close 
+        }
+  }
+  
   def filter(sql: String): Rows = {
     
         val st = conn.createStatement();         // statement objects can be reused with

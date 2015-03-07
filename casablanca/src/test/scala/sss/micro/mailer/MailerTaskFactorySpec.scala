@@ -12,23 +12,24 @@ import casablanca.task.TaskDescriptor
 import casablanca.task.TaskStatus
 import casablanca.webservice.remotetasks.TaskDoneHandler
 import casablanca.task.HandlerUpdate
+import casablanca.util.ConfigureFactory
+import casablanca.WorkflowManagerImpl
 
 class MailerTaskFactoySpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   "MailerTaskFactoySpec " should " support all aspects of status sequentially " in {
 
-    val tm = new TaskManager("taskManager")
-    val mailerTaskFactory = MailerTaskFactory
-    val shf = TaskHandlerFactoryFactory(mailerTaskFactory)
-    val statusQManager = new StatusQueueManager(tm, shf)
-    val scheduler = new Scheduler(tm, statusQManager, 10)
-    val tc = statusQManager.taskContext
-    val task = tc.startTask(TaskDescriptor(mailerTaskFactory.getTaskType, tc.taskStarted, ""))
-    assert(task.status == mailerTaskFactory.taskStarted.value)
-    val mailer = mailerTaskFactory.getHandler(TaskStatus(task.status))
+    
+    
+    val shf = TaskHandlerFactoryFactory(MailerTaskFactory)
+    val wfm = new WorkflowManagerImpl(shf)
+    val tc = wfm.statusQManager.taskContext
+    val task = tc.startTask(TaskDescriptor(MailerTaskFactory.getTaskType, tc.taskStarted, ""))
+    assert(task.status == MailerTaskFactory.taskStarted.value)
+    val mailer = MailerTaskFactory.getHandler(TaskStatus(task.status))
     mailer.get.handle(tc, task) match {
       case su: HandlerUpdate => assert(
-        mailerTaskFactory.getHandler(TaskStatus(su.nextStatus.get))
+        MailerTaskFactory.getHandler(TaskStatus(su.nextStatus.get))
           == Some(TaskDoneHandler))
       case x => fail("Wrong type")
     }

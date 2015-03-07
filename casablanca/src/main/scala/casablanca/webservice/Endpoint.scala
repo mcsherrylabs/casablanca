@@ -17,30 +17,84 @@ import casablanca.task.EventOrigin
 import casablanca.util.Logging
 import org.slf4j.Logger
 import casablanca.util.LogFactory
+import casablanca.task.TaskJsonMapper
 
 class Endpoint(taskContext: TaskHandlerContext) extends Controller   {
 
   private val myLog = LogFactory.getLogger(this.getClass.toString)
   
-  post(s"/task/:taskType") { request =>
-
-    
-    request.routeParams.get("taskType") match {
+  get(s"/task/:taskId") { request =>
+    request.routeParams.get("taskId") match {
       case None => {
-        myLog.warn("No task type, cannot process task create!!")
-        render.body("No task type! ").status(400).toFuture
+        myLog.warn("No task id, cannot get task.")
+        render.body("No task id! ").status(400).toFuture
       }
-      case Some(tType) => {
-        myLog.debug(s"Starting task (${tType}) via endpoint... ")
-        val str = request.contentString
-        val remoteTaskCase = toRemoteTaskDecorator(str)
-        taskContext.startTask(
-          TaskDescriptor(tType, taskContext.taskStarted, remoteTaskCase.strPayload),
-          None,
-          Some(TaskParent(remoteTaskCase.taskId.get, Some(remoteTaskCase.node))))
+      case Some(tId) => {
+    	myLog.debug(s"Get task (${tId}) via endpoint... ")
+        
+        val str = TaskJsonMapper.fromTask(taskContext.getTask(tId))
+        render.status(200).body(str).toFuture
+      }
+    }
+  }
 
-        render.status(200).toFuture
+  
+    post(s"/task/:taskType") { request =>
 
+    try {
+	    request.routeParams.get("taskType") match {
+	      case None => {
+	        myLog.warn("No task type, cannot process task create!!")
+	        render.body("No task type! ").status(400).toFuture
+	      }
+	      case Some(tType) => {
+	        myLog.debug(s"Starting task (${tType}) via endpoint... ")
+	        val str = request.contentString
+	        
+	        val t = taskContext.startTask(
+	          TaskDescriptor(tType, taskContext.taskStarted, str),
+	          None,
+	          None)
+	
+	        render.status(200).body(TaskJsonMapper.fromTask(t)).toFuture
+	
+	      }
+	      
+	    }
+    } catch {
+      case e: Exception => {
+        myLog.error("Couldn't process post /task", e)
+        throw e
+      }
+    }
+  }
+    
+  post(s"/task/decorated/:taskType") { request =>
+
+    try {
+	    request.routeParams.get("taskType") match {
+	      case None => {
+	        myLog.warn("No task type, cannot process task create!!")
+	        render.body("No task type! ").status(400).toFuture
+	      }
+	      case Some(tType) => {
+	        myLog.debug(s"Starting task (${tType}) via endpoint... ")
+	        val str = request.contentString
+	        val remoteTaskCase = toRemoteTaskDecorator(str)
+	        taskContext.startTask(
+	          TaskDescriptor(tType, taskContext.taskStarted, remoteTaskCase.strPayload),
+	          None,
+	          Some(TaskParent(remoteTaskCase.taskId.get, Some(remoteTaskCase.node))))
+	
+	        render.status(200).toFuture
+	
+	      }
+	      
+	    }
+    } catch {
+      case e: Exception => {
+        myLog.error("Couldn't process post /task/decorated", e)
+        throw e
       }
     }
   }
@@ -58,9 +112,9 @@ class Endpoint(taskContext: TaskHandlerContext) extends Controller   {
         val remoteTaskCase = toRemoteTaskDecorator(request.contentString)
         val origin = EventOrigin(remoteTaskCase.taskId.get, remoteTaskCase.taskType.get)
         val ev = TaskEvent(remoteTaskCase.strPayload, Some(origin))
-        myLog.debug(s"EVENT")
-        myLog.debug(s"${ev}")
-        myLog.debug(s"END EVENT")
+		//myLog.debug(s"EVENT")
+		//myLog.debug(s"${ev}")
+		//myLog.debug(s"END EVENT")
         taskContext.handleEvent(tId, ev)
         render.status(200).toFuture
       }

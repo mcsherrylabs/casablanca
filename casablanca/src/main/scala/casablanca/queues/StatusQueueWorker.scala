@@ -7,6 +7,7 @@ import casablanca.task.TaskHandler
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
 import casablanca.util.Logging
+import scala.annotation.tailrec
 
 
 class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) extends Logging {
@@ -18,6 +19,7 @@ class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) extends Logging {
   
   private val runnable = new Runnable {
   
+    @tailrec
     override def run {
       try {
 	      val polled = queue.take
@@ -29,16 +31,17 @@ class StatusQueueWorker(queue : BlockingQueue[StatusQueue]) extends Logging {
 		        case e:Exception => {
 		          log.error("FATAL: A status queue has failed to process a message correctly. ", e)
 		        }
-  		  } finally queue.put(polled)
-  		  
+  		  } finally {
+  		    queue.put(polled)  		    
+  		  }
+  		 
       } catch {
-        case e :InterruptedException => {
-          log.warn("StatusQueueWorker interrupted, exiting ... ")
+        case e : Exception => {
+          log.warn("StatusQueueWorker exiting ... ", e)
           throw e
-        }        
-        run
+        }                
       }
-      
+      run  
     }
     	
   }

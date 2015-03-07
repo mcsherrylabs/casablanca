@@ -2,10 +2,12 @@ package casablanca.task
 
 import org.scalatest._
 import java.util.Date
+import casablanca.util.ConfigureFactory
+import casablanca.util.ProgrammingError
 
 class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
-  val tmUnderTest = new TaskManager("taskManager")
+  val tmUnderTest = new TaskManager(ConfigureFactory.config("main"))
 
   val status = TaskStatus(4)
   val strPayload = "strPayload"
@@ -33,7 +35,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   }
 
   it should " find the task (using get or find) " in {
-    val foundTasks = tmUnderTest.findTasks(taskType, status.value)
+    val foundTasks = tmUnderTest.findTasks(taskType, Some(status.value))
     assert(foundTasks.size > 0)
     foundTasks map {
       t =>
@@ -85,7 +87,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
   it should " not find a task with a schedule " in {
     val t = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload), Some(TaskSchedule(new Date())))
     //val t = tmUnderTest.create(taskType, status, strPayload, intVal, Some(new Date()))
-    val foundTasks = tmUnderTest.findTasks(taskType, status.value)
+    val foundTasks = tmUnderTest.findTasks(taskType, Some(status.value))
     assert(foundTasks.size > 0)
     foundTasks map {
       foundTask =>
@@ -141,5 +143,21 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val updatedTask = tmUnderTest.updateTaskStatus(task.id, taskUpdate)
     assert(updatedTask.attemptCount == 0)
 
+  }
+  
+  it should " not find a task after it's deleted " in {
+    
+    val uniqueStatus = TaskStatus(434534534)
+    var task = tmUnderTest.create(TaskDescriptor(taskType, uniqueStatus, strPayload))
+
+    val numDeleted = tmUnderTest.deleteTasks(uniqueStatus.value, new Date())
+    assert(numDeleted == 1)
+    
+    val numDeletedShouldBeZero = tmUnderTest.deleteTasks(uniqueStatus.value, new Date())
+    assert(numDeletedShouldBeZero == 0)
+    
+    intercept[ProgrammingError] {
+    	tmUnderTest.getTask(task.id)
+    }
   }
 }

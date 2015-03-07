@@ -17,6 +17,9 @@ import scala.concurrent.Future
 import casablanca.util.Configure
 import com.twitter.finatra.Controller
 import casablanca.webservice.Endpoint
+import casablanca.webservice.remotetasks.NodeConfig
+import casablanca.queues.Reaper
+import casablanca.webservice.Visibility
 
 /**
  *
@@ -27,8 +30,7 @@ trait WorkflowManager {
 }
 
 class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
-    configName: String) extends WorkflowManager
-    
+    configName: String = "main") extends WorkflowManager   
   with Logging 
   with Configure {
 
@@ -47,10 +49,14 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
 
   log.info("Shutdown hook installed ... ")
 
-  private val tm = new TaskManager(config.getConfig(configName))
-  private val statusQManager = new StatusQueueManager(tm, taskHandlerFactoryFactory)
-  private val scheduler = new Scheduler(tm, statusQManager, config.getInt("schedulerGranularityInSeconds"))
-  private val restServer = new RestServer(config.getConfig(configName), new Endpoint(statusQManager.taskContext))
+  val tm = new TaskManager(config.getConfig(configName))
+  val nodeConfig = new NodeConfig(config.getConfig(configName)) 
+  val statusQManager = new StatusQueueManager(tm, taskHandlerFactoryFactory, nodeConfig)
+  val scheduler = new Scheduler(tm, statusQManager, config.getInt("schedulerGranularityInSeconds"))
+  val reaper = new Reaper(tm, config.getInt("reaperGranularityInSeconds"), config.getInt("waitBeforeDeletingInMinutes"))
+  val restServer = new RestServer(config.getConfig(configName), 
+      new Endpoint(statusQManager.taskContext),
+      new Visibility(tm))
 
   def stop {
     // todo add other stops for threads
@@ -72,11 +78,12 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
     Future { restServer.start }
     log.info("Started REST server ... ")
 
-    for (i <- 0 to numWorkers) {
+    for (i <- 1 to numWorkers) {
       new StatusQueueWorker(workerQueue).start
-      log.info(s"Started task queue worker # ${i + 1} ... ")
+      log.info(s"Started task queue worker # ${i} ... ")
     }
     scheduler.start
+    reaper.start
     log.info("Started scheduler ... ")
     val later = new Date().getTime
     log.info(s"Casablanca startup sucessful in ${later - when} ms !")

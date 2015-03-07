@@ -5,6 +5,7 @@ import casablanca.db._
 import java.util.UUID
 import java.util.Date
 import com.typesafe.config.Config
+import casablanca.util.ProgrammingError
 
 trait CreateTask {
   def create(descriptor: TaskDescriptor,
@@ -14,7 +15,7 @@ trait CreateTask {
 
 class TaskManager(configIt: Config) extends CreateTask {
 
-  private val myConfig = configIt.getConfig("TaskManager")
+  private val myConfig = configIt.getConfig("taskManager")
 
   private val db = new Db(myConfig.getString("db"))
   private val taskTable = db.table(myConfig.getString("taskTableName"))
@@ -30,7 +31,7 @@ class TaskManager(configIt: Config) extends CreateTask {
 
   def getTask(taskId: String): Task = {
     val results = taskTable.filter(s" taskId = '${taskId}'")
-    if (results.size != 1) throw new Error(s"Too many taskIds for ${taskId}")
+    if (results.size != 1) throw new ProgrammingError(s"There are ${results.size} taskIds (${taskId}) in the database! ")
     else fromRow(results.rows(0))
   }
 
@@ -48,13 +49,24 @@ class TaskManager(configIt: Config) extends CreateTask {
     getTask(taskId)
   }
 
+  def deleteTasks(status: Int, beforeWhen: Date): Int = {
+    val sql = s" createTime <= ${beforeWhen.getTime} AND status = ${status}"
+    taskTable.delete(sql)
+  }
+  
   def findScheduledTasks(beforeWhen: Date): List[Task] = {
     val sql = s" scheduleTime <= ${beforeWhen.getTime} ORDER BY createTime ASC"
     findTasksImpl(sql)
   }
 
-  def findTasks(taskType: String, status: Int): List[Task] = {
-    findTasksImpl(s" taskType = '${taskType}' AND status = ${status} AND scheduleTime IS NULL ORDER BY createTime ASC")
+  def findTasks(taskType: String, status: Option[Int]): List[Task] = {
+    
+    val statusSql = status match {
+      case None => ""
+      case Some(st) => s"AND status = ${st}"
+    }
+    
+    findTasksImpl(s" taskType = '${taskType}' ${statusSql} AND scheduleTime IS NULL ORDER BY createTime ASC")
   }
 
   private def findTasksImpl(sql: String): List[Task] = {

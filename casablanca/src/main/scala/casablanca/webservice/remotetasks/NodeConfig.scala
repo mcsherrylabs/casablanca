@@ -6,7 +6,7 @@ import scala.collection.JavaConversions._
 import com.typesafe.config.Config
 import casablanca.util.Logging
 
-object NodeConfig extends Configure with Logging {
+class NodeConfig(config: Config)  extends Logging {
   private val local = "local"
 
   lazy private val nodes = config.getConfig("nodes")

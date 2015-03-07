@@ -20,13 +20,16 @@ import casablanca.util.Configure
 import casablanca.util.ProgrammingError
 import casablanca.task.RelativeScheduledStatusUpdate
 import casablanca.task.TaskEvent
+import casablanca.webservice.remotetasks.NodeConfig
 
-class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory) extends Logging with Configure {
+class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory, aNodeConfig: NodeConfig) extends Logging with Configure {
 
   lazy val puntIntoFutureMinutes = config.getInt("queueOverloadRescheduleMinutes")
 
   lazy val taskContext: TaskHandlerContext = new TaskHandlerContext {
 
+    lazy val nodeConfig: NodeConfig = aNodeConfig
+    
     override def create(descriptor: TaskDescriptor,
       schedule: Option[TaskSchedule] = None,
       parent: Option[TaskParent] = None): Task = tm.create(descriptor, schedule, parent)
@@ -49,6 +52,10 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
 
     override def pushTask(task: Task, update: HandlerUpdate) {
       StatusQueueManager.this.pushTask(task, update)
+    }
+    
+    override def getTask(taskId: String): Task = {
+      tm.getTask(taskId)
     }
   }
 
@@ -111,7 +118,7 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
 
   }
 
-  def findTasks(taskType: String, status: Int): List[Task] = tm.findTasks(taskType, status)
+  def findTasks(taskType: String, status: Int): List[Task] = tm.findTasks(taskType, Some(status))
 
   def attemptTask(task: Task): Task = {
     // inc attempts

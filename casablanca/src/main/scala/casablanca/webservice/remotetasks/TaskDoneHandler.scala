@@ -52,11 +52,11 @@ object RemoteRestRequestHandler extends RemoteRestHandler {
 
     val newMsg = fromRemoteTaskDecorator(
       remoteTaskCase.strPayload,
-      NodeConfig.localNode,
+      taskHandlerContext.nodeConfig.localNode,
       Some(task.id),
       None)
 
-    val myUrl = new URL(NodeConfig.map(remoteTaskCase.node) + "/task/" + remoteTaskCase.taskType.get)
+    val myUrl = new URL(taskHandlerContext.nodeConfig.map(remoteTaskCase.node) + "/task/decorated/" + remoteTaskCase.taskType.get)
     val p = POST(myUrl).addBody(newMsg)
     val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
     HandlerUpdate.awaitEvent
@@ -78,7 +78,7 @@ object TaskDoneHandler extends RemoteRestHandler {
     def callParentRemotely: HandlerUpdate = {
       val myUrl = new URL(task.parentNode.get + "/event/" + task.parentTaskId.get)
       log.debug("Calling remote parent ..." + myUrl)
-      val decorated = fromRemoteTaskDecorator(task.strPayload, NodeConfig.localNode, Some(task.id), Some(task.taskType))
+      val decorated = fromRemoteTaskDecorator(task.strPayload, taskHandlerContext.nodeConfig.localNode, Some(task.id), Some(task.taskType))
       val p = POST(myUrl).addBody(decorated)
       val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
       log.info(s"Remote parent informed - all done ${task.taskType} ${task.id} ")
