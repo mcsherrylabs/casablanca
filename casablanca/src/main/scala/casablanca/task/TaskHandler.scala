@@ -98,5 +98,6 @@ object AwaitEvent extends TaskStatuses {
 
 object StatusUpdate {
   def apply(nextStatus: Int, newStringPayload: Option[String] = None) = HandlerUpdate(Some(nextStatus), newStringPayload)
+  
 }
 

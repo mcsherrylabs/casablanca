@@ -20,16 +20,20 @@ class TaskCompletionListener(implicit scheduleService: ScheduledExecutorService)
   
   def listenForCompletion[T](defaultResult:Task, mapOnCompletion: Task =>  T,
       mininmumWaitTimeMs: Option[Int] = None): TwitFuture[T] = {
+    
     log.debug(s"Pool size is now ${monitoredTasks.size}")
     
     mininmumWaitTimeMs match {
       case Some(timeOut) if timeOut > 0 => {
-        val tf = new TimeoutFuture(defaultResult, mininmumWaitTimeMs.get)
+        
+        val tf = new TimeoutFuture(defaultResult, timeOut)
 	    monitoredTasks.put(defaultResult.id, tf)
+	    
 	    val twitProm = TwitPromise[T]()
-	    val f = tf.get.map(mapOnCompletion)
-	    f.onComplete {
-          case Success(t) => {
+	    
+	    tf.get.map(mapOnCompletion).onComplete {
+          
+	      case Success(t) => {
             monitoredTasks.remove(defaultResult.id)
             twitProm.setValue(t)
           }

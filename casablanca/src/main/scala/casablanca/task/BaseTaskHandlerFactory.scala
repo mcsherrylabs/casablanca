@@ -28,6 +28,11 @@ trait BaseTaskHandlerFactory extends TaskHandlerFactory
             with Logging 
             with Configure {
 
+  protected lazy val taskConfig = {
+    if(config.hasPath(getTaskType)) Some(config.getConfig(getTaskType))
+    else None 
+  }
+  
   def getStatusConfig(status:Int): StatusConfig = {
     
     val configPath = s"${getTaskType}.${status}" 

@@ -8,7 +8,8 @@ class RestServer(config: Config, controllers: Controller*) extends FinatraServer
   val finatraPackage: String = "com.twitter.finatra.config"
   val configPrefix: String = "restServer"
 
-  System.setProperty(s"${finatraPackage}.adminPort", ":" + config.getString(s"${configPrefix}.adminPort"))
+  System.setProperty(s"${finatraPackage}.adminPort", "") 
+      //":" + config.getString(s"${configPrefix}.adminPort"))
   //System.setProperty(s"${finatraPackage}.appName", config.getString(s"${configPrefix}.appName"))
   //  System.setProperty(s"${finatraPackage}.assetPath", config.getString(s"${configPrefix}.assetPath"))
   //  System.setProperty(s"${finatraPackage}.certificatePath", config.getString(s"${configPrefix}.certificatePath"))

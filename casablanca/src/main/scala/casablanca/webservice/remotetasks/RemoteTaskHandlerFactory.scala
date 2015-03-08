@@ -33,6 +33,11 @@ trait RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
     case unsupported => super.getHandler(status)
   }
 
+  def startRemoteTask(taskContext: TaskHandlerContext, strPayload: String, parent: Task): Task = {
+    val taskParent: Option[TaskParent] = Some(TaskParent(parent.id, Some(taskContext.nodeConfig.localNode)))
+    startRemoteTask(taskContext, strPayload, taskParent)
+  }
+  
   def startRemoteTask(taskContext: TaskHandlerContext, strPayload: String, parent: Option[TaskParent] = None): Task = {
     // add remote details
     val decorated = fromRemoteTaskDecorator(strPayload, remoteTask.node, None, Some(remoteTask.taskType))

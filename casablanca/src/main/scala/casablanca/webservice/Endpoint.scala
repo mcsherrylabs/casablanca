@@ -54,7 +54,7 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
 	        val str = request.contentString
 	        
 	        // Note task may finish in gap between task started
-	        // and time listener is set up...., so seperate out create
+	        // and time listener is set up...., so separate out create
 	        // and push
 	        val t = taskContext.create(
 	          TaskDescriptor(tType, taskContext.taskStarted, str),
