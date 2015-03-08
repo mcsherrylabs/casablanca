@@ -18,8 +18,10 @@ import casablanca.util.Logging
 import org.slf4j.Logger
 import casablanca.util.LogFactory
 import casablanca.task.TaskJsonMapper
+import casablanca.task.Task
+import scala.concurrent.Future
 
-class Endpoint(taskContext: TaskHandlerContext) extends Controller   {
+class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskCompletionListener) extends Controller   {
 
   private val myLog = LogFactory.getLogger(this.getClass.toString)
   
@@ -39,7 +41,7 @@ class Endpoint(taskContext: TaskHandlerContext) extends Controller   {
   }
 
   
-    post(s"/task/:taskType") { request =>
+  post(s"/task/:taskType") { request =>
 
     try {
 	    request.routeParams.get("taskType") match {
@@ -51,13 +53,22 @@ class Endpoint(taskContext: TaskHandlerContext) extends Controller   {
 	        myLog.debug(s"Starting task (${tType}) via endpoint... ")
 	        val str = request.contentString
 	        
-	        val t = taskContext.startTask(
+	        // Note task may finish in gap between task started
+	        // and time listener is set up...., so seperate out create
+	        // and push
+	        val t = taskContext.create(
 	          TaskDescriptor(tType, taskContext.taskStarted, str),
 	          None,
 	          None)
-	
-	        render.status(200).body(TaskJsonMapper.fromTask(t)).toFuture
-	
+	    
+	        val mininmumWaitTimeMs = request.request.getIntParam("wait", 0)
+            val twitFuture = taskCompletionListener.listenForCompletion[ResponseBuilder](t,
+                tsk =>	render.status(200).body(TaskJsonMapper.fromTask(tsk)),
+                Some(mininmumWaitTimeMs))
+                
+            // pushing the task allows it to start...    
+            taskContext.pushTask(t)
+            twitFuture
 	      }
 	      
 	    }

@@ -8,8 +8,10 @@ import casablanca.task.StatusUpdate
 import casablanca.task.HandlerUpdate
 import casablanca.util.Logging
 import casablanca.task.SystemTaskStatuses
+import java.util.concurrent.ScheduledExecutorService
 
 class Reaper(tm: TaskManager,
+    scheduledExecutorService: ScheduledExecutorService,
     scheduleIntervalInSeconds: Int,
     waitBeforeDeletingMinutes: Int) extends Logging with SystemTaskStatuses {
 
@@ -24,12 +26,15 @@ class Reaper(tm: TaskManager,
         log.info(s"Reaper deleted ${deleted} 'system finished' tasks ... ")
       } catch {
          case e: Exception => log.error(s"Scheduler failed to reschedule tasks", e)      
-      } finally start
+      } 
     }
   }
 
   def start {
-    Executors.newScheduledThreadPool(1).schedule(runnable, scheduleIntervalInSeconds, TimeUnit.SECONDS)
+    scheduledExecutorService.scheduleAtFixedRate(runnable, 
+        scheduleIntervalInSeconds, 
+        scheduleIntervalInSeconds, 
+        TimeUnit.SECONDS)
   }
 
   

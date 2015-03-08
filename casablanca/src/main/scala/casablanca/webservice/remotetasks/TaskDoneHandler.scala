@@ -90,6 +90,9 @@ object TaskDoneHandler extends RemoteRestHandler {
       log.warn(s"FAILED: ${task}")
     }
 
+    // Inform any waiting req that it's finished
+    taskHandlerContext.taskCompletionListener.complete(task)
+    
     (task.parentNode, task.parentTaskId) match {
       case (Some(parent), Some(taskId)) => callParentRemotely
       case (None, Some(taskId)) => callParentAsEvent

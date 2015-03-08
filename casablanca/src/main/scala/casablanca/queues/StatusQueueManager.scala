@@ -21,14 +21,19 @@ import casablanca.util.ProgrammingError
 import casablanca.task.RelativeScheduledStatusUpdate
 import casablanca.task.TaskEvent
 import casablanca.webservice.remotetasks.NodeConfig
+import casablanca.webservice.TaskCompletionListener
 
-class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandlerFactoryFactory, aNodeConfig: NodeConfig) extends Logging with Configure {
+class StatusQueueManager(tm: TaskManager, 
+    taskHandlerFactoryFactory: TaskHandlerFactoryFactory, 
+    aNodeConfig: NodeConfig,
+    aTaskCompletionListener: TaskCompletionListener) extends Logging with Configure {
 
   lazy val puntIntoFutureMinutes = config.getInt("queueOverloadRescheduleMinutes")
 
   lazy val taskContext: TaskHandlerContext = new TaskHandlerContext {
 
     lazy val nodeConfig: NodeConfig = aNodeConfig
+    lazy val taskCompletionListener =  aTaskCompletionListener 
     
     override def create(descriptor: TaskDescriptor,
       schedule: Option[TaskSchedule] = None,
@@ -50,6 +55,8 @@ class StatusQueueManager(tm: TaskManager, taskHandlerFactoryFactory: TaskHandler
       }
     }
 
+    override def pushTask(task: Task) = StatusQueueManager.this.pushTask(task)
+    
     override def pushTask(task: Task, update: HandlerUpdate) {
       StatusQueueManager.this.pushTask(task, update)
     }

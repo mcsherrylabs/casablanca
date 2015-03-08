@@ -7,8 +7,12 @@ import casablanca.task.TaskManager
 import casablanca.task.StatusUpdate
 import casablanca.task.HandlerUpdate
 import casablanca.util.Logging
+import java.util.concurrent.ScheduledExecutorService
 
-class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeconds: Int) extends Logging {
+class Scheduler(tm: TaskManager, 
+    scheduledExecutorService: ScheduledExecutorService, 
+    sqm: StatusQueueManager, 
+    scheduleIntervalInSeconds: Int) extends Logging {
 
   private val runnable = new Runnable {
     def run {
@@ -16,12 +20,12 @@ class Scheduler(tm: TaskManager, sqm: StatusQueueManager, scheduleIntervalInSeco
         reschedule()
       } catch {
          case e: Exception => log.error(s"Scheduler failed to reschedule tasks", e)      
-      } finally start
+      } 
     }
   }
 
   def start {
-    Executors.newScheduledThreadPool(1).schedule(runnable, scheduleIntervalInSeconds, TimeUnit.SECONDS)
+    scheduledExecutorService.scheduleAtFixedRate(runnable, scheduleIntervalInSeconds, scheduleIntervalInSeconds, TimeUnit.SECONDS)    
   }
 
   def reschedule(beforeWhen: Date = new Date()) {

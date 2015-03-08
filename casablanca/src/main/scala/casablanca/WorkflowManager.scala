@@ -20,6 +20,8 @@ import casablanca.webservice.Endpoint
 import casablanca.webservice.remotetasks.NodeConfig
 import casablanca.queues.Reaper
 import casablanca.webservice.Visibility
+import java.util.concurrent.Executors
+import casablanca.webservice.TaskCompletionListener
 
 /**
  *
@@ -51,11 +53,15 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
 
   val tm = new TaskManager(config.getConfig(configName))
   val nodeConfig = new NodeConfig(config.getConfig(configName)) 
-  val statusQManager = new StatusQueueManager(tm, taskHandlerFactoryFactory, nodeConfig)
-  val scheduler = new Scheduler(tm, statusQManager, config.getInt("schedulerGranularityInSeconds"))
-  val reaper = new Reaper(tm, config.getInt("reaperGranularityInSeconds"), config.getInt("waitBeforeDeletingInMinutes"))
+  
+  val scheduledExecutorService = Executors.newScheduledThreadPool(1)
+  val taskCompletionschedulerPool = Executors.newScheduledThreadPool(config.getInt("taskCompletionSchedulerPoolSize"))
+  val taskCompletionListener = new TaskCompletionListener()(taskCompletionschedulerPool)
+  val statusQManager = new StatusQueueManager(tm, taskHandlerFactoryFactory, nodeConfig, taskCompletionListener)
+  val scheduler = new Scheduler(tm, scheduledExecutorService, statusQManager, config.getInt("schedulerGranularityInSeconds"))
+  val reaper = new Reaper(tm, scheduledExecutorService , config.getInt("reaperGranularityInSeconds"), config.getInt("waitBeforeDeletingInMinutes"))
   val restServer = new RestServer(config.getConfig(configName), 
-      new Endpoint(statusQManager.taskContext),
+      new Endpoint(statusQManager.taskContext, taskCompletionListener),
       new Visibility(tm))
 
   def stop {
