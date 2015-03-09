@@ -20,11 +20,18 @@ import casablanca.task.TaskDescriptor
 import casablanca.task.TaskParent
 import casablanca.task.BaseTaskHandlerFactory
 import casablanca.task.TaskEvent
+import casablanca.task.MailJsonMapper
 
-object MailHandler extends TaskHandler {
+case class MailerConfig(server: String, port: Int, auth: Boolean, user: String, pass: String, stratTtls: Boolean)
+case class Mail(mailerConfigName: String, from: String, to: String, subject: String, body: String)
+
+class MailHandler() extends TaskHandler {
 
   val maxAttemptCount = 5
 
+  private def getMailConfig(name: String): MailerConfig = ???
+  
+  
   private val mailer = Mailer("smtp.gmail.com", 587)
     .auth(true)
     .as("alanmcsherry@gmail.com", "cuimuxmqnucnmiuh")
@@ -32,6 +39,12 @@ object MailHandler extends TaskHandler {
 
   private def mailIt(task: Task): HandlerUpdate = {
 
+    val mail = MailJsonMapper.toMail(task.strPayload)
+    
+    val mailConfig = getMailConfig(mail.mailerConfigName)
+    
+    START HERE !
+    
     val f = mailer(Envelope.from("alanmcsherry" at "gmail.com")
       .to("alan" `@` "mcsherrylabs.com")
       .subject("MAiler Task")
