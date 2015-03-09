@@ -55,8 +55,7 @@ class TaskCompletionListener(implicit scheduleService: ScheduledExecutorService)
   
   def complete(completedTask: Task) {
     monitoredTasks.get(completedTask.id) map { tf =>
-      tf.complete(completedTask)
-      //monitoredTasks.remove(completedTask.id)
+      tf.complete(completedTask)      
     }
   }
 }

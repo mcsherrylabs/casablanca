@@ -24,6 +24,7 @@ import com.stackmob.newman.dsl._
 import com.stackmob.newman._
 import java.net.URL
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
+import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory._
 import scala.util.Random
 
 trait DemoStatuses {
@@ -71,10 +72,9 @@ class StartNextPanel(row: Int, col: Int) extends TaskHandler with DemoStatuses {
     log.info(s"Going to start next panel ")
     nextNode match {
       case Some(nextNode) => {
-    	  val nextPanel = new RemoteTaskHandlerFactory {
-               val remoteTask: RemoteTask = RemoteTask(nextNode, demoTask)
-    	  }
-    	  nextPanel.startRemoteTask(taskHandlerContext, "", task)
+    	  
+        val remoteTask: RemoteTask = RemoteTask(nextNode, demoTask, "")    	  
+    	  RemoteTaskHandlerFactory.startRemoteTask(taskHandlerContext, remoteTask, task)
     	  log.info(s"Next panel is ${nextNode}, awainting event")
     	  StatusUpdate(awaitingEvent.value)
       }

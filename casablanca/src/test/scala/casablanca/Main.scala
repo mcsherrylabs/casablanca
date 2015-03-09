@@ -23,9 +23,7 @@ object Main {
     }
     val thf = TaskHandlerFactoryFactory(DummyTaskHandlerFactory, remoteDummy)
     */
-    val thf = TaskHandlerFactoryFactory(new DemoTaskFactory(args(1).toInt, args(2).toInt), new RemoteTaskHandlerFactory {
-               val remoteTask: RemoteTask = RemoteTask("nextNode", "demoTask")
-    	  })
+    val thf = TaskHandlerFactoryFactory(new DemoTaskFactory(args(1).toInt, args(2).toInt),  RemoteTaskHandlerFactory )
 
     LogFactory.getLogger("MAIN").info(s"Starting panel row ${args(1)} col ${args(1)}")
     new WorkflowManagerImpl(thf, args(0)).start

@@ -17,11 +17,9 @@ import casablanca.task.TaskParent
 import casablanca.task.TaskEvent
 import casablanca.task.TaskDescriptor
 
-trait RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
+object RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
 
-  case class RemoteTask(node: String, taskType: String)
-
-  val remoteTask: RemoteTask
+  case class RemoteTask(node: String, taskType: String, payload: String)
 
   private val remoteTaskType = "remoteTask"
   def getTaskType: String = remoteTaskType
@@ -33,14 +31,14 @@ trait RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
     case unsupported => super.getHandler(status)
   }
 
-  def startRemoteTask(taskContext: TaskHandlerContext, strPayload: String, parent: Task): Task = {
+  def startRemoteTask(taskContext: TaskHandlerContext, remoteTask: RemoteTask, parent: Task): Task = {
     val taskParent: Option[TaskParent] = Some(TaskParent(parent.id, Some(taskContext.nodeConfig.localNode)))
-    startRemoteTask(taskContext, strPayload, taskParent)
+    startRemoteTask(taskContext, remoteTask, taskParent)
   }
   
-  def startRemoteTask(taskContext: TaskHandlerContext, strPayload: String, parent: Option[TaskParent] = None): Task = {
+  def startRemoteTask(taskContext: TaskHandlerContext, remoteTask: RemoteTask, parent: Option[TaskParent] = None): Task = {
     // add remote details
-    val decorated = fromRemoteTaskDecorator(strPayload, remoteTask.node, None, Some(remoteTask.taskType))
+    val decorated = fromRemoteTaskDecorator(remoteTask.payload, remoteTask.node, None, Some(remoteTask.taskType))
     taskContext.startTask(TaskDescriptor(remoteTaskType, taskStarted, decorated), None,
       parent)
   }
