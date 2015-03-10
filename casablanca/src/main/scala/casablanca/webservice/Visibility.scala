@@ -21,47 +21,47 @@ import casablanca.task.TaskJsonMapper
 import casablanca.task.TaskManager
 import casablanca.task.Task
 
-class Visibility(tm: TaskManager) extends Controller   {
+import casablanca.task.TaskJsonMapper._
+
+class Visibility(tm: TaskManager) extends Controller {
 
   private val prefix = "/visibility"
-    
+
   private val myLog = LogFactory.getLogger(this.getClass.toString)
-  
+
   get(s"${prefix}/task/:taskId") { request =>
     request.routeParams.get("taskId") match {
       case None => {
-        
+
         render.html(s"No task id given! ").status(400).toFuture
       }
-      case Some(tId) => {    	
-        val str = TaskJsonMapper.fromTask(tm.getTask(tId))        
-        render.status(200).html(str).toFuture
+      case Some(tId) => {
+        render.status(200).html(tm.getTask(tId)).toFuture
       }
     }
   }
 
-  
   get(s"${prefix}/tasktype/:tasktype/:status") { request =>
 
     try {
-	    request.routeParams.get("tasktype") match {
-	      case None => {	        
-	        render.html("No task type!").status(400).toFuture
-	      }
-	      case Some(tType) => {
-	    	
-	        val statusOrAll = request.routeParams.get("status").map(_.toInt) match {
-	          case Some(-1) => None	          
-	          case x => Some(x)
-	        }
-	        
-	    	val tasks = tm.findTasks(tType, statusOrAll.flatten)
-	    	val html = toHtml(tasks)
-	        render.status(200).html(html).toFuture
-	
-	      }
-	      
-	    }
+      request.routeParams.get("tasktype") match {
+        case None => {
+          render.html("No task type!").status(400).toFuture
+        }
+        case Some(tType) => {
+
+          val statusOrAll = request.routeParams.get("status").map(_.toInt) match {
+            case Some(-1) => None
+            case x => Some(x)
+          }
+
+          val tasks = tm.findTasks(tType, statusOrAll.flatten)
+          val html = toHtml(tasks)
+          render.status(200).html(html).toFuture
+
+        }
+
+      }
     } catch {
       case e: Exception => {
         myLog.error("Couldn't process ", e)
@@ -94,13 +94,13 @@ class Visibility(tm: TaskManager) extends Controller   {
     val header = "<html><h1>Tasks list... </h1><table>"
     tasks.map { t =>
       s"<tr><td><a href ='${prefix}/task/${t.id}\'>${t.id}</a></td>" +
-      s"<td>${t.status}</td>" +
-      s"<td>${t.createTime}</td>" + 
-      s"<td>${t.attemptCount}</td>" + 
-      s"<td>${t.parentNode}</td>" + 
-      s"<td>${t.parentTaskId}</td>" + 
-      s"<td>${t.strPayload}</td> </tr>"
-      
+        s"<td>${t.status}</td>" +
+        s"<td>${t.createTime}</td>" +
+        s"<td>${t.attemptCount}</td>" +
+        s"<td>${t.parentNode}</td>" +
+        s"<td>${t.parentTaskId}</td>" +
+        s"<td>${t.strPayload}</td> </tr>"
+
     }.foldLeft(header)((a, b) => a + b) + "</table><html>"
-  } 
+  }
 }

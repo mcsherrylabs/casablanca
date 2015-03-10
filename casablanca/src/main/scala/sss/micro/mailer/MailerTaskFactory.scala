@@ -20,55 +20,63 @@ import casablanca.task.TaskDescriptor
 import casablanca.task.TaskParent
 import casablanca.task.BaseTaskHandlerFactory
 import casablanca.task.TaskEvent
-import casablanca.task.MailJsonMapper
+import scala.collection.JavaConversions._
+import casablanca.util.ProgrammingError
+import casablanca.task.TaskDescriptor
 
-case class MailerConfig(server: String, port: Int, auth: Boolean, user: String, pass: String, stratTtls: Boolean)
-case class Mail(mailerConfigName: String, from: String, to: String, subject: String, body: String)
+case class Email(name: String, domain: String)
+case class Mail(from: Email, to: Email, subject: String, body: String, mailerConfigName: String = "default")
 
-class MailHandler() extends TaskHandler {
+class MailHandler(mailers: Map[String, Mailer]) extends TaskHandler {
 
-  val maxAttemptCount = 5
-
-  private def getMailConfig(name: String): MailerConfig = ???
-  
-  
-  private val mailer = Mailer("smtp.gmail.com", 587)
-    .auth(true)
-    .as("alanmcsherry@gmail.com", "cuimuxmqnucnmiuh")
-    .startTtls(true)()
+  import MailJsonMapper._
 
   private def mailIt(task: Task): HandlerUpdate = {
 
-    val mail = MailJsonMapper.toMail(task.strPayload)
-    
-    val mailConfig = getMailConfig(mail.mailerConfigName)
-    
-    START HERE !
-    
-    val f = mailer(Envelope.from("alanmcsherry" at "gmail.com")
-      .to("alan" `@` "mcsherrylabs.com")
-      .subject("MAiler Task")
-      .content(Text("Hello there business task in progress")))
+    val mail: Mail = task.strPayload
+
+    def t(msg: String) = throw new ProgrammingError(msg)
+
+    val f = mailers.getOrElse(mail.mailerConfigName,
+      t(s"No such mail config -> ${mail.mailerConfigName}"))(Envelope.from(mail.from.name at mail.from.domain)
+        .to(mail.to.name `@` mail.to.domain)
+        .subject(mail.subject)
+        .content(Text(mail.body)))
 
     Await.result(f, Duration(60, TimeUnit.SECONDS))
     StatusUpdate(taskFinished.value)
   }
 
-  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-    mailIt(task)
-  }
+  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = mailIt(task)
 
 }
 
 object MailerTaskFactory extends BaseTaskHandlerFactory {
+
+  import MailJsonMapper._
+
+  lazy val mailers = taskConfig.get.getConfigList("mailConfigs").map { c =>
+
+    (c.getString("name") ->
+      Mailer(c.getString("server"), c.getInt("port"))
+      .auth(c.getBoolean("auth"))
+      .as(c.getString("user"), c.getString("pass"))
+      .startTtls(c.getBoolean("startTtls"))())
+
+  }.toMap
 
   val mailerTaskType = "mailerTask"
   def getTaskType: String = mailerTaskType
 
   override def getSupportedStatuses: Set[TaskStatus] = super.getSupportedStatuses ++ Set(taskStarted)
   override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = status match {
-    case `taskStarted` => Some(MailHandler)
+    case `taskStarted` => Some(new MailHandler(mailers))
     case _ => super.getHandler(status)
   }
 
+  def mail(taskContext: TaskHandlerContext, mail: Mail, parent: Option[TaskParent] = None): Task = {
+
+    val taskDescriptor = TaskDescriptor(mailerTaskType, taskStarted, mail)
+    taskContext.startTask(taskDescriptor, None, parent)
+  }
 }
