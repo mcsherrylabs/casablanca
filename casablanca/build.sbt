@@ -1,6 +1,13 @@
-//import NativePackagerKeys._
+import com.typesafe.sbt.packager.archetypes._
 
-//packageArchetype.java_application
+packagerSettings
+
+JavaAppPackaging.settings
+
+mappings in Universal += { file("bin/casablanca") -> "bin/casablanca" }
+
+mappings in Universal += { file("bin/demo") -> "bin/demo" }
+
 
 scalaVersion := "2.10.4"
 

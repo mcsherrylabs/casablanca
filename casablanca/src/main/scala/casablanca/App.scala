@@ -17,18 +17,32 @@ import casablanca.webservice.RestServer
 import casablanca.util.ConfigureFactory
 import casablanca.util.LogFactory
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
+import casablanca.sss.demo.DemoTaskFactory
+import casablanca.util.Logging
 
 object App {
 
   def main(args: Array[String]): Unit = {
 
-    val restConfigName = if(args.size > 0) {
+    val configName = if (args.size > 0) {
       args(0)
     } else "main"
-      
-    val thf = TaskHandlerFactoryFactory(MailerTaskFactory, RemoteTaskHandlerFactory, DomainTransferHandlerFactory)
-    new WorkflowManagerImpl(thf, restConfigName).start
-      
+
+    val (row: Int, col: Int) = if (args.size > 2) {
+      (args(1).toInt, args(2).toInt)
+    } else (0, 0)
+
+    val thf = TaskHandlerFactoryFactory(MailerTaskFactory,
+      RemoteTaskHandlerFactory,
+      DomainTransferHandlerFactory,
+      new DemoTaskFactory(row, col))
+
+    println(s"This instance supports the following task factories and statuses...")
+    thf.supportedFactories.foreach { fact =>
+      println(s"${fact.getTaskType}  ${fact.getSupportedStatuses}")
+    }
+
+    new WorkflowManagerImpl(thf, configName).start
 
   }
 }

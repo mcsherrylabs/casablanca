@@ -6,12 +6,14 @@ import casablanca.task.RelativeScheduledStatusUpdate
 import casablanca.task.TaskHandlerContext
 import casablanca.util.Logging
 import casablanca.task.StatusConfig
+import casablanca.task.SystemFailure
+import casablanca.task.TaskFatalError
 
-class StatusQueue(taskContext: TaskHandlerContext, 
-    statusConfig: StatusConfig, 
-    status: Int, 
-    val taskType: String, 
-    statusQueueManager: StatusQueueManager) extends Logging {
+class StatusQueue(taskContext: TaskHandlerContext,
+  statusConfig: StatusConfig,
+  status: Int,
+  val taskType: String,
+  statusQueueManager: StatusQueueManager) extends Logging {
 
   private val statusHandler = statusQueueManager.getHandler(taskType, status).getOrElse(throw new Error(s"No handler exists for status ${status}"))
   private val queue = new java.util.concurrent.ArrayBlockingQueue[Task](statusConfig.queueSize)
@@ -50,8 +52,13 @@ class StatusQueue(taskContext: TaskHandlerContext,
         }
 
       } catch {
+
+        case tf: TaskFatalError => {
+          log.error(s"FATAL problem handling task, abandoning ${t}", tf)
+          statusQueueManager.pushTask(t, SystemFailure())
+        }
         case ex: Exception => {
-          log.warn("Exception handling task, retry in 0 minutes", ex)          
+          log.warn("Exception handling task, retry in 0 minutes", ex)
           statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, statusConfig.retryDelayMinutes))
         }
       }

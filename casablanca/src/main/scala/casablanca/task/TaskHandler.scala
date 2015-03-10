@@ -30,23 +30,20 @@ trait TaskHandler extends TaskStatuses with Logging {
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate
   def reTry(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
     log.info(s"Default handler retrying task ${task}")
-   handle(taskHandlerContext, task) 
+    handle(taskHandlerContext, task)
   }
 }
 
 case class StatusConfig(
-  queueSize: Int = 25,   
+  queueSize: Int = 25,
   offerTimeoutMs: Int = 10000,
-  pollTimeoutMs: Int = 10000,
+  pollTimeoutMs: Int = 100,
   maxRetryCount: Int = 5,
-  retryDelayMinutes: Int = 0
-)
-
- 
+  retryDelayMinutes: Int = 0)
 
 trait TaskHandlerFactory extends TaskStatuses {
 
-  def getStatusConfig(status:Int): StatusConfig
+  def getStatusConfig(status: Int): StatusConfig
   def getTaskType: String
   def getSupportedStatuses: Set[TaskStatus]
   def getHandler[T >: TaskHandler](status: TaskStatus): Option[T]
@@ -84,6 +81,12 @@ object SystemSuccess extends TaskStatuses {
   }
 }
 
+object SystemFailure extends TaskStatuses {
+  def apply(): HandlerUpdate = {
+    HandlerUpdate(Some(systemFailed.value))
+  }
+}
+
 object Success extends TaskStatuses {
   def apply(): HandlerUpdate = {
     HandlerUpdate(Some(taskFinished.value))
@@ -98,6 +101,6 @@ object AwaitEvent extends TaskStatuses {
 
 object StatusUpdate {
   def apply(nextStatus: Int, newStringPayload: Option[String] = None) = HandlerUpdate(Some(nextStatus), newStringPayload)
-  
+
 }
 

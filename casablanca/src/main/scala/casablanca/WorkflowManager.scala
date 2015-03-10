@@ -32,8 +32,8 @@ trait WorkflowManager {
 }
 
 class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
-    configName: String = "main") extends WorkflowManager   
-  with Logging 
+  configName: String = "main") extends WorkflowManager
+  with Logging
   with Configure {
 
   Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -52,17 +52,17 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
   log.info("Shutdown hook installed ... ")
 
   val tm = new TaskManager(config.getConfig(configName))
-  val nodeConfig = new NodeConfig(config.getConfig(configName)) 
-  
+  val nodeConfig = new NodeConfig(config.getConfig(configName))
+
   val scheduledExecutorService = Executors.newScheduledThreadPool(1)
   val taskCompletionschedulerPool = Executors.newScheduledThreadPool(config.getInt("taskCompletionSchedulerPoolSize"))
   val taskCompletionListener = new TaskCompletionListener()(taskCompletionschedulerPool)
   val statusQManager = new StatusQueueManager(tm, taskHandlerFactoryFactory, nodeConfig, taskCompletionListener)
   val scheduler = new Scheduler(tm, scheduledExecutorService, statusQManager, config.getInt("schedulerGranularityInSeconds"))
-  val reaper = new Reaper(tm, scheduledExecutorService , config.getInt("reaperGranularityInSeconds"), config.getInt("waitBeforeDeletingInMinutes"))
-  val restServer = new RestServer(config.getConfig(configName), 
-      new Endpoint(statusQManager.taskContext, taskCompletionListener),
-      new Visibility(tm))
+  val reaper = new Reaper(tm, scheduledExecutorService, config.getInt("reaperGranularityInSeconds"), config.getInt("waitBeforeDeletingInMinutes"))
+  val restServer = new RestServer(config.getConfig(configName),
+    new Endpoint(statusQManager.taskContext, taskCompletionListener),
+    new Visibility(tm))
 
   def stop {
     // todo add other stops for threads
@@ -89,8 +89,9 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
       log.info(s"Started task queue worker # ${i} ... ")
     }
     scheduler.start
-    reaper.start
     log.info("Started scheduler ... ")
+    reaper.start
+    log.info("Started reaper ... ")
     val later = new Date().getTime
     log.info(s"Casablanca startup sucessful in ${later - when} ms !")
   }
