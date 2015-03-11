@@ -29,30 +29,35 @@ import scala.util.Random
 
 trait DemoStatuses {
   val demoTask = "demoTask"
-  val startNextTask = TaskStatus(1000) 
+  val startNextTask = TaskStatus(1000)
   val switchOffPanel = TaskStatus(1001)
 }
 
 abstract class BaseDemoHandler(row: Int, col: Int) extends TaskHandler with DemoStatuses {
-  protected implicit val httpClient = new ApacheHttpClient 
+  protected implicit val httpClient = new ApacheHttpClient
 }
 
 class SwitchPanel(row: Int, col: Int, onOff: Boolean) extends BaseDemoHandler(row, col) {
 
   val b = onOff match {
     case true => "true"
-    case false => "false"  
+    case false => "false"
   }
-  
+
   val url = new URL(s"http://localhost:7070/update/${row}/${col}/${b}")
-  
+
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-	  GET(url).apply
-	  if(onOff) {
-	    // if turning on, we're at the beginning
-	    log.info(s"Going to return startNextTask.value")
-	    StatusUpdate(startNextTask.value)
-	  } else StatusUpdate(taskFinished.value)
+
+    if (onOff) {
+      // if turning on, we're at the beginning
+      GET(url).apply
+      log.info(s"Going to return startNextTask.value")
+      StatusUpdate(startNextTask.value)
+    } else {
+      Thread.sleep(4000)
+      GET(url).apply
+      StatusUpdate(taskFinished.value)
+    }
   }
 
 }
@@ -60,33 +65,33 @@ class SwitchPanel(row: Int, col: Int, onOff: Boolean) extends BaseDemoHandler(ro
 class StartNextPanel(row: Int, col: Int) extends TaskHandler with DemoStatuses {
 
   private def nextNode: Option[String] = {
-	    val nextRow = if(Random.nextBoolean) row + 1 else row - 1
-	    val nextCol = if(Random.nextBoolean) col + 1 else col - 1
-	    if(nextRow < 1 || nextRow > 4 || nextCol < 1 || nextCol > 4 ) None
-	    else Some(s"${nextRow}_${nextCol}") 	      
-	    
-  	}
-  
+    val nextRow = if (Random.nextBoolean) row + 1 else row - 1
+    val nextCol = if (Random.nextBoolean) col + 1 else col - 1
+    if (nextRow < 1 || nextRow > 4 || nextCol < 1 || nextCol > 4) None
+    else Some(s"${nextRow}_${nextCol}")
+
+  }
+
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-    
+
     log.info(s"Going to start next panel ")
     nextNode match {
       case Some(nextNode) => {
-    	  
-        val remoteTask: RemoteTask = RemoteTask(nextNode, demoTask, "")    	  
-    	  RemoteTaskHandlerFactory.startRemoteTask(taskHandlerContext, remoteTask, task)
-    	  log.info(s"Next panel is ${nextNode}, awainting event")
-    	  StatusUpdate(awaitingEvent.value)
+
+        val remoteTask: RemoteTask = RemoteTask(nextNode, demoTask, "")
+        RemoteTaskHandlerFactory.startRemoteTask(taskHandlerContext, remoteTask, task)
+        log.info(s"Next panel is ${nextNode}, awainting event")
+        StatusUpdate(awaitingEvent.value)
       }
       case None => {
         log.info(s"No next panel!")
         Thread.sleep(5000) // just for effect
         StatusUpdate(switchOffPanel.value)
       }
-    } 
-    
+    }
+
   }
- 
+
 }
 
 class DemoTaskFactory(row: Int, col: Int) extends BaseTaskHandlerFactory with DemoStatuses {
@@ -94,6 +99,7 @@ class DemoTaskFactory(row: Int, col: Int) extends BaseTaskHandlerFactory with De
   def getTaskType: String = demoTask
 
   override def getSupportedStatuses: Set[TaskStatus] = super.getSupportedStatuses ++ Set(taskStarted, startNextTask, switchOffPanel)
+
   override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = status match {
     case `taskStarted` => Some(new SwitchPanel(row, col, true))
     case `startNextTask` => Some(new StartNextPanel(row, col))
