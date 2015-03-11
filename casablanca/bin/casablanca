@@ -1,0 +1,23 @@
+#!/bin/bash
+
+PATH_TO_BIN="$(dirname $(readlink -f $0))"
+cd $PATH_TO_BIN
+  
+LIB="../lib/"
+CONF="../conf"
+CLASSPATH="$CONF/*:$LIB/*"
+
+  
+## Uncomment to set memory requirements 
+##MEM="-Xms6G -Xmx9G"
+  
+MAINCLASS="casablanca.App"
+CONFFILE=-Dconfig.file="$CONF/production-application.conf" 
+ 
+ROW=7$2
+COL=7$3
+
+echo -Ddemo.restServer.port=$ROW$COL
+ 
+java  -Dpath=$PATH_TO_BIN $MEM -Ddemo.restServer.port=$ROW$COL -cp $CLASSPATH $MAINCLASS "$@" &
+

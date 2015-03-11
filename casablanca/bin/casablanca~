@@ -1,0 +1,18 @@
+#!/bin/bash
+
+PATH_TO_BIN="$(dirname $(readlink -f $0))"
+cd $PATH_TO_BIN
+  
+LIB="../lib/"
+CONF="../conf"
+CLASSPATH="$CONF/*:$LIB/*"
+
+  
+## Uncomment to set memory requirements 
+##MEM="-Xms6G -Xmx9G"
+  
+MAINCLASS="casablanca.Main"
+CONFFILE=-Dconfig.file="$CONF/production-application.conf" 
+  
+java  -Dpath=$PATH_TO_BIN $MEM -cp $CLASSPATH $MAINCLASS "$@" &
+

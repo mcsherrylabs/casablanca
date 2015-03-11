@@ -1,0 +1,10 @@
+#!/bin/bash
+
+for i in 1 2 
+do
+	for j in 1 2 
+	do
+	   echo "Starting node $i $j "
+           ./casablanca demo $i $j
+	done
+done
