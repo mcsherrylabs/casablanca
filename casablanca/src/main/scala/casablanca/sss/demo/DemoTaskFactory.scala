@@ -47,12 +47,17 @@ class SwitchPanel(row: Int, col: Int, onOff: Boolean) extends BaseDemoHandler(ro
   val url = new URL(s"http://localhost:7070/update/${row}/${col}/${b}")
   
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-	  GET(url).apply
+	  
 	  if(onOff) {
 	    // if turning on, we're at the beginning
+      GET(url).apply
 	    log.info(s"Going to return startNextTask.value")
 	    StatusUpdate(startNextTask.value)
-	  } else StatusUpdate(taskFinished.value)
+	  } else {
+      Thread.sleep(4000)
+       GET(url).apply
+       StatusUpdate(taskFinished.value)
+    }
   }
 
 }
