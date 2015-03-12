@@ -54,7 +54,7 @@ class SwitchPanel(row: Int, col: Int, onOff: Boolean) extends BaseDemoHandler(ro
       log.info(s"Going to return startNextTask.value")
       StatusUpdate(startNextTask.value)
     } else {
-      Thread.sleep(4000)
+      Thread.sleep(700)
       GET(url).apply
       StatusUpdate(taskFinished.value)
     }
@@ -85,7 +85,7 @@ class StartNextPanel(row: Int, col: Int) extends TaskHandler with DemoStatuses {
       }
       case None => {
         log.info(s"No next panel!")
-        Thread.sleep(5000) // just for effect
+        Thread.sleep(700) // just for effect
         StatusUpdate(switchOffPanel.value)
       }
     }

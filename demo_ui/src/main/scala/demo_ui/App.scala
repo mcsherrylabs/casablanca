@@ -56,8 +56,8 @@ class UpdateWorld extends Controller {
     val url = new URL(s"http://localhost:7${row}7${col}/task/demoTask")
     val p = POST(url)
     p.apply
-    //val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
-    redirect("/").toFuture
+
+    redirect("/index.html").toFuture
   }
 
   get("/square/red.jpg") { request =>
@@ -76,30 +76,15 @@ class UpdateWorld extends Controller {
       .toFuture
   }
 
-  get("/") { request =>
-
-    render.html(paintWorld).toFuture
+  get("/example") { request =>
+    render.static("index.html").toFuture
   }
 
-  private val htmlHead = "<html><head><meta http-equiv='refresh' content='1'></head><body><center><table>"
-  private val htmlTail = "</table></center></body></html>"
-
-  private def paintRow(rowIndex: Int, row: Map[Int, Boolean]) = {
-    row.foldLeft("")((a, rowElem) => {
-      val push = s"/start/${rowIndex}/${rowElem._1}"
-      val greenOrRed = if (rowElem._2) "/square/red.jpg" else "/square/green.jpg"
-      a + s"<td><a  href='${push}'><img src='${greenOrRed}'/></a></td>"
-    })
+  get("/world") { request =>
+    println("Called world")
+    render.json(world).toFuture
   }
 
-  def paintWorld: String = {
-    var rowIndex = 0
-    val middle = world.foldLeft("")((a, row) => {
-      rowIndex += 1
-      a + s"<tr>${paintRow(rowIndex, row._2)}</tr>"
-    })
-    htmlHead + middle + htmlTail
-  }
 }
 
 object App extends FinatraServer {
