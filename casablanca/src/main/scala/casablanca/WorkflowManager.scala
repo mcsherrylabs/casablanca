@@ -93,7 +93,7 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
     reaper.start
     log.info("Started reaper ... ")
     val later = new Date().getTime
-    log.info(s"Casablanca startup sucessful in ${later - when} ms !")
+    log.info(s"Casablanca startup successful in ${later - when} ms !")
   }
 
 }
