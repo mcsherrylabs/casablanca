@@ -17,22 +17,13 @@ class UpdateWorld extends Controller {
 
   protected implicit val httpClient = new ApacheHttpClient
 
-  private def toByteArray(name: String) = {
-    import scala.language.postfixOps
-    val in: InputStream = this.getClass().getResourceAsStream(name);
-    Stream.continually(in.read).takeWhile(-1 !=).map(_.toByte).toArray
-  }
-
-  private val redByteArray = toByteArray("/red-square.jpg")
-  private val greenByteArray = toByteArray("/green-square.jpg")
-
-  private def genRow: Map[Int, Boolean] = {
+  private def genRow: Map[Int, Int] = {
     ((1 to 4) map { i: Int =>
-      (i -> false)
+      (i -> 0)
     }).toMap
   }
 
-  private var world: Map[Int, Map[Int, Boolean]] = {
+  private var world: Map[Int, Map[Int, Int]] = {
     ((1 to 4) map { i: Int =>
       (i -> genRow)
     }).toMap
@@ -44,7 +35,13 @@ class UpdateWorld extends Controller {
     val col = request.routeParams("col").toInt
     val onOff = request.routeParams("onoff").toBoolean
     val cols = world(row)
-    val newCols = cols + (col -> onOff)
+    val newVal = if (onOff) {
+      cols(col) + 1
+    } else {
+      if (cols(col) - 1 < 0) 0 else cols(col) - 1
+    }
+
+    val newCols = cols + (col -> +newVal)
     world = world + (row -> newCols)
     render.status(200).toFuture
   }
@@ -54,26 +51,10 @@ class UpdateWorld extends Controller {
     val col = request.routeParams("col").toInt
     log.info(s"Starting panel ${row} ${col}")
     val url = new URL(s"http://localhost:7${row}7${col}/task/demoTask")
-    val p = POST(url)
+    val p = POST(url).addBody("1")
     p.apply
 
     redirect("/index.html").toFuture
-  }
-
-  get("/square/red.jpg") { request =>
-
-    render.status(200)
-      .contentType("application/octet-stream")
-      .body(redByteArray)
-      .toFuture
-  }
-
-  get("/square/green.jpg") { request =>
-
-    render.status(200)
-      .contentType("application/octet-stream")
-      .body(greenByteArray)
-      .toFuture
   }
 
   get("/example") { request =>
@@ -81,7 +62,6 @@ class UpdateWorld extends Controller {
   }
 
   get("/world") { request =>
-    println("Called world")
     render.json(world).toFuture
   }
 
