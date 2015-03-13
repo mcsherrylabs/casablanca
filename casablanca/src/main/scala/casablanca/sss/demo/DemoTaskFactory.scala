@@ -71,8 +71,7 @@ class StartNextPanel(minTailLen: Int, row: Int, col: Int) extends TaskHandler wi
     val nextCol = if (Random.nextBoolean) col + 1 else col - 1
     if (nextRow < 1 || nextRow > 4 || nextCol < 1 || nextCol > 4) {
       if (tailSize > minTailLen) None else nextNode(tailSize)
-    } else if (tailSize == 10) None
-    else Some(s"${nextRow}_${nextCol}")
+    } else Some(s"${nextRow}_${nextCol}")
 
   }
 

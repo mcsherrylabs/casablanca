@@ -47,7 +47,11 @@ $.getJSON( worldAPI, {})
 for (j = 1; j < 5; j++) {
 	for (i = 1; i < 5; i++) {
 		var deep = data[i][j]
-	    $("img#" + i + j).attr("src", "/" + deep + ".jpg");							    		   
+		var adjusted = deep
+		while(adjusted > 10) {
+			adjusted = adjusted - 10
+		}
+	    $("img#" + i + j).attr("src", "/" + adjusted + ".jpg");							    		   
 	}
 }
 

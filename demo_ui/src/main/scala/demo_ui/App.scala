@@ -34,15 +34,17 @@ class UpdateWorld extends Controller {
     val row = request.routeParams("row").toInt
     val col = request.routeParams("col").toInt
     val onOff = request.routeParams("onoff").toBoolean
-    val cols = world(row)
-    val newVal = if (onOff) {
-      cols(col) + 1
-    } else {
-      if (cols(col) - 1 < 0) 0 else cols(col) - 1
-    }
+    synchronized {
+      val cols = world(row)
+      val newVal = if (onOff) {
+        cols(col) + 1
+      } else {
+        if (cols(col) - 1 < 0) 0 else cols(col) - 1
+      }
 
-    val newCols = cols + (col -> +newVal)
-    world = world + (row -> newCols)
+      val newCols = cols + (col -> newVal)
+      world = world + (row -> newCols)
+    }
     render.status(200).toFuture
   }
 
