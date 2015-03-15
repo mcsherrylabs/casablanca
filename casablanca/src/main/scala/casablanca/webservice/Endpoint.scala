@@ -42,6 +42,24 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
     }
   }
 
+  //Provide the lastTimeStamp and UUID
+  //mark that as distributed (delete it)
+  //find the tasks after or equal to ts limit 2  
+  get(s"/distribute/:taskType") { request =>
+    request.routeParams.get("taskType") match {
+      case None => {
+        myLog.warn("No task id, cannot get task.")
+        render.body("No task id! ").status(400).toFuture
+      }
+      case Some(tId) => {
+        myLog.debug(s"Get task (${tId}) via endpoint... ")
+
+        val str: String = taskContext.getTask(tId)
+        render.status(200).body(str).toFuture
+      }
+    }
+  }
+
   post(s"/task/:taskType") { request =>
 
     try {
@@ -150,7 +168,7 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
    * curl http://localhost:7070/notfound
    */
   notFound { request =>
-    render.status(404).plain("not found yo").toFuture
+    render.status(404).plain("not found").toFuture
   }
 
 }
