@@ -19,11 +19,8 @@ import casablanca.util.LogFactory
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import casablanca.sss.demo.DemoTaskFactory
 import casablanca.util.Logging
-<<<<<<< HEAD
 import casablanca.sss.demo.BrokenTaskFactory
-=======
 import casablanca.sss.demo.LoadTestTaskFactory
->>>>>>> b9773b2db4d211162e0ae379eac319386082746c
 
 object App {
 
