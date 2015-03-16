@@ -34,19 +34,20 @@ trait BaseTaskHandlerFactory extends TaskHandlerFactory
   }
   
   def getStatusConfig(status:Int): StatusConfig = {
-    
-    val configPath = s"${getTaskType}.${status}" 
-    if(config.hasPath(configPath)) {
-      val conf = config.getConfig(configPath)
-      StatusConfig(
-          conf.getInt("queueSize"),   
-          conf.getInt("offerTimeoutMs"),
-          conf.getInt("pollTimeoutMs"),
-          conf.getInt("maxRetryCount"),
-          conf.getInt("retryDelayMinutes")
+    //val configPath = s"${getTaskType}.${status}"
+    taskConfig match {
+      case Some(someConfig) if(someConfig.hasPath(s"${status}")) => {
+         val conf = someConfig.getConfig(s"${status}")
+         StatusConfig(
+            conf.getInt("queueSize"),   
+            conf.getInt("offerTimeoutMs"),
+            conf.getInt("pollTimeoutMs"),
+            conf.getInt("maxRetryCount"),
+            conf.getInt("retryDelayMinutes")
           )
-    } else StatusConfig()
-          
+      }
+      case _ => StatusConfig()  
+    }              
   }
   
   override def getSupportedStatuses: Set[TaskStatus] = Set(taskFinished, taskFailed)
