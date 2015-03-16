@@ -19,6 +19,7 @@ import casablanca.util.LogFactory
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import casablanca.sss.demo.DemoTaskFactory
 import casablanca.util.Logging
+import casablanca.sss.demo.BrokenTaskFactory
 
 object App {
 
@@ -35,6 +36,7 @@ object App {
     val thf = TaskHandlerFactoryFactory(MailerTaskFactory,
       RemoteTaskHandlerFactory,
       DomainTransferHandlerFactory,
+      BrokenTaskFactory,
       new DemoTaskFactory(row, col))
 
     println(s"This instance supports the following task factories and statuses...")

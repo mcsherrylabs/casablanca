@@ -15,7 +15,7 @@ class StatusQueue(taskContext: TaskHandlerContext,
   val taskType: String,
   statusQueueManager: StatusQueueManager) extends Logging {
 
-  private val statusHandler = statusQueueManager.getHandler(taskType, status).getOrElse(throw new Error(s"No handler exists for status ${status}"))
+  private val statusHandler = statusQueueManager.getHandler(taskType, status).getOrElse(throw new Error(s"No handler exists for status ${taskType}:${status}"))
   private val queue = new java.util.concurrent.ArrayBlockingQueue[Task](statusConfig.queueSize)
 
   def init {
