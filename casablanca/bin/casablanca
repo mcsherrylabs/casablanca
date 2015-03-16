@@ -21,3 +21,4 @@ echo -Ddemo.restServer.port=$ROW$COL
  
 java  -Dpath=$PATH_TO_BIN $MEM -Ddemo.restServer.port=$ROW$COL -cp $CLASSPATH $MAINCLASS "$@" &
 
+echo kill $! >> pids

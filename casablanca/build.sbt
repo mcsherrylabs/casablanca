@@ -39,6 +39,8 @@ libraryDependencies += "me.lessis" %% "courier" % "0.1.3"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
 
+libraryDependencies += "postgresql" % "postgresql" % "9.1-901.jdbc4"
+
 resolvers += "Twitter" at "http://maven.twttr.com"
 
 resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven"

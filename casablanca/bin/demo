@@ -5,7 +5,6 @@ do
 	for j in 1 2 3 4 
 	do
 	   echo "Starting node $i $j "
-           ./casablanca demo $i $j
-           echo  $! >> pids
+           ./casablanca demo $i $j 
 	done
 done
