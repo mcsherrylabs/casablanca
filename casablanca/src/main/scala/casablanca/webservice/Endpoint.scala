@@ -42,6 +42,7 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
     }
   }
 
+
   post(s"/task/:taskType") { request =>
 
     try {
@@ -150,7 +151,7 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
    * curl http://localhost:7070/notfound
    */
   notFound { request =>
-    render.status(404).plain("not found yo").toFuture
+    render.status(404).plain("not found").toFuture
   }
 
 }

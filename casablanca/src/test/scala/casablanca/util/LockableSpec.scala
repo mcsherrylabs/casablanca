@@ -38,7 +38,7 @@ class LockableSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     Await.result(Future.sequence(all), Duration.Inf)
     val dur = new Date().getTime - start
     assert(dur >= 4000)
-    assert(dur < 4300)
+    assert(dur < 5000)
 
   }
 
@@ -96,7 +96,7 @@ class LockableSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     val dur = new Date().getTime - start
     println(s"duration in parallel ${dur}")
     assert(dur >= 1000)
-    assert(dur < 1010)
+    assert(dur < 2000)
 
   }
 
