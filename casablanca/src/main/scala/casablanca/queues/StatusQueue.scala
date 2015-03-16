@@ -58,7 +58,7 @@ class StatusQueue(taskContext: TaskHandlerContext,
           statusQueueManager.pushTask(t, SystemFailure())
         }
         case ex: Exception => {
-          log.warn("Exception handling task, retry in 0 minutes", ex)
+          log.warn(s"Exception handling task, retry in ${statusConfig.retryDelayMinutes} minutes", ex)
           statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, statusConfig.retryDelayMinutes))
         }
       }

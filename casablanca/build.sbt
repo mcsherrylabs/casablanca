@@ -8,6 +8,7 @@ mappings in Universal += { file("bin/casablanca") -> "bin/casablanca" }
 
 mappings in Universal += { file("bin/demo") -> "bin/demo" }
 
+mappings in Universal += { file("conf/production-application.conf") -> "conf/production-application.conf" }
 
 scalaVersion := "2.10.4"
 

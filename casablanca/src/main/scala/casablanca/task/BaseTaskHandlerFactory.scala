@@ -38,6 +38,7 @@ trait BaseTaskHandlerFactory extends TaskHandlerFactory
     taskConfig match {
       case Some(someConfig) if(someConfig.hasPath(s"${status}")) => {
          val conf = someConfig.getConfig(s"${status}")
+         log.info(s"Using task specific settings for ${getTaskType}:${status}")
          StatusConfig(
             conf.getInt("queueSize"),   
             conf.getInt("offerTimeoutMs"),

@@ -9,7 +9,7 @@ CLASSPATH="$CONF/*:$LIB/*"
 
   
 ## Uncomment to set memory requirements 
-##MEM="-Xms6G -Xmx9G"
+MEM="-Xms4G -Xmx8G"
   
 MAINCLASS="casablanca.App"
 CONFFILE=-Dconfig.file="$CONF/production-application.conf" 
@@ -19,6 +19,6 @@ COL=7$3
 
 echo -Ddemo.restServer.port=$ROW$COL
  
-java  -Dpath=$PATH_TO_BIN $MEM -Ddemo.restServer.port=$ROW$COL -cp $CLASSPATH $MAINCLASS "$@" &
+java  -Dpath=$PATH_TO_BIN $CONFFILE $MEM -Ddemo.restServer.port=$ROW$COL -cp $CLASSPATH $MAINCLASS "$@" &
 
 echo kill $! >> pids
