@@ -23,18 +23,18 @@ import casablanca.task.TaskEvent
 import casablanca.webservice.remotetasks.NodeConfig
 import casablanca.webservice.TaskCompletionListener
 
-class StatusQueueManager(tm: TaskManager, 
-    taskHandlerFactoryFactory: TaskHandlerFactoryFactory, 
-    aNodeConfig: NodeConfig,
-    aTaskCompletionListener: TaskCompletionListener) extends Logging with Configure {
+class StatusQueueManager(tm: TaskManager,
+  taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
+  aNodeConfig: NodeConfig,
+  aTaskCompletionListener: TaskCompletionListener) extends Logging with Configure {
 
   lazy val puntIntoFutureMinutes = config.getInt("queueOverloadRescheduleMinutes")
 
   lazy val taskContext: TaskHandlerContext = new TaskHandlerContext {
 
     lazy val nodeConfig: NodeConfig = aNodeConfig
-    lazy val taskCompletionListener =  aTaskCompletionListener 
-    
+    lazy val taskCompletionListener = aTaskCompletionListener
+
     override def create(descriptor: TaskDescriptor,
       schedule: Option[TaskSchedule] = None,
       parent: Option[TaskParent] = None): Task = tm.create(descriptor, schedule, parent)
@@ -55,12 +55,16 @@ class StatusQueueManager(tm: TaskManager,
       }
     }
 
+    override def findChildren(parentTaskId: String, taskType: Option[String] = None): List[Task] = {
+      tm.findChildren(parentTaskId, taskType)
+    }
+
     override def pushTask(task: Task) = StatusQueueManager.this.pushTask(task)
-    
+
     override def pushTask(task: Task, update: HandlerUpdate) {
       StatusQueueManager.this.pushTask(task, update)
     }
-    
+
     override def getTask(taskId: String): Task = {
       tm.getTask(taskId)
     }

@@ -20,6 +20,7 @@ import casablanca.task.TaskDescriptor
 object RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
 
   case class RemoteTask(node: String, taskType: String, payload: String)
+  //case class RemoteTask(node: String, taskType: String, remoteTaskId: String, payload: String)
 
   private val remoteTaskType = "remoteTask"
   def getTaskType: String = remoteTaskType
@@ -35,7 +36,7 @@ object RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
     val taskParent: Option[TaskParent] = Some(TaskParent(parent.id, Some(taskContext.nodeConfig.localNode)))
     startRemoteTask(taskContext, remoteTask, taskParent)
   }
-  
+
   def startRemoteTask(taskContext: TaskHandlerContext, remoteTask: RemoteTask, parent: Option[TaskParent] = None): Task = {
     // add remote details
     val decorated = fromRemoteTaskDecorator(remoteTask.payload, remoteTask.node, None, Some(remoteTask.taskType))

@@ -4,6 +4,7 @@ import org.scalatest._
 import java.util.Date
 import casablanca.util.ConfigureFactory
 import casablanca.util.ProgrammingError
+import java.util.UUID
 
 class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
 
@@ -144,20 +145,54 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     assert(updatedTask.attemptCount == 0)
 
   }
-  
+
+  it should " find the children " in {
+
+    val parentId = UUID.randomUUID().toString()
+
+    val taskParent = TaskParent(parentId)
+    val child1 = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload), None, Some(taskParent))
+    val child2 = tmUnderTest.create(TaskDescriptor(taskType, status, strPayload), None, Some(taskParent))
+
+    val children = tmUnderTest.findChildren(parentId, Some(taskType))
+    assert(children.size == 2)
+    assert(children.contains(child1))
+    assert(children.contains(child2))
+
+  }
+
+  it should " find the children by task type " in {
+
+    val parentId = UUID.randomUUID().toString()
+
+    val taskParent = TaskParent(parentId)
+    val child1 = tmUnderTest.create(TaskDescriptor(taskType + 1, status, strPayload), None, Some(taskParent))
+    val child2 = tmUnderTest.create(TaskDescriptor(taskType + 2, status, strPayload), None, Some(taskParent))
+
+    var children = tmUnderTest.findChildren(parentId, Some(taskType))
+    assert(children.size == 0)
+    children = tmUnderTest.findChildren(parentId, Some(taskType + 1))
+    assert(children.size == 1)
+    assert(children.contains(child1))
+
+    children = tmUnderTest.findChildren(parentId, Some(taskType + 2))
+    assert(children.size == 1)
+    assert(children.contains(child2))
+
+  }
   it should " not find a task after it's deleted " in {
-    
+
     val uniqueStatus = TaskStatus(434534534)
     var task = tmUnderTest.create(TaskDescriptor(taskType, uniqueStatus, strPayload))
 
     val numDeleted = tmUnderTest.deleteTasks(uniqueStatus.value, new Date())
     assert(numDeleted == 1)
-    
+
     val numDeletedShouldBeZero = tmUnderTest.deleteTasks(uniqueStatus.value, new Date())
     assert(numDeletedShouldBeZero == 0)
-    
+
     intercept[ProgrammingError] {
-    	tmUnderTest.getTask(task.id)
+      tmUnderTest.getTask(task.id)
     }
   }
 }

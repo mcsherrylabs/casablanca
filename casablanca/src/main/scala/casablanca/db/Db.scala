@@ -65,11 +65,14 @@ class Db(dbConfigName: String) extends Configure with Logging {
   def shutdown {
 
     val st = conn.createStatement();
-    // db writes out to files and performs clean shuts down
-    // otherwise there will be an unclean shutdown
-    // when program ends
-    st.execute("SHUTDOWN");
-    conn.close();
+    try {
+      // db writes out to files and performs clean shuts down
+      // otherwise there will be an unclean shutdown
+      // when program ends
+      st.execute("SHUTDOWN");
+    } finally {
+      conn.close();
+    }
 
   }
 }

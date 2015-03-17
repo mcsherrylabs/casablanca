@@ -53,19 +53,35 @@ class TaskManager(configIt: Config) extends CreateTask {
     val sql = s" createTime <= ${beforeWhen.getTime} AND status = ${status}"
     taskTable.delete(sql)
   }
-  
+
+  def deleteTask(taskId: String): Boolean = {
+    val sql = s" taskId = ${taskId} "
+    taskTable.delete(sql) == 1
+  }
+
+  def deleteTask(t: Task): Boolean = deleteTask(t.id)
+
   def findScheduledTasks(beforeWhen: Date): List[Task] = {
     val sql = s" scheduleTime <= ${beforeWhen.getTime} ORDER BY createTime ASC"
     findTasksImpl(sql)
   }
 
+  def findChildren(parentTaskId: String, taskType: Option[String] = None): List[Task] = {
+    val taskTypeSql = taskType match {
+      case None => ""
+      case Some(tt) => s"AND taskType = '${tt}'"
+    }
+
+    findTasksImpl(s" parentTaskId = '${parentTaskId}' ${taskTypeSql} AND scheduleTime IS NULL ORDER BY createTime ASC")
+  }
+
   def findTasks(taskType: String, status: Option[Int]): List[Task] = {
-    
+
     val statusSql = status match {
       case None => ""
       case Some(st) => s"AND status = ${st}"
     }
-    
+
     findTasksImpl(s" taskType = '${taskType}' ${statusSql} AND scheduleTime IS NULL ORDER BY createTime ASC")
   }
 

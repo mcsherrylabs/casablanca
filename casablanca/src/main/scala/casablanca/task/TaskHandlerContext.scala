@@ -12,15 +12,16 @@ trait TaskHandlerContext extends CreateTask with TaskStatuses {
 
   val nodeConfig: NodeConfig
   val taskCompletionListener: TaskCompletionListener
-  
+
   def startTask(descriptor: TaskDescriptor,
     schedule: Option[TaskSchedule] = None,
     parent: Option[TaskParent] = None): Task
 
+  def findChildren(parentTaskId: String, taskType: Option[String] = None): List[Task]
   def handleEvent(taskId: String, ev: TaskEvent)
   def pushTask(task: Task, update: HandlerUpdate)
   def pushTask(task: Task)
-  
+
   def getTask(taskId: String): Task
 
 }

@@ -40,7 +40,7 @@ class StatusQueue(taskContext: TaskHandlerContext,
     if (t != null) {
       log.debug(s"StatusQueueWorker for ${status} attempts to handle task ${t.taskType}:${t.id}")
       try {
-
+        // TODO could start DB transaction here to make 
         if (t.attemptCount > 1) {
           if (t.attemptCount <= statusConfig.maxRetryCount) {
             val handlerResult = statusHandler.reTry(taskContext, t)

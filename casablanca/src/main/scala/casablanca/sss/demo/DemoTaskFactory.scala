@@ -93,9 +93,14 @@ class StartNextPanel(minTailLen: Int, row: Int, col: Int) extends TaskHandler wi
         StatusUpdate(switchOffPanel.value)
       }
     }
-
   }
 
+  override def reTry(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
+    taskHandlerContext.findChildren(task.id) match {
+      case Nil => handle(taskHandlerContext, task)
+      case child :: _ => StatusUpdate(awaitingEvent.value)
+    }
+  }
 }
 
 class DemoTaskFactory(row: Int, col: Int) extends BaseTaskHandlerFactory with DemoStatuses {

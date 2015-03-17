@@ -42,7 +42,6 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
     }
   }
 
-
   post(s"/task/:taskType") { request =>
 
     try {
@@ -82,6 +81,68 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
     }
   }
 
+  post(s"/task/createonly/:taskType") { request =>
+
+    try {
+      request.routeParams.get("taskType") match {
+        case None => {
+          myLog.warn("No task type, cannot process task create!!")
+          render.body("No task type! ").status(400).toFuture
+        }
+        case Some(tType) => {
+          myLog.debug(s"Starting task (${tType}) via endpoint... ")
+          val str = request.contentString
+
+          // Note task may finish in gap between task started
+          // and time listener is set up...., so separate out create
+          // and push
+          val t = taskContext.create(
+            TaskDescriptor(tType, taskContext.taskStarted, str),
+            None,
+            None)
+          render.status(200).body(t).toFuture
+
+        }
+
+      }
+    } catch {
+      case e: Exception => {
+        myLog.error("Couldn't process post /task/createonly", e)
+        throw e
+      }
+    }
+  }
+
+  post(s"/task/createonly/decorated/:taskType") { request =>
+
+    try {
+      request.routeParams.get("taskType") match {
+        case None => {
+          myLog.warn("No task type, cannot process task create!!")
+          render.body("No task type! ").status(400).toFuture
+        }
+        case Some(tType) => {
+          myLog.debug(s"Starting task (${tType}) via endpoint... ")
+          val str = request.contentString
+          val remoteTaskCase = toRemoteTaskDecorator(str)
+          val t = taskContext.create(
+            TaskDescriptor(tType, taskContext.taskStarted, remoteTaskCase.strPayload),
+            None,
+            Some(TaskParent(remoteTaskCase.taskId.get, Some(remoteTaskCase.node))))
+
+          render.status(200).body(t).toFuture
+
+        }
+
+      }
+    } catch {
+      case e: Exception => {
+        myLog.error("Couldn't process post /task/decorated", e)
+        throw e
+      }
+    }
+  }
+
   post(s"/task/decorated/:taskType") { request =>
 
     try {
@@ -94,12 +155,12 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
           myLog.debug(s"Starting task (${tType}) via endpoint... ")
           val str = request.contentString
           val remoteTaskCase = toRemoteTaskDecorator(str)
-          taskContext.startTask(
+          val t = taskContext.startTask(
             TaskDescriptor(tType, taskContext.taskStarted, remoteTaskCase.strPayload),
             None,
             Some(TaskParent(remoteTaskCase.taskId.get, Some(remoteTaskCase.node))))
 
-          render.status(200).toFuture
+          render.status(200).body(t).toFuture
 
         }
 
@@ -124,10 +185,6 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
         val remoteTaskCase = toRemoteTaskDecorator(request.contentString)
         val origin = EventOrigin(remoteTaskCase.taskId.get, remoteTaskCase.taskType.get)
         val ev = TaskEvent(remoteTaskCase.strPayload, Some(origin))
-        //myLog.debug(s"EVENT")
-        //myLog.debug(s"${ev}")
-        //myLog.debug(s"END EVENT")
-        taskContext.handleEvent(tId, ev)
         render.status(200).toFuture
       }
     }

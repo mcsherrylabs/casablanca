@@ -20,21 +20,41 @@ import casablanca.util.LogFactory
 import casablanca.task.TaskJsonMapper
 import casablanca.task.Task
 import scala.concurrent.Future
-
 import casablanca.task.TaskJsonMapper._
+import casablanca.task.TaskManager
 
-class Distribute(taskContext: TaskHandlerContext, taskCompletionListener: TaskCompletionListener) extends Controller {
+class Distribute(tm: TaskManager, taskContext: TaskHandlerContext, taskCompletionListener: TaskCompletionListener) extends Controller {
 
   private val myLog = LogFactory.getLogger(this.getClass.toString)
 
-
+  put("/distribute/:nodeName/:lastTaskId") { request =>
+    request.routeParams.get("nodeName") match {
+      case None => {
+        myLog.warn("No node name, cannot get task.")
+        render.body("No node name ! ").status(400).toFuture
+      }
+      case Some(nodeName) => {
+        request.routeParams.get("lastTaskId") match {
+          case None => {
+            myLog.warn("No last task id , cannot get task.")
+            render.body("No last task id! ").status(400).toFuture
+          }
+          case Some(lastTaskId) => {
+            val task = tm.getTask(lastTaskId)
+            val res = tm.deleteTask(lastTaskId)
+            render.status(200).body(res.toString).toFuture
+          }
+        }
+      }
+    }
+  }
   //Provide the lastTimeStamp and UUID
   //mark that as distributed (delete it)
   //find the tasks after or equal to ts limit 2  
-  get(s"/distribute/:nodeName/:taskType") { request =>
-    request.routeParams.get("taskType") match {
+  get(s"/distribute/:nodeName/:taskType/:lastTaskId") { request =>
+    request.routeParams.get("nodeName") match {
       case None => {
-        myLog.warn("No task id, cannot get task.")
+        myLog.warn("No node name, cannot get task.")
         render.body("No task id! ").status(400).toFuture
       }
       case Some(tId) => {
@@ -44,28 +64,6 @@ class Distribute(taskContext: TaskHandlerContext, taskCompletionListener: TaskCo
         render.status(200).body(str).toFuture
       }
     }
-  }
-
-
-
-  error { request =>
-    request.error match {
-      case Some(e: ArithmeticException) =>
-        render.status(500).plain("whoops, divide by zero!").toFuture
-      case Some(e: UnsupportedMediaType) =>
-        render.status(415).plain("Unsupported Media Type!").toFuture
-      case _ =>
-        render.status(500).plain("Something went wrong!").toFuture
-    }
-  }
-
-  /**
-   * Custom 404s
-   *
-   * curl http://localhost:7070/notfound
-   */
-  notFound { request =>
-    render.status(404).plain("not found").toFuture
   }
 
 }
