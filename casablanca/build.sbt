@@ -42,6 +42,10 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
 
 libraryDependencies += "postgresql" % "postgresql" % "9.1-901.jdbc4"
 
+libraryDependencies += "org.apache.commons" % "commons-dbcp2" % "2.0"
+
+libraryDependencies += "org.apache.commons" % "commons-pool2" % "2.0"
+
 resolvers += "Twitter" at "http://maven.twttr.com"
 
 resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven"

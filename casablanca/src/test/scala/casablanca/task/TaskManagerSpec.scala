@@ -180,6 +180,7 @@ class TaskManagerSpec extends FlatSpec with Matchers with BeforeAndAfterAll {
     assert(children.contains(child2))
 
   }
+
   it should " not find a task after it's deleted " in {
 
     val uniqueStatus = TaskStatus(434534534)

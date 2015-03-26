@@ -6,6 +6,7 @@ import java.util.UUID
 import java.util.Date
 import com.typesafe.config.Config
 import casablanca.util.ProgrammingError
+import java.sql.Connection
 
 trait CreateTask {
   def create(descriptor: TaskDescriptor,
@@ -18,14 +19,20 @@ class TaskManager(configIt: Config) extends CreateTask {
   private val myConfig = configIt.getConfig("taskManager")
 
   private val db = new Db(myConfig.getString("db"))
-  private val taskTable = db.table(myConfig.getString("taskTableName"))
+  private val taskTable = db.simpleTable(myConfig.getString("taskTableName"))
 
-  override def create(descriptor: TaskDescriptor,
+  def create(descriptor: TaskDescriptor,
     schedule: Option[TaskSchedule] = None,
     parent: Option[TaskParent]): Task = {
+    tx(implicit conn => createTx(descriptor, schedule, parent))
+  }
+
+  def createTx(descriptor: TaskDescriptor,
+    schedule: Option[TaskSchedule] = None,
+    parent: Option[TaskParent])(implicit conn: Connection): Task = {
 
     val uuid = UUID.randomUUID.toString
-    taskTable.insert(parent.map(_.node), parent.map(_.taskId), uuid, new Date(), descriptor.taskType, descriptor.status.value, 0, schedule.map(_.when), descriptor.strPayload)
+    taskTable.insertTx(parent.map(_.node), parent.map(_.taskId), uuid, new Date(), descriptor.taskType, descriptor.status.value, 0, schedule.map(_.when), descriptor.strPayload)
     getTask(uuid)
   }
 
@@ -36,6 +43,10 @@ class TaskManager(configIt: Config) extends CreateTask {
   }
 
   def updateTaskStatus(taskId: String, taskUpdate: TaskUpdate): Task = {
+    tx(implicit conn => updateTaskStatusTx(taskId, taskUpdate))
+  }
+
+  def updateTaskStatusTx(taskId: String, taskUpdate: TaskUpdate)(implicit conn: Connection): Task = {
 
     val scheduleTimeUpdate = taskUpdate.scheduleAfter match {
       case None => s", scheduleTime = NULL"
@@ -45,18 +56,25 @@ class TaskManager(configIt: Config) extends CreateTask {
     val strPayloadUpdate = s", strPayload = '${taskUpdate.strPayload}'"
 
     val sql = s"status = ${taskUpdate.nextStatus}, attemptCount = ${taskUpdate.numAttempts}, createTime = ${(new Date().getTime)} ${scheduleTimeUpdate} ${strPayloadUpdate} "
-    taskTable.update(sql, s"taskId = '${taskId}' ")
+    taskTable.updateTx(sql, s"taskId = '${taskId}' ")
     getTask(taskId)
   }
 
-  def deleteTasks(status: Int, beforeWhen: Date): Int = {
+  def deleteTasksTx(status: Int, beforeWhen: Date)(conn: Connection): Int = {
     val sql = s" createTime <= ${beforeWhen.getTime} AND status = ${status}"
-    taskTable.delete(sql)
+    taskTable.deleteTx(sql)(conn)
   }
 
-  def deleteTask(taskId: String): Boolean = {
+  def deleteTasks(status: Int, beforeWhen: Date): Int = tx[Int](deleteTasksTx(status, beforeWhen))
+
+  def tx[T] = taskTable.inTransaction[T] _
+
+  def deleteTask(taskId: String) = tx(deleteTaskTx(taskId))
+
+  def deleteTaskTx(taskId: String)(conn: Connection): Boolean = {
     val sql = s" taskId = ${taskId} "
-    taskTable.delete(sql) == 1
+    //taskTable.inTransaction[Int] { taskTable.delete(sql) } == 1
+    taskTable.deleteTx(sql)(conn) == 1
   }
 
   def deleteTask(t: Task): Boolean = deleteTask(t.id)

@@ -11,13 +11,14 @@ import casablanca.task.SystemTaskStatuses
 import java.util.concurrent.ScheduledExecutorService
 
 class Reaper(tm: TaskManager,
-    scheduledExecutorService: ScheduledExecutorService,
-    scheduleIntervalInSeconds: Int,
-    waitBeforeDeletingMinutes: Int) extends Logging with SystemTaskStatuses {
+  scheduledExecutorService: ScheduledExecutorService,
+  scheduleIntervalInSeconds: Int,
+  waitBeforeDeletingMinutes: Int) extends Logging with SystemTaskStatuses {
 
   private val waitBeforeDeletingMs = waitBeforeDeletingMinutes * 60 * 1000
-  
+
   private val runnable = new Runnable {
+
     def run {
       try {
         val now = new Date()
@@ -25,17 +26,16 @@ class Reaper(tm: TaskManager,
         val deleted = tm.deleteTasks(systemFinished.value, beforeWhen)
         log.info(s"Reaper deleted ${deleted} 'system finished' tasks ... ")
       } catch {
-         case e: Exception => log.error(s"Scheduler failed to reschedule tasks", e)      
-      } 
+        case e: Exception => log.error(s"Scheduler failed to reschedule tasks", e)
+      }
     }
   }
 
   def start {
-    scheduledExecutorService.scheduleAtFixedRate(runnable, 
-        scheduleIntervalInSeconds, 
-        scheduleIntervalInSeconds, 
-        TimeUnit.SECONDS)
+    scheduledExecutorService.scheduleAtFixedRate(runnable,
+      scheduleIntervalInSeconds,
+      scheduleIntervalInSeconds,
+      TimeUnit.SECONDS)
   }
 
-  
 }

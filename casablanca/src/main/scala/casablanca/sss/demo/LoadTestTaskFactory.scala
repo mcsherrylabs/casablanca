@@ -29,6 +29,7 @@ import scala.annotation.tailrec
 import casablanca.db.Db
 import casablanca.db.Table
 import casablanca.task.Success
+import casablanca.db.SimpleTable
 
 trait LoadTestStatuses {
   val loadTestTask = "loadTestTask"
@@ -36,7 +37,7 @@ trait LoadTestStatuses {
 
 }
 
-class SetupDatabase(table: Table, isBroken: Boolean) extends TaskHandler with LoadTestStatuses {
+class SetupDatabase(table: SimpleTable, isBroken: Boolean) extends TaskHandler with LoadTestStatuses {
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
     table.insert(isBroken, 0, task.id)
@@ -45,7 +46,7 @@ class SetupDatabase(table: Table, isBroken: Boolean) extends TaskHandler with Lo
 
 }
 
-class WriteDatabase(table: Table) extends TaskHandler with LoadTestStatuses {
+class WriteDatabase(table: SimpleTable) extends TaskHandler with LoadTestStatuses {
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
     table.getRow(s"tid = '${task.id}'") match {
@@ -65,7 +66,7 @@ object LoadTestTaskFactory extends BaseTaskHandlerFactory with LoadTestStatuses 
 
   def getTaskType: String = loadTestTask
 
-  lazy val table = Db("loadTestTaskDb").table("casablanca_test")
+  lazy val table = Db("loadTestTaskDb").simpleTable("casablanca_test")
 
   override def getSupportedStatuses: Set[TaskStatus] = super.getSupportedStatuses ++ Set(taskStarted, writeDatabase)
 

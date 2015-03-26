@@ -2,11 +2,66 @@ package casablanca.db
 
 import java.sql.Connection
 import java.util.Date
+import util.control.Exception.allCatch
+import javax.sql.DataSource
+import scala.util.Try
+import scala.util.Success
+import scala.util.Failure
 
-class Table(val name: String, val conn: Connection) {
+trait Tx {
+  val ds: DataSource
+  def start = Tx.set(ds.getConnection())
+  implicit def conn: Connection = Tx.get()
+  def close = Tx.remove()
+}
 
-  def getRow(sql: String): Option[Row] = {
-    val rows = filter(sql)
+object Tx extends ThreadLocal[Connection]
+
+class Table(val name: String, val ds: DataSource) extends Tx {
+
+  def inTransaction[T](f: Connection => T): T = {
+    start
+
+    try {
+      if (conn == null) println("WHAT?? THE? GOOK?")
+      conn.setAutoCommit(false)
+      val r = f(conn)
+      conn.commit()
+      r
+    } catch {
+      case e: Exception =>
+        println("ROLLING BACK" + e)
+        conn.rollback()
+        throw e
+    } finally {
+      conn.close
+      close
+    }
+
+  }
+
+  def inTransaction2[T](f: Connection => T): Try[T] = {
+    val conn = ds.getConnection()
+
+    try {
+      if (conn == null) println("WHAT?? THE? GOOK?")
+      conn.setAutoCommit(false)
+      val r = f(conn)
+      conn.commit()
+      Success(r)
+    } catch {
+      case e: Exception =>
+        println("ROLLING BACK" + e)
+        conn.rollback()
+        Failure(e)
+    } finally {
+      conn.close
+    }
+
+  }
+
+  def getRowz(sql: String): Option[Row] = {
+    val rows = filterTx(sql)
 
     rows.size match {
       case 0 => None
@@ -15,9 +70,19 @@ class Table(val name: String, val conn: Connection) {
     }
   }
 
-  def getRow(id: Long): Option[Row] = getRow(s"id = ${id}")
+  def getRowTx(sql: String)(implicit conn: Connection): Option[Row] = {
+    val rows = filterTx(sql)
 
-  def map[B](f: Row => B): List[B] = {
+    rows.size match {
+      case 0 => None
+      case 1 => Some(rows.rows(0))
+      case size => throw new Error(s"Too many ${size}")
+    }
+  }
+
+  def getRowTx(id: Long)(implicit conn: Connection): Option[Row] = getRowTx(s"id = ${id}")(conn)
+
+  def mapTx[B](f: Row => B)(implicit conn: Connection): List[B] = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -28,13 +93,13 @@ class Table(val name: String, val conn: Connection) {
     }
   }
 
-  def delete(sql: String): Int = {
+  def deleteTx(sql: String)(implicit conn: Connection): Int = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
       st.executeUpdate(s"DELETE FROM ${name} WHERE ${sql}"); // run the query	       
     } finally {
-      st.close
+      st.close()
     }
   }
 
@@ -63,7 +128,7 @@ class Table(val name: String, val conn: Connection) {
     Stream.cons(fetchBuffer(), fetchBuffer _)
   }*/
 
-  def filter(sql: String): Rows = {
+  def filterTx(sql: String)(implicit conn: Connection): Rows = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -74,7 +139,8 @@ class Table(val name: String, val conn: Connection) {
     }
   }
 
-  def update(values: String, filter: String): Int = {
+  def updateTx(values: String, filter: String)(implicit conn: Connection): Int = {
+
     val st = conn.createStatement(); // statement objects can be reused with
     try {
 
@@ -97,7 +163,7 @@ class Table(val name: String, val conn: Connection) {
     }
   }
 
-  def insert(values: Any*): Int = {
+  def insertTx(values: Any*)(implicit conn: Connection): Int = {
     val st = conn.createStatement(); // statement objects can be reused with
     try {
       val asStrs = values map (mapToSql(_))
