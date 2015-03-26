@@ -24,12 +24,12 @@ class TaskManager(configIt: Config) extends CreateTask {
   def create(descriptor: TaskDescriptor,
     schedule: Option[TaskSchedule] = None,
     parent: Option[TaskParent]): Task = {
-    tx(implicit conn => createTx(descriptor, schedule, parent))
+    tx(createTx(descriptor, schedule, parent))
   }
 
   def createTx(descriptor: TaskDescriptor,
     schedule: Option[TaskSchedule] = None,
-    parent: Option[TaskParent])(implicit conn: Connection): Task = {
+    parent: Option[TaskParent]): Task = {
 
     val uuid = UUID.randomUUID.toString
     taskTable.insertTx(parent.map(_.node), parent.map(_.taskId), uuid, new Date(), descriptor.taskType, descriptor.status.value, 0, schedule.map(_.when), descriptor.strPayload)
@@ -43,10 +43,10 @@ class TaskManager(configIt: Config) extends CreateTask {
   }
 
   def updateTaskStatus(taskId: String, taskUpdate: TaskUpdate): Task = {
-    tx(implicit conn => updateTaskStatusTx(taskId, taskUpdate))
+    tx(updateTaskStatusTx(taskId, taskUpdate))
   }
 
-  def updateTaskStatusTx(taskId: String, taskUpdate: TaskUpdate)(implicit conn: Connection): Task = {
+  def updateTaskStatusTx(taskId: String, taskUpdate: TaskUpdate): Task = {
 
     val scheduleTimeUpdate = taskUpdate.scheduleAfter match {
       case None => s", scheduleTime = NULL"
@@ -60,9 +60,9 @@ class TaskManager(configIt: Config) extends CreateTask {
     getTask(taskId)
   }
 
-  def deleteTasksTx(status: Int, beforeWhen: Date)(conn: Connection): Int = {
+  def deleteTasksTx(status: Int, beforeWhen: Date): Int = {
     val sql = s" createTime <= ${beforeWhen.getTime} AND status = ${status}"
-    taskTable.deleteTx(sql)(conn)
+    taskTable.deleteTx(sql)
   }
 
   def deleteTasks(status: Int, beforeWhen: Date): Int = tx[Int](deleteTasksTx(status, beforeWhen))
@@ -71,10 +71,10 @@ class TaskManager(configIt: Config) extends CreateTask {
 
   def deleteTask(taskId: String) = tx(deleteTaskTx(taskId))
 
-  def deleteTaskTx(taskId: String)(conn: Connection): Boolean = {
+  def deleteTaskTx(taskId: String): Boolean = {
     val sql = s" taskId = ${taskId} "
     //taskTable.inTransaction[Int] { taskTable.delete(sql) } == 1
-    taskTable.deleteTx(sql)(conn) == 1
+    taskTable.deleteTx(sql) == 1
   }
 
   def deleteTask(t: Task): Boolean = deleteTask(t.id)

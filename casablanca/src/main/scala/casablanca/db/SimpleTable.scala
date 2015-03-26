@@ -7,13 +7,13 @@ import javax.sql.DataSource
 
 class SimpleTable(name: String, ds: DataSource) extends Table(name, ds) {
 
-  def getRow(sql: String): Option[Row] = inTransaction[Option[Row]](implicit conn => getRowTx(sql))
+  def getRow(sql: String): Option[Row] = inTransaction[Option[Row]](getRowTx(sql))
 
-  def getRow(id: Long): Option[Row] = inTransaction[Option[Row]](implicit con => getRowTx(id))
+  def getRow(id: Long): Option[Row] = inTransaction[Option[Row]](getRowTx(id))
 
-  def map[B](f: Row => B): List[B] = inTransaction[List[B]](implicit conn => mapTx(f))
+  def map[B](f: Row => B): List[B] = inTransaction[List[B]](mapTx(f))
 
-  def delete(sql: String): Int = inTransaction[Int](implicit conn => deleteTx(sql))
+  def delete(sql: String): Int = inTransaction[Int](deleteTx(sql))
 
   /*
    * Need distributedTo and distributedFrom columns
@@ -41,15 +41,15 @@ class SimpleTable(name: String, ds: DataSource) extends Table(name, ds) {
   }*/
 
   def filter(sql: String): Rows = {
-    inTransaction(implicit conn => filterTx(sql))
+    inTransaction(filterTx(sql))
   }
 
   def update(values: String, filter: String): Int = {
-    inTransaction(implicit conn => updateTx(values, filter))
+    inTransaction(updateTx(values, filter))
   }
 
   def insert(values: Any*): Int = {
-    inTransaction(implicit conn => insertTx(values: _*))
+    inTransaction(insertTx(values: _*))
   }
 
 }

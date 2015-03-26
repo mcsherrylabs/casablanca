@@ -9,23 +9,26 @@ import scala.util.Success
 import scala.util.Failure
 
 trait Tx {
-  val ds: DataSource
-  def start = Tx.set(ds.getConnection())
-  implicit def conn: Connection = Tx.get()
-  def close = Tx.remove()
+  def startTx
+  def closeTx
 }
 
 object Tx extends ThreadLocal[Connection]
 
 class Table(val name: String, val ds: DataSource) extends Tx {
 
-  def inTransaction[T](f: Connection => T): T = {
-    start
+  implicit def conn: Connection = Tx.get
 
+  def startTx = Tx.set(ds.getConnection())
+  def closeTx = Tx.remove
+
+  def inTransaction[T](f: => T): T = {
+    if (conn == null) startTx
+    println("AUCPMIT " + conn.getAutoCommit())
     try {
       if (conn == null) println("WHAT?? THE? GOOK?")
       conn.setAutoCommit(false)
-      val r = f(conn)
+      val r = f
       conn.commit()
       r
     } catch {
@@ -34,33 +37,13 @@ class Table(val name: String, val ds: DataSource) extends Tx {
         conn.rollback()
         throw e
     } finally {
-      conn.close
-      close
+      if (conn != null) conn.close
+      closeTx
     }
 
   }
 
-  def inTransaction2[T](f: Connection => T): Try[T] = {
-    val conn = ds.getConnection()
-
-    try {
-      if (conn == null) println("WHAT?? THE? GOOK?")
-      conn.setAutoCommit(false)
-      val r = f(conn)
-      conn.commit()
-      Success(r)
-    } catch {
-      case e: Exception =>
-        println("ROLLING BACK" + e)
-        conn.rollback()
-        Failure(e)
-    } finally {
-      conn.close
-    }
-
-  }
-
-  def getRowz(sql: String): Option[Row] = {
+  def getRowTx(sql: String): Option[Row] = {
     val rows = filterTx(sql)
 
     rows.size match {
@@ -70,19 +53,9 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     }
   }
 
-  def getRowTx(sql: String)(implicit conn: Connection): Option[Row] = {
-    val rows = filterTx(sql)
+  def getRowTx(id: Long): Option[Row] = getRowTx(s"id = ${id}")
 
-    rows.size match {
-      case 0 => None
-      case 1 => Some(rows.rows(0))
-      case size => throw new Error(s"Too many ${size}")
-    }
-  }
-
-  def getRowTx(id: Long)(implicit conn: Connection): Option[Row] = getRowTx(s"id = ${id}")(conn)
-
-  def mapTx[B](f: Row => B)(implicit conn: Connection): List[B] = {
+  def mapTx[B](f: Row => B): List[B] = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -93,7 +66,7 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     }
   }
 
-  def deleteTx(sql: String)(implicit conn: Connection): Int = {
+  def deleteTx(sql: String): Int = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -128,7 +101,7 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     Stream.cons(fetchBuffer(), fetchBuffer _)
   }*/
 
-  def filterTx(sql: String)(implicit conn: Connection): Rows = {
+  def filterTx(sql: String): Rows = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -139,7 +112,7 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     }
   }
 
-  def updateTx(values: String, filter: String)(implicit conn: Connection): Int = {
+  def updateTx(values: String, filter: String): Int = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -163,7 +136,7 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     }
   }
 
-  def insertTx(values: Any*)(implicit conn: Connection): Int = {
+  def insertTx(values: Any*): Int = {
     val st = conn.createStatement(); // statement objects can be reused with
     try {
       val asStrs = values map (mapToSql(_))

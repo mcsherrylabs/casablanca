@@ -106,7 +106,7 @@ class DbSpec extends FlatSpec with Matchers {
     val table = dbUnderTest.simpleTable("test")
 
     try {
-      table.inTransaction { implicit conn =>
+      table.inTransaction {
         table.insertTx(999999, "strId", time, 45)
         throw new Error("Ah HA!")
 
