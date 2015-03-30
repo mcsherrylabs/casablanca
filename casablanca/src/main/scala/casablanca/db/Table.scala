@@ -7,43 +7,69 @@ import javax.sql.DataSource
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
+import casablanca.util.Logging
+import scala.util.control.NonFatal
 
 trait Tx {
-  def startTx
+  def inTransaction[T](f: => T): T
+  def startTx: Boolean
   def closeTx
 }
 
-object Tx extends ThreadLocal[Connection]
+case class ConnectionTracker(conn: Connection, count: Int)
 
-class Table(val name: String, val ds: DataSource) extends Tx {
+object Tx extends ThreadLocal[ConnectionTracker]
 
-  implicit def conn: Connection = Tx.get
+class Table(val name: String, val ds: DataSource) extends Tx with Logging {
 
-  def startTx = Tx.set(ds.getConnection())
-  def closeTx = Tx.remove
+  implicit def conn: Connection = Tx.get.conn
+
+  def startTx: Boolean = {
+    val existing = Tx.get()
+    if (existing == null) {
+      // auto commit should be off by default
+      Tx.set(ConnectionTracker(ds.getConnection(), 0))
+      true
+    } else {
+      Tx.set(ConnectionTracker(existing.conn, existing.count + 1))
+      false
+    }
+
+  }
+
+  def closeTx = {
+    val existing = Tx.get()
+    if (existing == null) throw new IllegalStateException("Closing a non existing tx?")
+    else {
+      if (existing.count == 0) {
+        existing.conn.close
+        Tx.remove
+      } else {
+        Tx.set(ConnectionTracker(existing.conn, existing.count - 1))
+      }
+
+    }
+
+  }
 
   def inTransaction[T](f: => T): T = {
-    if (conn == null) startTx
-    println("AUCPMIT " + conn.getAutoCommit())
+    val isNew = startTx
     try {
-      if (conn == null) println("WHAT?? THE? GOOK?")
-      conn.setAutoCommit(false)
       val r = f
-      conn.commit()
+      if (isNew) conn.commit()
       r
     } catch {
-      case e: Exception =>
-        println("ROLLING BACK" + e)
-        conn.rollback()
+      case NonFatal(e) =>
+        log.warn("ROLLING BACK!", e)
+        conn.rollback
         throw e
     } finally {
-      if (conn != null) conn.close
       closeTx
     }
 
   }
 
-  def getRowTx(sql: String): Option[Row] = {
+  private def getRowTx(sql: String): Option[Row] = {
     val rows = filterTx(sql)
 
     rows.size match {
@@ -53,9 +79,9 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     }
   }
 
-  def getRowTx(id: Long): Option[Row] = getRowTx(s"id = ${id}")
+  private def getRowTx(id: Long): Option[Row] = getRowTx(s"id = ${id}")
 
-  def mapTx[B](f: Row => B): List[B] = {
+  private def mapTx[B](f: Row => B): List[B] = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -66,7 +92,7 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     }
   }
 
-  def deleteTx(sql: String): Int = {
+  private def deleteTx(sql: String): Int = {
 
     val st = conn.createStatement(); // statement objects can be reused with
     try {
@@ -75,6 +101,63 @@ class Table(val name: String, val ds: DataSource) extends Tx {
       st.close()
     }
   }
+
+  private def filterTx(sql: String): Rows = {
+
+    val st = conn.createStatement(); // statement objects can be reused with
+    try {
+      val rs = st.executeQuery(s"SELECT * FROM ${name} WHERE ${sql}"); // run the query
+      new Rows(rs)
+    } finally {
+      st.close
+    }
+  }
+
+  private def updateTx(values: String, filter: String): Int = {
+
+    val st = conn.createStatement(); // statement objects can be reused with
+    try {
+
+      val sql = s"UPDATE ${name} SET ${values} WHERE ${filter}"
+      st.executeUpdate(sql); // run the query
+
+    } finally {
+      st.close
+    }
+  }
+
+  private def mapToSql(value: Any): Any = {
+    value match {
+      case v: String => s"'${v}'"
+      case v: Date => v.getTime
+      case null => "null"
+      case Some(x) => mapToSql(x)
+      case None => "null"
+      case v => v
+    }
+  }
+
+  private def insertTx(values: Any*): Int = {
+    val st = conn.createStatement(); // statement objects can be reused with
+    try {
+      val asStrs = values map (mapToSql(_))
+
+      val str = asStrs.mkString(", ")
+      val sql = s"INSERT INTO ${name} VALUES ( ${str})"
+      st.executeUpdate(sql); // run the query
+
+    } finally {
+      st.close
+    }
+  }
+
+  def getRow(sql: String): Option[Row] = inTransaction[Option[Row]](getRowTx(sql))
+
+  def getRow(id: Long): Option[Row] = inTransaction[Option[Row]](getRowTx(id))
+
+  def map[B](f: Row => B): List[B] = inTransaction[List[B]](mapTx(f))
+
+  def delete(sql: String): Int = inTransaction[Int](deleteTx(sql))
 
   /*
    * Need distributedTo and distributedFrom columns
@@ -101,52 +184,16 @@ class Table(val name: String, val ds: DataSource) extends Tx {
     Stream.cons(fetchBuffer(), fetchBuffer _)
   }*/
 
-  def filterTx(sql: String): Rows = {
-
-    val st = conn.createStatement(); // statement objects can be reused with
-    try {
-      val rs = st.executeQuery(s"SELECT * FROM ${name} WHERE ${sql}"); // run the query
-      new Rows(rs)
-    } finally {
-      st.close
-    }
+  def filter(sql: String): Rows = {
+    inTransaction(filterTx(sql))
   }
 
-  def updateTx(values: String, filter: String): Int = {
-
-    val st = conn.createStatement(); // statement objects can be reused with
-    try {
-
-      val sql = s"UPDATE ${name} SET ${values} WHERE ${filter}"
-      st.executeUpdate(sql); // run the query
-
-    } finally {
-      st.close
-    }
+  def update(values: String, filter: String): Int = {
+    inTransaction(updateTx(values, filter))
   }
 
-  private def mapToSql(value: Any): Any = {
-    value match {
-      case v: String => s"'${v}'"
-      case v: Date => v.getTime
-      case null => "null"
-      case Some(x) => mapToSql(x)
-      case None => "null"
-      case v => v
-    }
+  def insert(values: Any*): Int = {
+    inTransaction(insertTx(values: _*))
   }
 
-  def insertTx(values: Any*): Int = {
-    val st = conn.createStatement(); // statement objects can be reused with
-    try {
-      val asStrs = values map (mapToSql(_))
-
-      val str = asStrs.mkString(", ")
-      val sql = s"INSERT INTO ${name} VALUES ( ${str})"
-      st.executeUpdate(sql); // run the query
-
-    } finally {
-      st.close
-    }
-  }
 }

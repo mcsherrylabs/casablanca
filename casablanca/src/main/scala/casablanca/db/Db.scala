@@ -76,10 +76,6 @@ class Db(dbConfigName: String) extends Configure with Logging {
     new Table(name, ds);
   }
 
-  def simpleTable(name: String): SimpleTable = {
-    new SimpleTable(name, ds);
-  }
-
   def shutdown {
     val conn = ds.getConnection()
     val st = conn.createStatement();
@@ -113,6 +109,7 @@ class Db(dbConfigName: String) extends Configure with Logging {
     // the classes that implement the pooling functionality.
     //
     val poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, null);
+    poolableConnectionFactory.setDefaultAutoCommit(false);
 
     //
     // Now we'll need a ObjectPool that serves as the

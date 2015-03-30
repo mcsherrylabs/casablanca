@@ -84,6 +84,8 @@ class StatusQueueManager(tm: TaskManager,
 
   }
 
+  def tx[T] = tm.tx[T]
+
   val statusQueues = statusQueueMap.values.flatMap(_.values)
 
   def getHandler(taskType: String, status: Int) = taskHandlerFactoryFactory.getHandler(taskType, TaskStatus(status))

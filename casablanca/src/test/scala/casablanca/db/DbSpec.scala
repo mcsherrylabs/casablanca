@@ -15,7 +15,7 @@ class DbSpec extends FlatSpec with Matchers {
   it should " allow insert into existing table " in {
 
     val dbUnderTest = Db("testDb")
-    val table = dbUnderTest.simpleTable("test")
+    val table = dbUnderTest.table("test")
     val numInserted = table.insert(0, "strId", new Date().getTime, 42)
     assert(numInserted == 1, s"Should be 1 row created not ${numInserted}!")
     dbUnderTest.shutdown
@@ -24,7 +24,7 @@ class DbSpec extends FlatSpec with Matchers {
   it should " be able to read all rows from a table " in {
 
     val dbUnderTest = Db("testDb")
-    val table = dbUnderTest.simpleTable("test")
+    val table = dbUnderTest.table("test")
     val time = new Date()
     table.insert(0, "strId", time, 42)
     val rows: List[Row] = table.map(r => r)
@@ -41,7 +41,7 @@ class DbSpec extends FlatSpec with Matchers {
 
     val time = new Date()
     val dbUnderTest = Db("testDb")
-    val table = dbUnderTest.simpleTable("test")
+    val table = dbUnderTest.table("test")
     table.insert(0, "strId", time, 45)
     val rows = table.filter(s"createTime = ${time.getTime} ")
     assert(rows.size === 1, "Should only be one row found !")
@@ -57,7 +57,7 @@ class DbSpec extends FlatSpec with Matchers {
 
     val time = new Date()
     val dbUnderTest = Db("testDb")
-    val table = dbUnderTest.simpleTable("test")
+    val table = dbUnderTest.table("test")
     table.insert(99, "strId", time, 45)
     table.getRow(99) match {
       case None => fail("oh oh, failed to find row by id")
@@ -71,7 +71,7 @@ class DbSpec extends FlatSpec with Matchers {
 
     val time = new Date()
     val dbUnderTest = Db("testDb")
-    val table = dbUnderTest.simpleTable("test")
+    val table = dbUnderTest.table("test")
     table.insert(99, "strId", time, 45)
     table.getRow(s"id = 99") match {
       case None => fail("oh oh, failed to find row by id")
@@ -85,7 +85,7 @@ class DbSpec extends FlatSpec with Matchers {
 
     val time = new Date()
     val dbUnderTest = Db("testDb")
-    val table = dbUnderTest.simpleTable("test")
+    val table = dbUnderTest.table("test")
     table.insert(99, "strId", time, 45)
     table.insert(99, "strId", time, 45)
     try {
@@ -103,11 +103,11 @@ class DbSpec extends FlatSpec with Matchers {
 
     val time = new Date()
     val dbUnderTest = Db("testDb")
-    val table = dbUnderTest.simpleTable("test")
+    val table = dbUnderTest.table("test")
 
     try {
       table.inTransaction {
-        table.insertTx(999999, "strId", time, 45)
+        table.insert(999999, "strId", time, 45)
         throw new Error("Ah HA!")
 
       }
@@ -125,6 +125,23 @@ class DbSpec extends FlatSpec with Matchers {
       case e: Error =>
     }
 
+    try {
+      table.inTransaction {
+        table.insert(999999, "strId", time, 45)
+      }
+    } catch {
+      case e: Error => println(e)
+    }
+
+    try {
+      table.getRow(s"id = 999999") match {
+        case Some(r) =>
+        case x => fail("there is no row with 999999...")
+      }
+
+    } catch {
+      case e: Error =>
+    }
     dbUnderTest.shutdown
   }
 }
