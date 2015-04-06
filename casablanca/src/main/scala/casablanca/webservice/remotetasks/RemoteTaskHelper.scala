@@ -2,25 +2,27 @@ package casablanca.webservice.remotetasks
 
 import spray.json._
 import DefaultJsonProtocol._
+import casablanca.util.JsonMapper
+import scala.language.implicitConversions
 
-case class RemoteTaskDecorator(strPayload: String, node: String,
-  taskId: Option[String] = None,
-  taskType: Option[String] = None)
+case class RemoteTaskDecorator(
+  strPayload: String,
+  node: String,
+  parentTaskId: Option[String],
+  taskId: String,
+  taskType: String)
 
-object RemoteTaskHelper {
+object RemoteTaskHelper extends JsonMapper[String, RemoteTaskDecorator] {
 
-  implicit val remoteTaskWithPayloadFormat = jsonFormat4(RemoteTaskDecorator)
+  implicit val remoteTaskWithPayloadFormat = jsonFormat5(RemoteTaskDecorator)
 
-  def toRemoteTaskDecorator(msg: String): RemoteTaskDecorator = {
+  implicit def from(msg: String): RemoteTaskDecorator = {
     val js = msg.parseJson
     js.convertTo[RemoteTaskDecorator]
   }
 
-  def fromRemoteTaskDecorator(strPayload: String, node: String,
-    taskId: Option[String] = None,
-    taskType: Option[String] = None): String = {
-    val decorator = RemoteTaskDecorator(strPayload, node, taskId, taskType)
-    val js = decorator.toJson
+  implicit def to(remoteTaskDecorator: RemoteTaskDecorator): String = {
+    val js = remoteTaskDecorator.toJson
     js.compactPrint
   }
 

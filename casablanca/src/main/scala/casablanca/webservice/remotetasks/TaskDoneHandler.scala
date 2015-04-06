@@ -23,6 +23,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import java.net.URL
 import casablanca.webservice.remotetasks.RemoteTaskHelper._
+import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory.RemoteTask
 import casablanca.util.Configure
 import spray.json._
 import DefaultJsonProtocol._
@@ -44,20 +45,30 @@ trait RemoteRestHandler extends TaskHandler with Configure with Logging {
 
 object RemoteRestRequestHandler extends RemoteRestHandler {
 
+  import casablanca.webservice.remotetasks.RemoteTaskJsonMapper._
+
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
-    val str = task.strPayload
+    val remoteTask: RemoteTask = task.strPayload
 
-    val remoteTaskCase = toRemoteTaskDecorator(str)
+    val remoteTaskDecorator = RemoteTaskDecorator(
+      remoteTask.payload,
+      taskHandlerContext.nodeConfig.localNode,
+      task.parentTaskId map (_ => task.id),
+      remoteTask.taskId,
+      remoteTask.taskType)
 
-    val newMsg = fromRemoteTaskDecorator(
+    /*val newMsg = from(
       remoteTaskCase.strPayload,
       taskHandlerContext.nodeConfig.localNode,
-      Some(task.id),
-      None)
+      remoteTaskCase.parentTaskId,
+      task.id,
+      remoteTaskCase.taskType)*/
 
-    val myUrl = new URL(taskHandlerContext.nodeConfig.map(remoteTaskCase.node) + "/task/decorated/" + remoteTaskCase.taskType.get)
-    val p = POST(myUrl).addBody(newMsg)
+    import casablanca.webservice.remotetasks.RemoteTaskHelper._
+
+    val myUrl = new URL(taskHandlerContext.nodeConfig.map(remoteTask.node) + "/task/decorated")
+    val p = POST(myUrl).addBody(remoteTaskDecorator)
     val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
     HandlerUpdate.awaitEvent
   }
@@ -78,7 +89,7 @@ object TaskDoneHandler extends RemoteRestHandler {
     def callParentRemotely: HandlerUpdate = {
       val myUrl = new URL(task.parentNode.get + "/event/" + task.parentTaskId.get)
       log.debug("Calling remote parent ..." + myUrl)
-      val decorated = fromRemoteTaskDecorator(task.strPayload, taskHandlerContext.nodeConfig.localNode, Some(task.id), Some(task.taskType))
+      val decorated = RemoteTaskDecorator(task.strPayload, taskHandlerContext.nodeConfig.localNode, task.parentTaskId, task.id, task.taskType)
       val p = POST(myUrl).addBody(decorated)
       val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
       log.info(s"Remote parent informed - all done ${task.taskType} ${task.id} ")
@@ -92,7 +103,7 @@ object TaskDoneHandler extends RemoteRestHandler {
 
     // Inform any waiting req that it's finished
     taskHandlerContext.taskCompletionListener.complete(task)
-    
+
     (task.parentNode, task.parentTaskId) match {
       case (Some(parent), Some(taskId)) => callParentRemotely
       case (None, Some(taskId)) => callParentAsEvent

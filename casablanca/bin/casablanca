@@ -18,7 +18,10 @@ ROW=7$2
 COL=7$3
 
 echo -Ddemo.restServer.port=$ROW$COL
- 
-java  -Dpath=$PATH_TO_BIN $CONFFILE $MEM -Ddemo.restServer.port=$ROW$COL -cp $CLASSPATH $MAINCLASS "$@" &
+
+REMOTE_DBG="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=40${2}${3},suspend=n"
+#$CONFFILE $MEM
+
+java $REMOTE_DBG -Dpath=$PATH_TO_BIN  -Ddemo.restServer.port=$ROW$COL -cp $CLASSPATH $MAINCLASS "$@" &
 
 echo kill $! >> pids

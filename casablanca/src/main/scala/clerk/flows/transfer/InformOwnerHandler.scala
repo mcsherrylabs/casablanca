@@ -15,7 +15,7 @@ object InformOwnerHandler extends TaskHandler {
   var callbackTask: String = ""
 
   def handle(taskContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-    val rem = RemoteTask("mailerNode", "mailerTask", "strPayload Inform owner")
+    val rem = RemoteTask("strPayload Inform owner", "mailerNode", "mailerTask")
     val t = RemoteTaskHandlerFactory.startRemoteTask(taskContext, rem, Some(TaskParent(task.id)))
     callbackTask = t.id
     StatusUpdate(awaitOwnerReponse.value)

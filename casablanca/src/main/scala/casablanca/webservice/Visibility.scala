@@ -25,6 +25,7 @@ import casablanca.task.TaskJsonMapper._
 
 class Visibility(tm: TaskManager) extends Controller {
 
+  import casablanca.task.TaskJsonMapper._
   private val prefix = "/visibility"
 
   private val myLog = LogFactory.getLogger(this.getClass.toString)

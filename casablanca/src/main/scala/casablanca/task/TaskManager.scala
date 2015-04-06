@@ -25,7 +25,7 @@ class TaskManager(configIt: Config) extends CreateTask {
     schedule: Option[TaskSchedule] = None,
     parent: Option[TaskParent]): Task = {
 
-    val uuid = UUID.randomUUID.toString
+    val uuid = descriptor.taskId.getOrElse(UUID.randomUUID.toString)
     taskTable.insert(parent.map(_.node), parent.map(_.taskId), uuid, new Date(), descriptor.taskType, descriptor.status.value, 0, schedule.map(_.when), descriptor.strPayload)
     getTask(uuid)
   }

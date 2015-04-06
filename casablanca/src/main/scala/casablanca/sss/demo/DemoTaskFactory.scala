@@ -27,6 +27,8 @@ import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory._
 import scala.util.Random
 import scala.annotation.tailrec
+import casablanca.webservice.remotetasks.SimpleChildTaskTrackingPayloadJsonMapper._
+import casablanca.webservice.remotetasks.SimpleChildTaskTrackingPayload
 
 trait DemoStatuses {
   val demoTask = "demoTask"
@@ -53,7 +55,17 @@ class SwitchPanel(row: Int, col: Int, onOff: Boolean) extends BaseDemoHandler(ro
       // if turning on, we're at the beginning
       GET(url).apply
       log.info(s"Going to return startNextTask.value")
-      StatusUpdate(startNextTask.value)
+
+      val payload: SimpleChildTaskTrackingPayload = try {
+        task.strPayload.toInt
+        SimpleChildTaskTrackingPayload(task.strPayload, Map())
+      } catch {
+        case e: NumberFormatException => {
+          task.strPayload
+        }
+      }
+
+      StatusUpdate(startNextTask.value, Some(payload))
     } else {
       Thread.sleep(601)
       GET(url).apply
@@ -78,11 +90,15 @@ class StartNextPanel(minTailLen: Int, row: Int, col: Int) extends TaskHandler wi
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
     log.info(s"Going to start next panel ")
-    val tailSize = task.strPayload.toInt
+    val simpleTask: SimpleChildTaskTrackingPayload = task.strPayload
+    val tailSize = simpleTask.payload.toInt
     nextNode(tailSize) match {
       case Some(nextNodeRes) => {
 
-        val remoteTask: RemoteTask = RemoteTask(nextNodeRes, demoTask, (tailSize + 1).toString)
+        val remoteTaskId = taskHandlerContext.generateNewTaskId
+        val payload = SimpleChildTaskTrackingPayload((tailSize + 1).toString, Map("myOneRemoteTask" -> remoteTaskId))
+        val remoteTask = RemoteTask(payload, nextNodeRes, demoTask)
+
         RemoteTaskHandlerFactory.startRemoteTask(taskHandlerContext, remoteTask, task)
         log.info(s"Next panel is ${nextNodeRes}, awainting event")
         StatusUpdate(awaitingEvent.value)
@@ -119,6 +135,8 @@ class DemoTaskFactory(row: Int, col: Int) extends BaseTaskHandlerFactory with De
   }
 
   override def consume(taskContext: TaskHandlerContext, task: Task, event: TaskEvent): Option[HandlerUpdate] = {
+    log.debug(s"Consume Demo Task Event - ${task}, ${event}")
     Some(StatusUpdate(switchOffPanel.value))
   }
+
 }

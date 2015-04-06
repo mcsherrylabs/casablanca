@@ -20,11 +20,12 @@ import casablanca.util.LogFactory
 import casablanca.task.TaskJsonMapper
 import casablanca.task.Task
 import scala.concurrent.Future
-import casablanca.task.TaskJsonMapper._
+
 import casablanca.task.TaskManager
 
 class Distribute(tm: TaskManager, taskContext: TaskHandlerContext, taskCompletionListener: TaskCompletionListener) extends Controller {
 
+  import casablanca.task.TaskJsonMapper._
   private val myLog = LogFactory.getLogger(this.getClass.toString)
 
   put("/distribute/:nodeName/:lastTaskId") { request =>

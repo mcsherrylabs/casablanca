@@ -65,7 +65,7 @@ class StatusQueue(taskContext: TaskHandlerContext,
       }
     } else {
       loopCount += 1
-      if (loopCount % 10 == 0) log.debug(s"StatusQueueWorker for status=${status} is alive...")
+      if (loopCount % 100 == 0) log.debug(s"StatusQueueWorker for status=${status} is alive...(loop count: ${loopCount})")
     }
 
   }

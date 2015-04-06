@@ -10,17 +10,18 @@ import casablanca.task.StatusUpdate
 import casablanca.task.ScheduledStatusUpdate
 import casablanca.task.RelativeScheduledStatusUpdate
 import casablanca.task.TaskStatus
-
 import casablanca.webservice.remotetasks.RemoteTaskHelper._
 import com.typesafe.config.ConfigFactory
 import casablanca.task.TaskParent
 import casablanca.task.TaskEvent
 import casablanca.task.TaskDescriptor
+import java.util.UUID
 
 object RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
 
-  case class RemoteTask(node: String, taskType: String, payload: String)
-  //case class RemoteTask(node: String, taskType: String, remoteTaskId: String, payload: String)
+  import casablanca.webservice.remotetasks.RemoteTaskJsonMapper._
+
+  case class RemoteTask(payload: String, node: String, taskType: String, taskId: String = UUID.randomUUID().toString)
 
   private val remoteTaskType = "remoteTask"
   def getTaskType: String = remoteTaskType
@@ -38,9 +39,8 @@ object RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
   }
 
   def startRemoteTask(taskContext: TaskHandlerContext, remoteTask: RemoteTask, parent: Option[TaskParent] = None): Task = {
-    // add remote details
-    val decorated = fromRemoteTaskDecorator(remoteTask.payload, remoteTask.node, None, Some(remoteTask.taskType))
-    taskContext.startTask(TaskDescriptor(remoteTaskType, taskStarted, decorated), None,
+    // add remote details    
+    taskContext.startTask(TaskDescriptor(remoteTaskType, taskStarted, remoteTask), None,
       parent)
   }
 

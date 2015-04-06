@@ -3,9 +3,10 @@ package casablanca.task
 import java.util.Date
 import casablanca.webservice.remotetasks.NodeConfig
 import casablanca.webservice.TaskCompletionListener
+import java.util.UUID
 
 case class TaskParent(taskId: String, node: Option[String] = None)
-case class TaskDescriptor(taskType: String, status: TaskStatus, strPayload: String)
+case class TaskDescriptor(taskType: String, status: TaskStatus, strPayload: String, taskId: Option[String] = None)
 case class TaskSchedule(when: Date)
 
 trait TaskHandlerContext extends CreateTask with TaskStatuses {
@@ -23,5 +24,6 @@ trait TaskHandlerContext extends CreateTask with TaskStatuses {
   def pushTask(task: Task)
 
   def getTask(taskId: String): Task
+  def generateNewTaskId: String = UUID.randomUUID().toString
 
 }
