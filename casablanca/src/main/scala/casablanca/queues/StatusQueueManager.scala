@@ -68,6 +68,8 @@ class StatusQueueManager(tm: TaskManager,
     override def getTask(taskId: String): Task = {
       tm.getTask(taskId)
     }
+
+    override def findTask(taskId: String): Option[Task] = tm.findTask(taskId)
   }
 
   val statusQueueMap: Map[String, Map[Int, StatusQueue]] = {

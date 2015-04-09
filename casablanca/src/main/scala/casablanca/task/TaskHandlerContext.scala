@@ -24,6 +24,7 @@ trait TaskHandlerContext extends CreateTask with TaskStatuses {
   def pushTask(task: Task)
 
   def getTask(taskId: String): Task
+  def findTask(taskId: String): Option[Task]
   def generateNewTaskId: String = UUID.randomUUID().toString
 
 }

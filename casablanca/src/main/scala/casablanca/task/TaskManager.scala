@@ -30,6 +30,15 @@ class TaskManager(configIt: Config) extends CreateTask {
     getTask(uuid)
   }
 
+  def findTask(taskId: String): Option[Task] = {
+    val results = taskTable.filter(s" taskId = '${taskId}'")
+    results.size match {
+      case 1 => Some(fromRow(results.rows(0)))
+      case 0 => None
+      case x => throw new ProgrammingError(s"There are ${results.size} taskIds (${taskId}) in the database! ")
+    }
+  }
+
   def getTask(taskId: String): Task = {
     val results = taskTable.filter(s" taskId = '${taskId}'")
     if (results.size != 1) throw new ProgrammingError(s"There are ${results.size} taskIds (${taskId}) in the database! ")

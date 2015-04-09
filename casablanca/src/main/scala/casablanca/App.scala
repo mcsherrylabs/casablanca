@@ -21,8 +21,11 @@ import casablanca.sss.demo.DemoTaskFactory
 import casablanca.util.Logging
 import casablanca.sss.demo.BrokenTaskFactory
 import casablanca.sss.demo.LoadTestTaskFactory
+import casablanca.task.TaskDescriptor
+import casablanca.task.TaskStatus
+import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory.RemoteTask
 
-object App {
+object App extends Logging {
 
   def main(args: Array[String]): Unit = {
 
@@ -34,19 +37,27 @@ object App {
       (args(1).toInt, args(2).toInt)
     } else (0, 0)
 
+    val dtf = new DemoTaskFactory(row, col)
     val thf = TaskHandlerFactoryFactory(MailerTaskFactory,
       RemoteTaskHandlerFactory,
       DomainTransferHandlerFactory,
       BrokenTaskFactory,
       LoadTestTaskFactory,
-      new DemoTaskFactory(row, col))
+      dtf)
 
     println(s"This instance supports the following task factories and statuses...")
     thf.supportedFactories.foreach { fact =>
       println(s"${fact.getTaskType}  ${fact.getSupportedStatuses}")
     }
 
-    new WorkflowManagerImpl(thf, configName).start
+    val wfm = new WorkflowManagerImpl(thf, configName)
+    wfm.start
+
+    val remoteTask = RemoteTask("1", "1_1", "demoTask")
+    val t = RemoteTaskHandlerFactory.startRemoteTask(wfm.statusQManager.taskContext, remoteTask, None)
+    log.info(s"Started ${t}")
+    //val descriptor = TaskDescriptor("remoteTask", TaskStatus(102), "1")
+    //wfm.statusQManager.taskContext.startTask(descriptor, None)
 
   }
 }

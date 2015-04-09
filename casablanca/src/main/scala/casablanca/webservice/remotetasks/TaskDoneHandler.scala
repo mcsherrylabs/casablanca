@@ -35,6 +35,7 @@ import casablanca.task.TaskParent
 import casablanca.task.AwaitEvent
 import casablanca.task.EventOrigin
 import casablanca.task.TaskEvent
+import com.stackmob.newman.response.HttpResponseCode
 
 trait RemoteRestHandler extends TaskHandler with Configure with Logging {
 
@@ -49,12 +50,13 @@ object RemoteRestRequestHandler extends RemoteRestHandler {
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
+    log.debug("P " + task.strPayload)
     val remoteTask: RemoteTask = task.strPayload
 
     val remoteTaskDecorator = RemoteTaskDecorator(
       remoteTask.payload,
       taskHandlerContext.nodeConfig.localNode,
-      task.parentTaskId map (_ => task.id),
+      task.parentTaskId,
       remoteTask.taskId,
       remoteTask.taskType)
 
@@ -67,9 +69,17 @@ object RemoteRestRequestHandler extends RemoteRestHandler {
 
     import casablanca.webservice.remotetasks.RemoteTaskHelper._
 
-    val myUrl = new URL(taskHandlerContext.nodeConfig.map(remoteTask.node) + "/task/decorated")
+    val debugNode = remoteTask.node
+
+    val myUrl = new URL(taskHandlerContext.nodeConfig.map(debugNode) + "/task")
     val p = POST(myUrl).addBody(remoteTaskDecorator)
+    log.debug(s"REMOTE POST ${myUrl}, ${remoteTaskDecorator}")
     val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
+    if (response.code != HttpResponseCode.Ok) {
+      if (response.code != HttpResponseCode.Created) {
+        log.warn("This task is already created on remote side...!")
+      } else throw new RuntimeException(s"Remote response is ${response.code} (not 200), ${response}")
+    }
     HandlerUpdate.awaitEvent
   }
 }
@@ -87,11 +97,12 @@ object TaskDoneHandler extends RemoteRestHandler {
     }
 
     def callParentRemotely: HandlerUpdate = {
-      val myUrl = new URL(task.parentNode.get + "/event/" + task.parentTaskId.get)
+      val myUrl = new URL(task.parentNode.get + "/event")
       log.debug("Calling remote parent ..." + myUrl)
       val decorated = RemoteTaskDecorator(task.strPayload, taskHandlerContext.nodeConfig.localNode, task.parentTaskId, task.id, task.taskType)
       val p = POST(myUrl).addBody(decorated)
       val response = Await.result(p.apply, 10.second) //this will throw if the response doesn't return within  seconds
+      if (response.code != HttpResponseCode.Ok) throw new RuntimeException(s"Remote response is ${response.code} (not 200), ${response}")
       log.info(s"Remote parent informed - all done ${task.taskType} ${task.id} ")
       HandlerUpdate.systemSuccess
     }

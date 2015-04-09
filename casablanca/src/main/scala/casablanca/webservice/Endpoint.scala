@@ -13,7 +13,6 @@ import casablanca.task.TaskDescriptor
 import casablanca.webservice.remotetasks.RemoteTaskHelper._
 import casablanca.task.TaskEvent
 import casablanca.task.EventOrigin
-import casablanca.task.EventOrigin
 import casablanca.util.Logging
 import org.slf4j.Logger
 import casablanca.util.LogFactory
@@ -21,6 +20,7 @@ import casablanca.task.TaskJsonMapper
 import casablanca.task.Task
 import scala.concurrent.Future
 import casablanca.task.TaskJsonMapper
+import com.twitter.util.{ Future => TwitFuture }
 
 import casablanca.webservice.remotetasks.RemoteTaskDecorator
 
@@ -45,46 +45,63 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
     }
   }
 
+  post(s"/task") { request =>
+    val str = request.contentString
+    val remoteTaskCase: RemoteTaskDecorator = str
+    myLog.debug(s"Starting task (${remoteTaskCase.taskType}) via endpoint... ")
+
+    taskContext.findTask(remoteTaskCase.taskId) match {
+
+      case None => {
+        val t = taskContext.create(
+          TaskDescriptor(remoteTaskCase.taskType, taskContext.taskStarted, remoteTaskCase.strPayload, Some(remoteTaskCase.taskId)),
+          None,
+          remoteTaskCase.parentTaskId map (parentTaskId => TaskParent(parentTaskId, Some(remoteTaskCase.node))))
+
+        val mininmumWaitTimeMs = request.request.getIntParam("wait", 0)
+        val twitFuture = taskCompletionListener.listenForCompletion[ResponseBuilder](t,
+          tsk => render.status(200).body((TaskJsonMapper.from(tsk))),
+          Some(mininmumWaitTimeMs))
+
+        // pushing the task allows it to start...    
+        taskContext.pushTask(t)
+        twitFuture
+      }
+      case Some(tsk) => render.status(201).body((TaskJsonMapper.from(tsk))).toFuture
+    }
+  }
+
   post(s"/task/:taskType") { request =>
 
-    try {
-      request.routeParams.get("taskType") match {
-        case None => {
-          myLog.warn("No task type, cannot process task create!!")
-          render.body("No task type! ").status(400).toFuture
-        }
-        case Some(tType) => {
-          myLog.debug(s"Starting task (${tType}) via endpoint... ")
-          val str = request.contentString
+    myLog.debug("WE ARE POSTED")
 
-          // Note task may finish in gap between task started
-          // and time listener is set up...., so separate out create
-          // and push
-          val t = taskContext.create(
-            TaskDescriptor(tType, taskContext.taskStarted, str),
-            None,
-            None)
+    request.routeParams.get("taskType") match {
+      case None => throw new RuntimeException(s"NO task type... ")
+      case Some(tType) => {
+        myLog.debug(s"Starting task (${tType}) via endpoint... ")
+        val str = request.contentString
 
-          val mininmumWaitTimeMs = request.request.getIntParam("wait", 0)
-          val twitFuture = taskCompletionListener.listenForCompletion[ResponseBuilder](t,
-            tsk => render.status(200).body((TaskJsonMapper.from(tsk))),
-            Some(mininmumWaitTimeMs))
+        // Note task may finish in gap between task started
+        // and time listener is set up...., so separate out create
+        // and push
+        val t = taskContext.create(
+          TaskDescriptor(tType, taskContext.taskStarted, str),
+          None,
+          None)
 
-          // pushing the task allows it to start...    
-          taskContext.pushTask(t)
-          twitFuture
-        }
+        val mininmumWaitTimeMs = request.request.getIntParam("wait", 0)
+        val twitFuture = taskCompletionListener.listenForCompletion[ResponseBuilder](t,
+          tsk => render.status(200).body((TaskJsonMapper.from(tsk))),
+          Some(mininmumWaitTimeMs))
 
-      }
-    } catch {
-      case e: Exception => {
-        myLog.error("Couldn't process post /task", e)
-        throw e
+        // pushing the task allows it to start...    
+        taskContext.pushTask(t)
+        twitFuture
       }
     }
   }
 
-  post(s"/task/decorated") { request =>
+  /*post(s"/task/decorated") { request =>
 
     try {
 
@@ -105,6 +122,17 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
         throw e
       }
     }
+  }*/
+
+  post(s"/event") { request =>
+
+    val remoteTaskCase: RemoteTaskDecorator = request.contentString
+    myLog.debug(s"Processing event (${remoteTaskCase.parentTaskId}) via endpoint... ")
+    val origin = EventOrigin(remoteTaskCase.taskId, remoteTaskCase.taskType)
+    val ev = TaskEvent(remoteTaskCase.strPayload, Some(origin))
+    taskContext.handleEvent(remoteTaskCase.parentTaskId.get, ev)
+    render.status(200).toFuture
+
   }
 
   post(s"/event/:taskId") { request =>
@@ -114,15 +142,10 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
         myLog.debug(s"Processing event (${tId}) via endpoint... ")
         val ev = TaskEvent(request.contentString, None)
         taskContext.handleEvent(tId, ev)
-        render.body("No task id! ").status(400).toFuture
+        render.status(200).toFuture
       }
       case None => {
-        val remoteTaskCase: RemoteTaskDecorator = request.contentString
-        myLog.debug(s"Processing event (${remoteTaskCase.parentTaskId}) via endpoint... ")
-        val origin = EventOrigin(remoteTaskCase.taskId, remoteTaskCase.taskType)
-        val ev = TaskEvent(remoteTaskCase.strPayload, Some(origin))
-        taskContext.handleEvent(remoteTaskCase.parentTaskId.get, ev)
-        render.status(200).toFuture
+        render.status(400).plain("No taskId included").toFuture
       }
     }
 

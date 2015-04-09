@@ -37,35 +37,30 @@ class StatusQueue(taskContext: TaskHandlerContext,
 
   def run(t: Task) {
 
-    if (t != null) {
-      log.debug(s"StatusQueueWorker for ${status} attempts to handle task ${t.taskType}:${t.id}")
-      statusQueueManager.tx {
-        try {
-          if (t.attemptCount > 1) {
-            if (t.attemptCount <= statusConfig.maxRetryCount) {
-              val handlerResult = statusHandler.reTry(taskContext, t)
-              statusQueueManager.pushTask(t, handlerResult)
-            } else log.warn(s"Giving up on task ${t}, max try count exceeded (${statusConfig.maxRetryCount})")
-          } else {
-            val handlerResult = statusHandler.handle(taskContext, t)
+    log.debug(s"StatusQueueWorker for ${status} attempts to handle task ${t.taskType}:${t.id}")
+    statusQueueManager.tx {
+      try {
+        if (t.attemptCount > 1) {
+          if (t.attemptCount <= statusConfig.maxRetryCount) {
+            val handlerResult = statusHandler.reTry(taskContext, t)
             statusQueueManager.pushTask(t, handlerResult)
-          }
+          } else log.warn(s"Giving up on task ${t}, max try count exceeded (${statusConfig.maxRetryCount})")
+        } else {
+          val handlerResult = statusHandler.handle(taskContext, t)
+          statusQueueManager.pushTask(t, handlerResult)
+        }
 
-        } catch {
+      } catch {
 
-          case tf: TaskFatalError => {
-            log.error(s"FATAL problem handling task, abandoning ${t}", tf)
-            statusQueueManager.pushTask(t, SystemFailure())
-          }
-          case ex: Exception => {
-            log.warn(s"Exception handling task, retry in ${statusConfig.retryDelayMinutes} minutes", ex)
-            statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, statusConfig.retryDelayMinutes))
-          }
+        case tf: TaskFatalError => {
+          log.error(s"FATAL problem handling task, abandoning ${t}", tf)
+          statusQueueManager.pushTask(t, SystemFailure())
+        }
+        case ex: Exception => {
+          log.warn(s"Exception handling task, retry in ${statusConfig.retryDelayMinutes} minutes", ex)
+          statusQueueManager.pushTask(t, RelativeScheduledStatusUpdate(t.status, statusConfig.retryDelayMinutes))
         }
       }
-    } else {
-      loopCount += 1
-      if (loopCount % 100 == 0) log.debug(s"StatusQueueWorker for status=${status} is alive...(loop count: ${loopCount})")
     }
 
   }
