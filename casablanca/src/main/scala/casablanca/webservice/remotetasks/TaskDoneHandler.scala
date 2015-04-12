@@ -60,13 +60,6 @@ object RemoteRestRequestHandler extends RemoteRestHandler {
       remoteTask.taskId,
       remoteTask.taskType)
 
-    /*val newMsg = from(
-      remoteTaskCase.strPayload,
-      taskHandlerContext.nodeConfig.localNode,
-      remoteTaskCase.parentTaskId,
-      task.id,
-      remoteTaskCase.taskType)*/
-
     import casablanca.webservice.remotetasks.RemoteTaskHelper._
 
     val debugNode = remoteTask.node

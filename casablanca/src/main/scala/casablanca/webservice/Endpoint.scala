@@ -46,9 +46,9 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
   }
 
   post(s"/task") { request =>
-    val str = request.contentString
-    val remoteTaskCase: RemoteTaskDecorator = str
-    myLog.debug(s"Starting task (${remoteTaskCase.taskType}) via endpoint... ")
+
+    val remoteTaskCase: RemoteTaskDecorator = request.contentString
+    myLog.debug(s"Starting task (${remoteTaskCase.taskType}, ${remoteTaskCase.taskId}) via endpoint... ")
 
     taskContext.findTask(remoteTaskCase.taskId) match {
 
@@ -100,29 +100,6 @@ class Endpoint(taskContext: TaskHandlerContext, taskCompletionListener: TaskComp
       }
     }
   }
-
-  /*post(s"/task/decorated") { request =>
-
-    try {
-
-      val str = request.contentString
-      val remoteTaskCase: RemoteTaskDecorator = str
-      myLog.debug(s"Starting task (${remoteTaskCase.taskType}) via endpoint... ")
-
-      val t = taskContext.startTask(
-        TaskDescriptor(remoteTaskCase.taskType, taskContext.taskStarted, remoteTaskCase.strPayload, Some(remoteTaskCase.taskId)),
-        None,
-        remoteTaskCase.parentTaskId map (parentTaskId => TaskParent(parentTaskId, Some(remoteTaskCase.node))))
-
-      render.status(200).body(TaskJsonMapper.from(t)).toFuture
-
-    } catch {
-      case e: Exception => {
-        myLog.error("Couldn't process post /task/decorated", e)
-        throw e
-      }
-    }
-  }*/
 
   post(s"/event") { request =>
 

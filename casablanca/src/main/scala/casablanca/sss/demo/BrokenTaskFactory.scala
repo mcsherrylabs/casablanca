@@ -12,8 +12,7 @@ import scala.concurrent.duration.Duration
 import casablanca.task.StatusUpdate
 import casablanca.task.RelativeScheduledStatusUpdate
 import java.util.concurrent.TimeUnit
-import scala.util.Success
-import scala.util.Failure
+
 import casablanca.task.TaskStatus
 import scala.language.reflectiveCalls
 import casablanca.task.TaskDescriptor
@@ -26,20 +25,29 @@ import java.net.URL
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory._
 import scala.util.Random
+import casablanca.task.Success
 
 trait BrokenStatuses {
   val brokenTask = "brokenTask"
-  
-}
 
+}
 
 object BreakTaskHandler extends TaskHandler with BrokenStatuses {
 
   def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
 
-    log.info(s"BREAKING!")
-    throw new RuntimeException("WE ARE ALWAYS GOING TO FAIL...!")
-      
+    task.strPayload match {
+      case "BREAK" => {
+        log.info(s"BREAKING!")
+        throw new RuntimeException("WE ARE ALWAYS GOING TO FAIL...!")
+      }
+      case x => {
+        log.info(s"NOT BREAKING")
+        Success()
+      }
+
+    }
+
   }
 }
 
@@ -50,7 +58,7 @@ object BrokenTaskFactory extends BaseTaskHandlerFactory with BrokenStatuses {
   override def getSupportedStatuses: Set[TaskStatus] = super.getSupportedStatuses ++ Set(taskStarted)
 
   override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = status match {
-    case `taskStarted` => Some(BreakTaskHandler)    
+    case `taskStarted` => Some(BreakTaskHandler)
     case _ => super.getHandler(status)
   }
 

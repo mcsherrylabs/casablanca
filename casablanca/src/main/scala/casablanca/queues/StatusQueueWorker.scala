@@ -28,17 +28,17 @@ class StatusQueueWorker(queue: BlockingQueue[StatusQueue]) extends Logging {
 
           val t = polled.poll
           if (t == null) {
-            /*quietCount += 1
+            quietCount += 1
             if (quietCount > queue.size() * 2) {
               loopCount += 1
               if (loopCount == 1 || loopCount % 100 == 0) {
-                log.info(s"Quiet Count is ${quietCount}, entering quiet mode... ")
+                log.info(s"Quiet Count is ${quietCount}, in quiet mode... ")
               }
               //This just prevents busy threads when the system is silent...
               // There's a better way of doing this. but other priorities take precedence. 
               Thread.sleep(50)
               quietCount = 0
-            }*/
+            }
           } else {
             quietCount = 0
             polled.run(t)

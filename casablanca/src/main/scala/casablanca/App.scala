@@ -53,9 +53,9 @@ object App extends Logging {
     val wfm = new WorkflowManagerImpl(thf, configName)
     wfm.start
 
-    val remoteTask = RemoteTask("1", "1_1", "demoTask")
-    val t = RemoteTaskHandlerFactory.startRemoteTask(wfm.statusQManager.taskContext, remoteTask, None)
-    log.info(s"Started ${t}")
+    //val remoteTask = RemoteTask("1", "1_1", "demoTask")
+    //val t = RemoteTaskHandlerFactory.startRemoteTask(wfm.statusQManager.taskContext, remoteTask, None)
+    //log.info(s"Started ${t}")
     //val descriptor = TaskDescriptor("remoteTask", TaskStatus(102), "1")
     //wfm.statusQManager.taskContext.startTask(descriptor, None)
 

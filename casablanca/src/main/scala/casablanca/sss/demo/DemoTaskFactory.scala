@@ -16,7 +16,6 @@ import scala.util.Success
 import scala.util.Failure
 import casablanca.task.TaskStatus
 import scala.language.reflectiveCalls
-import casablanca.task.TaskDescriptor
 import casablanca.task.TaskParent
 import casablanca.task.BaseTaskHandlerFactory
 import casablanca.task.TaskEvent
@@ -34,6 +33,7 @@ trait DemoStatuses {
   val demoTask = "demoTask"
   val startNextTask = TaskStatus(1000)
   val switchOffPanel = TaskStatus(1001)
+  val remoteTaskKey = "myOneRemoteTask"
 }
 
 abstract class BaseDemoHandler(row: Int, col: Int) extends TaskHandler with DemoStatuses {
@@ -55,13 +55,15 @@ class SwitchPanel(row: Int, col: Int, onOff: Boolean) extends BaseDemoHandler(ro
       // if turning on, we're at the beginning
       GET(url).apply
       log.info(s"Going to return startNextTask.value")
+      val remoteTaskId = taskHandlerContext.generateNewTaskId
 
       val payload: SimpleChildTaskTrackingPayload = try {
         task.strPayload.toInt
-        SimpleChildTaskTrackingPayload(task.strPayload, Map())
+        SimpleChildTaskTrackingPayload(task.strPayload, Map(remoteTaskKey -> remoteTaskId))
       } catch {
         case e: NumberFormatException => {
-          task.strPayload
+          val update: SimpleChildTaskTrackingPayload = task.strPayload
+          SimpleChildTaskTrackingPayload(update.payload, Map(remoteTaskKey -> remoteTaskId))
         }
       }
 
@@ -95,9 +97,8 @@ class StartNextPanel(minTailLen: Int, row: Int, col: Int) extends TaskHandler wi
     nextNode(tailSize) match {
       case Some(nextNodeRes) => {
 
-        val remoteTaskId = taskHandlerContext.generateNewTaskId
-        val payload = SimpleChildTaskTrackingPayload((tailSize + 1).toString, Map("myOneRemoteTask" -> remoteTaskId))
-        val remoteTask = RemoteTask(payload, nextNodeRes, demoTask)
+        val payload = SimpleChildTaskTrackingPayload((tailSize + 1).toString, Map())
+        val remoteTask = RemoteTask(payload, nextNodeRes, demoTask, simpleTask.remoteTasks.get(remoteTaskKey).get)
 
         RemoteTaskHandlerFactory.startRemoteTask(taskHandlerContext, remoteTask, task)
         log.info(s"Next panel is ${nextNodeRes}, awainting event")
@@ -136,6 +137,9 @@ class DemoTaskFactory(row: Int, col: Int) extends BaseTaskHandlerFactory with De
 
   override def consume(taskContext: TaskHandlerContext, task: Task, event: TaskEvent): Option[HandlerUpdate] = {
     log.debug(s"Consume Demo Task Event - ${task}, ${event}")
+    val simpleTask: SimpleChildTaskTrackingPayload = task.strPayload
+    val shouldMatch = simpleTask.remoteTasks.get(remoteTaskKey).get
+    log.debug(s"Check - ${event.origin.get.taskId} == ${shouldMatch}")
     Some(StatusUpdate(switchOffPanel.value))
   }
 

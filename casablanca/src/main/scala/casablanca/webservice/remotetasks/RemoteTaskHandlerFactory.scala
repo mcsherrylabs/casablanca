@@ -44,8 +44,4 @@ object RemoteTaskHandlerFactory extends BaseTaskHandlerFactory {
       parent)
   }
 
-  //override def consume(taskContext: TaskHandlerContext, task: Task, event: TaskEvent): Option[HandlerUpdate] = {
-  /// Some(StatusUpdate(taskFinished.value, Some(event.eventPayload)))
-  //}
-
 }
