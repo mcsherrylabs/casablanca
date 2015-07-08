@@ -24,12 +24,12 @@ import scala.concurrent.duration._
 import java.net.URL
 import casablanca.webservice.remotetasks.RemoteTaskHelper._
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory.RemoteTask
-import casablanca.util.Configure
+import _root_.sss.ancillary.Configure
 import spray.json._
 import DefaultJsonProtocol._
 import casablanca.task.TaskDescriptor
 import casablanca.task.Success
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import casablanca.task.SystemSuccess
 import casablanca.task.TaskParent
 import casablanca.task.AwaitEvent

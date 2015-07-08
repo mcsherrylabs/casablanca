@@ -26,10 +26,10 @@ import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory._
 import scala.util.Random
 import scala.annotation.tailrec
-import casablanca.db.Db
-import casablanca.db.Table
+import _root_.sss.db.Db
+import _root_.sss.db.Table
 import casablanca.task.Success
-import casablanca.db.Table
+import _root_.sss.db.Table
 
 trait LoadTestStatuses {
   val loadTestTask = "loadTestTask"

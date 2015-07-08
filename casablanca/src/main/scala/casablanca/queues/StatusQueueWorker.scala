@@ -6,7 +6,7 @@ import casablanca.task.Task
 import casablanca.task.TaskHandler
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import scala.annotation.tailrec
 
 class StatusQueueWorker(queue: BlockingQueue[StatusQueue]) extends Logging {

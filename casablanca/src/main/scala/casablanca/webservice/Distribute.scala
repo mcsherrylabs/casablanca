@@ -14,9 +14,9 @@ import casablanca.webservice.remotetasks.RemoteTaskHelper._
 import casablanca.task.TaskEvent
 import casablanca.task.EventOrigin
 import casablanca.task.EventOrigin
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import org.slf4j.Logger
-import casablanca.util.LogFactory
+import _root_.sss.ancillary.LogFactory
 import casablanca.task.TaskJsonMapper
 import casablanca.task.Task
 import scala.concurrent.Future

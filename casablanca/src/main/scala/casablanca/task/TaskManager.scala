@@ -1,7 +1,7 @@
 package casablanca.task
 
-import casablanca.util.Configure
-import casablanca.db._
+import _root_.sss.ancillary.Configure
+import _root_.sss.db._
 import java.util.UUID
 import java.util.Date
 import com.typesafe.config.Config
@@ -14,11 +14,11 @@ trait CreateTask {
     parent: Option[TaskParent] = None): Task
 }
 
-class TaskManager(configIt: Config) extends CreateTask {
+class TaskManager(db: Db, configIt: Config) extends CreateTask {
+
+  def this(configIt: Config) = this(new Db(configIt.getConfig("taskManager").getString("db")), configIt)
 
   private val myConfig = configIt.getConfig("taskManager")
-
-  private val db = new Db(myConfig.getString("db"))
   private val taskTable = db.table(myConfig.getString("taskTableName"))
 
   def create(descriptor: TaskDescriptor,

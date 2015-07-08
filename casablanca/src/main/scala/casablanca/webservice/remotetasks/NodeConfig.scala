@@ -1,10 +1,10 @@
 package casablanca.webservice.remotetasks
 
 import java.net.URL
-import casablanca.util.Configure
+import _root_.sss.ancillary.Configure
 import scala.collection.JavaConversions._
 import com.typesafe.config.Config
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 
 class NodeConfig(config: Config)  extends Logging {
   private val local = "local"

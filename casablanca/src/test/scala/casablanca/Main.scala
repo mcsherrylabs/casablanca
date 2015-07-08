@@ -12,7 +12,7 @@ import casablanca.webservice.RestServer
 import casablanca.testrigs.DummyTaskHandlerFactory
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import casablanca.sss.demo.DemoTaskFactory
-import casablanca.util.LogFactory
+import _root_.sss.ancillary.LogFactory
 import casablanca.sss.demo.BrokenTaskFactory
 
 object Main {

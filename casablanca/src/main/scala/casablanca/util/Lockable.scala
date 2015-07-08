@@ -4,6 +4,7 @@ import java.util.concurrent.locks.Lock
 import java.util.LinkedHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.TimeUnit
+import sss.ancillary.Logging
 
 class LockTimeoutException(msg: String) extends RuntimeException(msg)
 

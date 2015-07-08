@@ -1,6 +1,6 @@
 package casablanca.task
 
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 
 class TaskFatalError(msg: String) extends Error(msg) with Logging {
   log.error(msg)

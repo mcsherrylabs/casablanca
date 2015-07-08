@@ -4,7 +4,7 @@ import casablanca.task.Task
 import java.util.concurrent.TimeUnit
 import casablanca.task.RelativeScheduledStatusUpdate
 import casablanca.task.TaskHandlerContext
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import casablanca.task.StatusConfig
 import casablanca.task.SystemFailure
 import casablanca.task.TaskFatalError

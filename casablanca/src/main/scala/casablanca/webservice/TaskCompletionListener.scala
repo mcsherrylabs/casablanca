@@ -7,7 +7,7 @@ import casablanca.util.TimeoutFuture
 import scala.collection.concurrent.TrieMap
 import java.util.concurrent.ScheduledExecutorService
 import scala.concurrent.ExecutionContext
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import com.twitter.util.{Future => TwitFuture, Promise => TwitPromise }
 import scala.util.Success
 import scala.util.Failure

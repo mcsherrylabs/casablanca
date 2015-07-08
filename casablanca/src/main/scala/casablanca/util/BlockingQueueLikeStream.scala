@@ -2,6 +2,7 @@ package casablanca.util
 
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import sss.ancillary.Logging
 
 /**
  * A trait to turn an infinite stream into the head of a blocking list

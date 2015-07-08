@@ -1,7 +1,7 @@
 package casablanca.task
 
 import java.util.Date
-import casablanca.db.Row
+import _root_.sss.db.Row
 
 case class TaskUpdate(nextStatus: Int, strPayload: String, scheduleAfter: Option[Date] = None,
   numAttempts: Int)

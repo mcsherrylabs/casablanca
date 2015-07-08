@@ -5,7 +5,7 @@ import java.util.LinkedHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.TimeUnit
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 
 sealed case class TaskStatus(value: Int)
 

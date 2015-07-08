@@ -5,52 +5,37 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.TimeUnit
 import casablanca.util.Lockable
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import casablanca.webservice.remotetasks.TaskDoneHandler
-import casablanca.util.Configure
+import _root_.sss.ancillary.Configure
 
-/*object TaskFinishedHandler extends TaskHandler with Logging {
-  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-    log.info(s"FINSHED(SUCCESS)${task}")
-    StatusUpdate(systemFinished.value)
-  }
-}
-
-object TaskFailedHandler extends TaskHandler with Logging {
-  def handle(taskHandlerContext: TaskHandlerContext, task: Task): HandlerUpdate = {
-    log.info(s"FINSHED(FAILED) ${task}")
-    StatusUpdate(systemFinished.value)
-  }
-}*/
-
-trait BaseTaskHandlerFactory extends TaskHandlerFactory 
-            with Lockable[String] 
-            with Logging 
-            with Configure {
+trait BaseTaskHandlerFactory extends TaskHandlerFactory
+  with Lockable[String]
+  with Logging
+  with Configure {
 
   protected lazy val taskConfig = {
-    if(config.hasPath(getTaskType)) Some(config.getConfig(getTaskType))
-    else None 
+    if (config.hasPath(getTaskType)) Some(config.getConfig(getTaskType))
+    else None
   }
-  
-  def getStatusConfig(status:Int): StatusConfig = {
+
+  def getStatusConfig(status: Int): StatusConfig = {
     //val configPath = s"${getTaskType}.${status}"
     taskConfig match {
-      case Some(someConfig) if(someConfig.hasPath(s"${status}")) => {
-         val conf = someConfig.getConfig(s"${status}")
-         log.info(s"Using task specific settings for ${getTaskType}:${status}")
-         StatusConfig(
-            conf.getInt("queueSize"),   
-            conf.getInt("offerTimeoutMs"),
-            conf.getInt("pollTimeoutMs"),
-            conf.getInt("maxRetryCount"),
-            conf.getInt("retryDelayMinutes")
-          )
+      case Some(someConfig) if (someConfig.hasPath(s"${status}")) => {
+        val conf = someConfig.getConfig(s"${status}")
+        log.info(s"Using task specific settings for ${getTaskType}:${status}")
+        StatusConfig(
+          conf.getInt("queueSize"),
+          conf.getInt("offerTimeoutMs"),
+          conf.getInt("pollTimeoutMs"),
+          conf.getInt("maxRetryCount"),
+          conf.getInt("retryDelayMinutes"))
       }
-      case _ => StatusConfig()  
-    }              
+      case _ => StatusConfig()
+    }
   }
-  
+
   override def getSupportedStatuses: Set[TaskStatus] = Set(taskFinished, taskFailed)
 
   override def getHandler[T >: TaskHandler](status: TaskStatus): Option[T] = {

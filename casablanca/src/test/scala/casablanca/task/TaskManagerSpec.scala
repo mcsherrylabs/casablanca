@@ -2,7 +2,7 @@ package casablanca.task
 
 import org.scalatest._
 import java.util.Date
-import casablanca.util.ConfigureFactory
+import _root_.sss.ancillary.ConfigureFactory
 import casablanca.util.ProgrammingError
 import java.util.UUID
 

@@ -22,6 +22,10 @@ scalacOptions ++= Seq("-deprecation", "-feature")
 
 libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.2"
 
+libraryDependencies += "mcsherrylabs.com" %% "sss-db" % "0.9"
+
+libraryDependencies += "mcsherrylabs.com" %% "sss-ancillary" % "0.9"
+
 libraryDependencies += "org.hsqldb" % "hsqldb" % "2.3.2"
 
 libraryDependencies += "com.typesafe" % "config" % "1.2.1"

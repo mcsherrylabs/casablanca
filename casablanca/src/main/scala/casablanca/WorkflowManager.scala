@@ -12,9 +12,9 @@ import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.queues.StatusQueue
 import casablanca.queues.StatusQueueWorker
 import casablanca.webservice.RestServer
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import scala.concurrent.Future
-import casablanca.util.Configure
+import _root_.sss.ancillary.Configure
 import com.twitter.finatra.Controller
 import casablanca.webservice.Endpoint
 import casablanca.webservice.remotetasks.NodeConfig
@@ -22,6 +22,7 @@ import casablanca.queues.Reaper
 import casablanca.webservice.Visibility
 import java.util.concurrent.Executors
 import casablanca.webservice.TaskCompletionListener
+import _root_.sss.db.Db
 
 /**
  *
@@ -32,7 +33,9 @@ trait WorkflowManager {
 }
 
 class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
-  configName: String = "main") extends WorkflowManager
+  configName: String = "main",
+  userControllerList: List[Controller] = Nil,
+  dbOpt: Option[Db] = None) extends WorkflowManager
   with Logging
   with Configure {
 
@@ -51,7 +54,10 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
 
   log.info("Shutdown hook installed ... ")
 
-  val tm = new TaskManager(config.getConfig(configName))
+  val tm = dbOpt match {
+    case Some(db) => new TaskManager(db, config.getConfig(configName))
+    case None => new TaskManager(config.getConfig(configName))
+  }
   val nodeConfig = new NodeConfig(config.getConfig(configName))
 
   val scheduledExecutorService = Executors.newScheduledThreadPool(1)
@@ -60,9 +66,10 @@ class WorkflowManagerImpl(taskHandlerFactoryFactory: TaskHandlerFactoryFactory,
   val statusQManager = new StatusQueueManager(tm, taskHandlerFactoryFactory, nodeConfig, taskCompletionListener)
   val scheduler = new Scheduler(tm, scheduledExecutorService, statusQManager, config.getInt("schedulerGranularityInSeconds"))
   val reaper = new Reaper(tm, scheduledExecutorService, config.getInt("reaperGranularityInSeconds"), config.getInt("waitBeforeDeletingInMinutes"))
+  val controllerList = List(new Endpoint(statusQManager.taskContext, taskCompletionListener),
+    new Visibility(tm)) ++ userControllerList
   val restServer = new RestServer(config.getConfig(configName),
-    new Endpoint(statusQManager.taskContext, taskCompletionListener),
-    new Visibility(tm))
+    controllerList)
 
   def stop {
     // todo add other stops for threads

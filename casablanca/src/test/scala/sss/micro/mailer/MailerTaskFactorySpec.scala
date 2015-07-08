@@ -12,7 +12,7 @@ import casablanca.task.TaskDescriptor
 import casablanca.task.TaskStatus
 import casablanca.webservice.remotetasks.TaskDoneHandler
 import casablanca.task.HandlerUpdate
-import casablanca.util.ConfigureFactory
+import _root_.sss.ancillary.ConfigureFactory
 import casablanca.WorkflowManagerImpl
 import MailJsonMapper._
 

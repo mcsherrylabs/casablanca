@@ -9,16 +9,14 @@ import scala.concurrent.duration._
 import java.net.URL
 import _root_.sss.micro.mailer.MailerTaskFactory
 import casablanca.task.TaskManager
-import clerk.flows.transfer.DomainTransferHandlerFactory
 import casablanca.task.TaskHandlerFactoryFactory
 import casablanca.queues.StatusQueueManager
 import casablanca.queues.Scheduler
 import casablanca.webservice.RestServer
-import casablanca.util.ConfigureFactory
-import casablanca.util.LogFactory
+
 import casablanca.webservice.remotetasks.RemoteTaskHandlerFactory
 import casablanca.sss.demo.DemoTaskFactory
-import casablanca.util.Logging
+import _root_.sss.ancillary.Logging
 import casablanca.sss.demo.BrokenTaskFactory
 import casablanca.sss.demo.LoadTestTaskFactory
 import casablanca.task.TaskDescriptor
@@ -40,7 +38,6 @@ object App extends Logging {
     val dtf = new DemoTaskFactory(row, col)
     val thf = TaskHandlerFactoryFactory(MailerTaskFactory,
       RemoteTaskHandlerFactory,
-      DomainTransferHandlerFactory,
       BrokenTaskFactory,
       LoadTestTaskFactory,
       dtf)
