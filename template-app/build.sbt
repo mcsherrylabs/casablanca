@@ -1,3 +1,5 @@
+scalaVersion := "2.10.5"
+
 import com.typesafe.sbt.packager.archetypes._
 
 
@@ -8,8 +10,6 @@ JavaAppPackaging.settings
 mappings in Universal += { file("bin/casablanca") -> "bin/casablanca" }
 
 mappings in Universal += { file("conf/production-application.conf") -> "conf/production-application.conf" }
-
-scalaVersion := "2.10.5"
 
 version := "0.7.0"
 

@@ -1,6 +1,3 @@
-import NativePackagerKeys._
-
-packageArchetype.java_application
 
 name := "demo-ui"
 
