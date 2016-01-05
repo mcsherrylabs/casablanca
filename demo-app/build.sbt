@@ -23,7 +23,7 @@ libraryDependencies += "mcsherrylabs.com" %% "sss-db" % "0.9"
 
 libraryDependencies += "mcsherrylabs.com" %% "sss-ancillary" % "0.9"
 
-libraryDependencies += "mcsherrylabs.com" %% "sss-casablanca" % "0.7.0-SNAPSHOT"
+libraryDependencies += "mcsherrylabs.com" %% "sss-casablanca" % "0.7.0"
 
 libraryDependencies += "org.hsqldb" % "hsqldb" % "2.3.2"
 

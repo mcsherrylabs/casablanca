@@ -3,7 +3,7 @@ scalaVersion := "2.10.5"
 
 name := "sss-casablanca"
 
-version := "0.7.0-SNAPSHOT"
+version := "0.7.0"
 
 scalacOptions ++= Seq("-deprecation", "-feature")
 

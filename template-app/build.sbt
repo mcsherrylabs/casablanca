@@ -15,7 +15,7 @@ version := "0.7.0"
 
 scalacOptions ++= Seq("-deprecation", "-feature")
 
-libraryDependencies += "mcsherrylabs.com" %% "sss-casablanca" % "0.7.0-SNAPSHOT"
+libraryDependencies += "mcsherrylabs.com" %% "sss-casablanca" % "0.7.0"
 
 libraryDependencies += "org.hsqldb" % "hsqldb" % "2.3.2"
 
