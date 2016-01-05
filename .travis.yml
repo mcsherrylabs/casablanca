@@ -1,0 +1,12 @@
+language: scala
+
+scala:
+   - 2.10.5
+
+env:
+   - MODULE=sss.casablanca
+   - MODULE=template-app
+   - MODULE=demo-app
+   - MODULE=demo-ui
+
+script: cd $MODULE && sbt clean compile
