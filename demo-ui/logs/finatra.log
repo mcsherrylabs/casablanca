@@ -1,0 +1,744 @@
+INF [20160105-16:05:27.215] finatra: finatra process 26668 started
+INF [20160105-16:05:27.219] finatra: http server started on port: :7070
+INF [20160105-16:05:27.911] finatra: admin http server started on port: :9990
+INF [20160105-17:19:33.743] finatra: finatra process 31474 started
+INF [20160105-17:19:33.747] finatra: http server started on port: :7070
+INF [20160105-17:19:34.414] finatra: admin http server started on port: :9990
+INF [20160105-17:20:59.238] finatra: GET /example/ 404 22ms
+INF [20160105-17:20:59.339] finatra: GET /favicon.ico 404 1ms
+INF [20160105-17:20:59.364] finatra: GET /favicon.ico 404 1ms
+INF [20160105-17:21:04.137] finatra: GET / 404 0ms
+INF [20160105-17:21:34.248] finatra: GET /world 200 88ms
+INF [20160105-17:21:53.681] finatra: GET /example 200 36ms
+INF [20160105-17:21:53.982] finatra: GET /0.jpg 200 33ms
+INF [20160105-17:21:54.043] finatra: GET /world? 200 1ms
+INF [20160105-17:21:54.298] finatra: GET /world? 200 1ms
+INF [20160105-17:21:54.557] finatra: GET /world? 200 1ms
+INF [20160105-17:21:54.812] finatra: GET /world? 200 2ms
+INF [20160105-17:21:55.069] finatra: GET /world? 200 1ms
+INF [20160105-17:21:55.326] finatra: GET /world? 200 3ms
+INF [20160105-17:21:55.580] finatra: GET /world? 200 2ms
+INF [20160105-17:21:56.126] finatra: GET /world? 200 1ms
+INF [20160105-17:21:56.417] finatra: GET /world? 200 1ms
+INF [20160105-17:21:57.252] finatra: GET /world? 200 1ms
+INF [20160105-17:21:57.509] finatra: GET /world? 200 1ms
+INF [20160105-17:21:58.147] finatra: GET /world? 200 1ms
+INF [20160105-17:21:58.439] finatra: GET /world? 200 1ms
+INF [20160105-17:21:59.240] finatra: GET /world? 200 1ms
+INF [20160105-17:21:59.520] finatra: GET /world? 200 1ms
+INF [20160105-17:22:00.243] finatra: GET /world? 200 1ms
+INF [20160105-17:22:00.555] finatra: GET /world? 200 1ms
+INF [20160105-17:22:01.371] finatra: GET /world? 200 1ms
+INF [20160105-17:22:01.675] finatra: GET /world? 200 1ms
+INF [20160105-17:22:02.400] finatra: GET /world? 200 1ms
+INF [20160105-17:22:02.702] finatra: GET /world? 200 1ms
+INF [20160105-17:22:03.493] finatra: GET /world? 200 1ms
+INF [20160105-17:22:03.805] finatra: GET /world? 200 1ms
+INF [20160105-17:22:04.466] finatra: GET /world? 200 1ms
+INF [20160105-17:22:04.765] finatra: GET /world? 200 1ms
+INF [20160105-17:22:05.529] finatra: GET /world? 200 2ms
+INF [20160105-17:22:05.842] finatra: GET /world? 200 1ms
+INF [20160105-17:22:06.531] finatra: GET /world? 200 0ms
+INF [20160105-17:22:06.834] finatra: GET /world? 200 1ms
+INF [20160105-17:22:07.106] finatra: GET /world? 200 0ms
+INF [20160105-17:22:07.633] finatra: GET /world? 200 1ms
+INF [20160105-17:22:07.944] finatra: GET /world? 200 1ms
+INF [20160105-17:22:08.664] finatra: GET /world? 200 1ms
+INF [20160105-17:22:08.944] finatra: GET /world? 200 1ms
+INF [20160105-17:22:09.201] finatra: GET /world? 200 2ms
+INF [20160105-17:22:09.834] finatra: GET /world? 200 1ms
+INF [20160105-17:22:10.157] finatra: GET /world? 200 5ms
+INF [20160105-17:22:11.134] finatra: GET /world? 200 1ms
+INF [20160105-17:22:11.389] finatra: GET /world? 200 1ms
+INF [20160105-17:22:11.663] finatra: GET /world? 200 0ms
+INF [20160105-17:22:12.245] finatra: GET /world? 200 1ms
+INF [20160105-17:22:12.512] finatra: GET /world? 200 1ms
+INF [20160105-17:22:13.210] finatra: GET /world? 200 1ms
+INF [20160105-17:22:13.498] finatra: GET /world? 200 1ms
+INF [20160105-17:22:14.135] finatra: GET /world? 200 1ms
+INF [20160105-17:22:14.441] finatra: GET /world? 200 1ms
+INF [20160105-17:22:15.284] finatra: GET /world? 200 1ms
+INF [20160105-17:22:15.595] finatra: GET /world? 200 1ms
+INF [20160105-17:22:16.189] finatra: GET /world? 200 1ms
+INF [20160105-17:22:16.503] finatra: GET /world? 200 1ms
+INF [20160105-17:22:17.339] finatra: GET /world? 200 0ms
+INF [20160105-17:22:17.657] finatra: GET /world? 200 1ms
+INF [20160105-17:22:18.270] finatra: GET /world? 200 1ms
+INF [20160105-17:22:18.571] finatra: GET /world? 200 1ms
+INF [20160105-17:22:19.339] finatra: GET /world? 200 2ms
+INF [20160105-17:22:19.641] finatra: GET /world? 200 1ms
+INF [20160105-17:22:20.296] finatra: GET /world? 200 1ms
+INF [20160105-17:22:20.601] finatra: GET /world? 200 1ms
+INF [20160105-17:22:21.360] finatra: GET /world? 200 1ms
+INF [20160105-17:22:21.671] finatra: GET /world? 200 1ms
+INF [20160105-17:22:22.360] finatra: GET /world? 200 1ms
+INF [20160105-17:22:22.658] finatra: GET /world? 200 1ms
+INF [20160105-17:22:23.428] finatra: GET /world? 200 0ms
+INF [20160105-17:22:23.739] finatra: GET /world? 200 1ms
+INF [20160105-17:22:24.402] finatra: GET /world? 200 0ms
+INF [20160105-17:22:24.701] finatra: GET /world? 200 1ms
+INF [20160105-17:22:25.497] finatra: GET /world? 200 1ms
+INF [20160105-17:22:25.767] finatra: GET /world? 200 1ms
+INF [20160105-17:22:26.608] finatra: GET /world? 200 1ms
+INF [20160105-17:22:26.891] finatra: GET /world? 200 1ms
+INF [20160105-17:22:27.433] finatra: GET /world? 200 1ms
+INF [20160105-17:22:28.022] finatra: GET /world? 200 1ms
+INF [20160105-17:22:28.278] finatra: GET /world? 200 1ms
+INF [20160105-17:22:28.562] finatra: GET /world? 200 1ms
+INF [20160105-17:22:29.463] finatra: GET /world? 200 1ms
+INF [20160105-17:22:29.808] finatra: GET /world? 200 1ms
+INF [20160105-17:22:30.086] finatra: GET /world? 200 1ms
+INF [20160105-17:22:30.356] finatra: GET /world? 200 1ms
+INF [20160105-17:22:31.403] finatra: GET /world? 200 0ms
+INF [20160105-17:22:31.709] finatra: GET /world? 200 1ms
+INF [20160105-17:22:32.099] finatra: GET /world? 200 1ms
+INF [20160105-17:22:33.940] finatra: GET /world? 200 1ms
+INF [20160105-17:22:34.345] finatra: GET /world? 200 1ms
+INF [20160105-17:22:34.682] finatra: GET /world? 200 1ms
+INF [20160105-17:22:35.049] finatra: GET /world? 200 2ms
+INF [20160105-17:22:36.465] finatra: GET /world? 200 1ms
+INF [20160105-17:22:36.852] finatra: GET /world? 200 0ms
+INF [20160105-17:22:37.158] finatra: GET /world? 200 1ms
+INF [20160105-17:22:37.426] finatra: GET /world? 200 0ms
+INF [20160105-17:22:38.694] finatra: GET /world? 200 1ms
+INF [20160105-17:22:39.193] finatra: GET /world? 200 1ms
+INF [20160105-17:22:39.564] finatra: GET /world? 200 1ms
+INF [20160105-17:22:39.883] finatra: GET /world? 200 1ms
+INF [20160105-17:22:41.185] finatra: GET /world? 200 1ms
+INF [20160105-17:22:41.538] finatra: GET /world? 200 1ms
+INF [20160105-17:22:41.891] finatra: GET /world? 200 0ms
+INF [20160105-17:22:42.199] finatra: GET /world? 200 1ms
+INF [20160105-17:22:43.415] finatra: GET /world? 200 1ms
+INF [20160105-17:22:43.710] finatra: GET /world? 200 1ms
+INF [20160105-17:22:44.101] finatra: GET /world? 200 1ms
+INF [20160105-17:22:45.365] finatra: GET /world? 200 1ms
+INF [20160105-17:22:45.744] finatra: GET /world? 200 1ms
+INF [20160105-17:22:46.082] finatra: GET /world? 200 1ms
+INF [20160105-17:22:46.394] finatra: GET /world? 200 1ms
+INF [20160105-17:22:47.970] finatra: GET /world? 200 1ms
+INF [20160105-17:22:48.323] finatra: GET /world? 200 1ms
+INF [20160105-17:22:48.744] finatra: GET /world? 200 1ms
+INF [20160105-17:22:50.102] finatra: GET /world? 200 1ms
+INF [20160105-17:22:50.511] finatra: GET /world? 200 1ms
+INF [20160105-17:22:51.194] finatra: GET /world? 200 0ms
+INF [20160105-17:22:51.212] finatra: Starting panel 2 2
+INF [20160105-17:22:51.535] finatra: GET /world? 200 9ms
+INF [20160105-17:22:52.126] finatra: GET /start/2/2 302 920ms
+INF [20160105-17:22:53.038] finatra: GET /world? 200 1ms
+INF [20160105-17:22:53.373] finatra: GET /index.html 200 1ms
+INF [20160105-17:22:53.387] finatra: GET /world? 200 8ms
+INF [20160105-17:22:53.968] finatra: GET /world? 200 1ms
+INF [20160105-17:22:54.275] finatra: GET /world? 200 1ms
+INF [20160105-17:22:55.485] finatra: GET /world? 200 1ms
+INF [20160105-17:22:55.829] finatra: GET /world? 200 1ms
+INF [20160105-17:22:56.116] finatra: GET /world? 200 0ms
+INF [20160105-17:22:56.498] finatra: GET /world? 200 1ms
+INF [20160105-17:22:58.153] finatra: GET /world? 200 1ms
+INF [20160105-17:22:58.500] finatra: GET /world? 200 1ms
+INF [20160105-17:22:58.832] finatra: GET /world? 200 1ms
+INF [20160105-17:22:59.111] finatra: GET /world? 200 1ms
+INF [20160105-17:23:00.199] finatra: GET /world? 200 1ms
+INF [20160105-17:23:00.555] finatra: GET /world? 200 1ms
+INF [20160105-17:23:00.889] finatra: GET /world? 200 1ms
+INF [20160105-17:23:01.240] finatra: GET /world? 200 4ms
+INF [20160105-17:23:02.791] finatra: GET /world? 200 1ms
+INF [20160105-17:23:03.146] finatra: GET /world? 200 1ms
+INF [20160105-17:23:03.415] finatra: GET /world? 200 0ms
+INF [20160105-17:23:03.686] finatra: GET /world? 200 6ms
+INF [20160105-17:23:04.766] finatra: GET /world? 200 1ms
+INF [20160105-17:23:05.130] finatra: GET /world? 200 0ms
+INF [20160105-17:23:05.427] finatra: GET /world? 200 1ms
+INF [20160105-17:23:05.749] finatra: GET /world? 200 1ms
+INF [20160105-17:23:07.210] finatra: GET /world? 200 1ms
+INF [20160105-17:23:07.564] finatra: GET /world? 200 1ms
+INF [20160105-17:23:07.971] finatra: GET /world? 200 1ms
+INF [20160105-17:23:09.325] finatra: GET /world? 200 0ms
+INF [20160105-17:23:09.747] finatra: GET /world? 200 1ms
+INF [20160105-17:23:10.073] finatra: GET /world? 200 1ms
+INF [20160105-17:23:10.414] finatra: GET /world? 200 1ms
+INF [20160105-17:23:11.845] finatra: GET /world? 200 1ms
+INF [20160105-17:23:12.178] finatra: GET /world? 200 1ms
+INF [20160105-17:23:12.553] finatra: GET /world? 200 1ms
+INF [20160105-17:23:13.878] finatra: GET /world? 200 2ms
+INF [20160105-17:23:14.245] finatra: GET /world? 200 1ms
+INF [20160105-17:23:14.586] finatra: GET /world? 200 0ms
+INF [20160105-17:23:14.915] finatra: GET /world? 200 1ms
+INF [20160105-17:23:16.336] finatra: GET /world? 200 0ms
+INF [20160105-17:23:16.697] finatra: GET /world? 200 1ms
+INF [20160105-17:23:16.971] finatra: GET /world? 200 0ms
+INF [20160105-17:23:17.243] finatra: GET /world? 200 1ms
+INF [20160105-17:23:18.464] finatra: GET /world? 200 0ms
+INF [20160105-17:23:18.908] finatra: GET /world? 200 1ms
+INF [20160105-17:23:19.232] finatra: GET /world? 200 1ms
+INF [20160105-17:23:19.540] finatra: GET /world? 200 1ms
+INF [20160105-17:23:20.896] finatra: GET /world? 200 1ms
+INF [20160105-17:23:21.248] finatra: GET /world? 200 0ms
+INF [20160105-17:23:21.649] finatra: GET /world? 200 1ms
+INF [20160105-17:23:23.007] finatra: GET /world? 200 1ms
+INF [20160105-17:23:23.386] finatra: GET /world? 200 0ms
+INF [20160105-17:23:23.723] finatra: GET /world? 200 1ms
+INF [20160105-17:23:24.177] finatra: GET /world? 200 1ms
+INF [20160105-17:23:25.422] finatra: GET /world? 200 0ms
+INF [20160105-17:23:25.743] finatra: GET /world? 200 0ms
+INF [20160105-17:23:26.135] finatra: GET /world? 200 0ms
+INF [20160105-17:23:27.503] finatra: GET /world? 200 1ms
+INF [20160105-17:23:27.867] finatra: GET /world? 200 1ms
+INF [20160105-17:23:28.245] finatra: GET /world? 200 1ms
+INF [20160105-17:23:28.685] finatra: GET /world? 200 1ms
+INF [20160105-17:23:29.858] finatra: GET /world? 200 0ms
+INF [20160105-17:23:30.264] finatra: GET /world? 200 1ms
+INF [20160105-17:23:30.571] finatra: GET /world? 200 0ms
+INF [20160105-17:23:30.900] finatra: GET /world? 200 3ms
+INF [20160105-17:23:32.216] finatra: GET /world? 200 0ms
+INF [20160105-17:23:32.593] finatra: GET /world? 200 1ms
+INF [20160105-17:23:32.985] finatra: GET /world? 200 5ms
+INF [20160105-17:23:33.427] finatra: GET /world? 200 1ms
+INF [20160105-17:23:34.646] finatra: GET /world? 200 1ms
+INF [20160105-17:23:35.111] finatra: GET /world? 200 1ms
+INF [20160105-17:23:35.451] finatra: GET /world? 200 1ms
+INF [20160105-17:23:35.797] finatra: GET /world? 200 1ms
+INF [20160105-17:23:36.883] finatra: GET /world? 200 1ms
+INF [20160105-17:23:37.189] finatra: GET /world? 200 1ms
+INF [20160105-17:23:37.554] finatra: GET /world? 200 1ms
+INF [20160105-17:23:38.344] finatra: GET /world? 200 1ms
+INF [20160105-17:23:38.656] finatra: GET /world? 200 0ms
+INF [20160105-17:23:39.564] finatra: GET /world? 200 1ms
+INF [20160105-17:23:39.818] finatra: GET /world? 200 0ms
+INF [20160105-17:23:40.604] finatra: GET /world? 200 5ms
+INF [20160105-17:23:40.921] finatra: GET /world? 200 1ms
+INF [20160105-17:23:41.749] finatra: GET /world? 200 1ms
+INF [20160105-17:23:42.001] finatra: GET /world? 200 1ms
+INF [20160105-17:23:42.773] finatra: GET /world? 200 1ms
+INF [20160105-17:23:43.100] finatra: GET /world? 200 1ms
+INF [20160105-17:23:43.895] finatra: GET /world? 200 1ms
+INF [20160105-17:23:44.198] finatra: GET /world? 200 1ms
+INF [20160105-17:23:44.939] finatra: GET /world? 200 1ms
+INF [20160105-17:23:45.214] finatra: GET /world? 200 1ms
+INF [20160105-17:23:45.519] finatra: GET /world? 200 0ms
+INF [20160105-17:23:46.154] finatra: GET /world? 200 1ms
+INF [20160105-17:23:46.421] finatra: GET /world? 200 1ms
+INF [20160105-17:23:47.264] finatra: GET /world? 200 1ms
+INF [20160105-17:23:47.596] finatra: GET /world? 200 1ms
+INF [20160105-17:23:47.852] finatra: GET /world? 200 1ms
+INF [20160105-17:23:48.426] finatra: GET /world? 200 1ms
+INF [20160105-17:23:48.691] finatra: GET /world? 200 1ms
+INF [20160105-17:23:48.946] finatra: GET /world? 200 1ms
+INF [20160105-17:23:49.816] finatra: GET /world? 200 0ms
+INF [20160105-17:23:50.077] finatra: GET /world? 200 1ms
+INF [20160105-17:23:50.888] finatra: GET /world? 200 1ms
+INF [20160105-17:23:51.188] finatra: GET /world? 200 1ms
+INF [20160105-17:23:51.443] finatra: GET /world? 200 0ms
+INF [20160105-17:23:52.260] finatra: GET /world? 200 1ms
+INF [20160105-17:23:52.562] finatra: GET /world? 200 1ms
+INF [20160105-17:23:52.821] finatra: GET /world? 200 1ms
+INF [20160105-17:23:53.481] finatra: GET /world? 200 1ms
+INF [20160105-17:23:53.739] finatra: GET /world? 200 1ms
+INF [20160105-17:23:54.477] finatra: GET /world? 200 1ms
+INF [20160105-17:23:54.765] finatra: GET /world? 200 0ms
+INF [20160105-17:23:55.396] finatra: GET /world? 200 1ms
+INF [20160105-17:23:55.659] finatra: GET /world? 200 1ms
+INF [20160105-17:23:55.914] finatra: GET /world? 200 1ms
+INF [20160105-17:23:56.672] finatra: GET /world? 200 0ms
+INF [20160105-17:23:56.961] finatra: GET /world? 200 1ms
+INF [20160105-17:23:57.619] finatra: GET /world? 200 1ms
+INF [20160105-17:23:57.927] finatra: GET /world? 200 1ms
+INF [20160105-17:23:58.805] finatra: GET /world? 200 1ms
+INF [20160105-17:23:59.119] finatra: GET /world? 200 0ms
+INF [20160105-17:23:59.784] finatra: GET /world? 200 1ms
+INF [20160105-17:24:00.092] finatra: GET /world? 200 1ms
+INF [20160105-17:24:00.345] finatra: GET /world? 200 1ms
+INF [20160105-17:24:01.015] finatra: GET /world? 200 1ms
+INF [20160105-17:24:01.330] finatra: GET /world? 200 1ms
+INF [20160105-17:24:02.028] finatra: GET /world? 200 1ms
+INF [20160105-17:24:02.361] finatra: Starting panel 2 2
+INF [20160105-17:24:02.362] finatra: GET /start/2/2 302 2ms
+INF [20160105-17:24:02.379] finatra: GET /world? 200 1ms
+INF [20160105-17:24:02.722] finatra: GET /world? 200 1ms
+INF [20160105-17:24:03.092] finatra: GET /world? 200 0ms
+INF [20160105-17:24:03.385] finatra: GET /world? 200 1ms
+INF [20160105-17:24:03.534] finatra: update called ...
+INF [20160105-17:24:03.535] finatra: GET /update/2/2/true 200 2ms
+INF [20160105-17:24:04.154] finatra: GET /world? 200 0ms
+INF [20160105-17:24:04.307] finatra: update called ...
+INF [20160105-17:24:04.308] finatra: GET /update/1/1/true 200 2ms
+INF [20160105-17:24:04.323] finatra: GET /1.jpg 200 1ms
+INF [20160105-17:24:04.429] finatra: GET /world? 200 1ms
+INF [20160105-17:24:04.684] finatra: GET /world? 200 1ms
+INF [20160105-17:24:05.345] finatra: GET /world? 200 1ms
+INF [20160105-17:24:05.462] finatra: update called ...
+INF [20160105-17:24:05.462] finatra: GET /update/1/1/false 200 1ms
+INF [20160105-17:24:05.630] finatra: GET /world? 200 1ms
+INF [20160105-17:24:05.943] finatra: GET /world? 200 3ms
+INF [20160105-17:24:06.174] finatra: update called ...
+INF [20160105-17:24:06.175] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:06.552] finatra: GET /world? 200 1ms
+INF [20160105-17:24:06.817] finatra: GET /world? 200 1ms
+INF [20160105-17:24:07.614] finatra: GET /world? 200 0ms
+INF [20160105-17:24:07.927] finatra: GET /world? 200 0ms
+INF [20160105-17:24:08.257] finatra: GET /world? 200 0ms
+INF [20160105-17:24:08.938] finatra: GET /world? 200 1ms
+INF [20160105-17:24:09.254] finatra: GET /world? 200 0ms
+INF [20160105-17:24:10.156] finatra: GET /world? 200 1ms
+INF [20160105-17:24:10.293] finatra: Starting panel 2 3
+INF [20160105-17:24:10.294] finatra: GET /start/2/3 302 1ms
+INF [20160105-17:24:10.472] finatra: GET /world? 200 1ms
+INF [20160105-17:24:10.994] finatra: GET /world? 200 4ms
+INF [20160105-17:24:11.124] finatra: update called ...
+INF [20160105-17:24:11.124] finatra: GET /update/2/3/true 200 1ms
+INF [20160105-17:24:11.256] finatra: GET /world? 200 0ms
+INF [20160105-17:24:11.945] finatra: update called ...
+INF [20160105-17:24:11.946] finatra: GET /update/1/4/true 200 1ms
+INF [20160105-17:24:12.058] finatra: GET /world? 200 1ms
+INF [20160105-17:24:12.322] finatra: GET /world? 200 0ms
+INF [20160105-17:24:12.924] finatra: update called ...
+INF [20160105-17:24:12.924] finatra: GET /update/1/4/false 200 0ms
+INF [20160105-17:24:13.083] finatra: GET /world? 200 0ms
+INF [20160105-17:24:13.408] finatra: GET /world? 200 1ms
+INF [20160105-17:24:13.588] finatra: update called ...
+INF [20160105-17:24:13.589] finatra: GET /update/2/3/false 200 1ms
+INF [20160105-17:24:14.097] finatra: GET /world? 200 1ms
+INF [20160105-17:24:14.389] finatra: GET /world? 200 1ms
+INF [20160105-17:24:15.240] finatra: GET /world? 200 1ms
+INF [20160105-17:24:15.322] finatra: Starting panel 2 2
+INF [20160105-17:24:15.325] finatra: GET /start/2/2 302 3ms
+INF [20160105-17:24:15.366] finatra: update called ...
+INF [20160105-17:24:15.367] finatra: GET /update/2/2/true 200 1ms
+INF [20160105-17:24:15.764] finatra: GET /world? 200 1ms
+INF [20160105-17:24:16.214] finatra: update called ...
+INF [20160105-17:24:16.214] finatra: GET /update/3/3/true 200 1ms
+INF [20160105-17:24:16.815] finatra: GET /world? 200 1ms
+INF [20160105-17:24:17.108] finatra: update called ...
+INF [20160105-17:24:17.108] finatra: GET /update/4/2/true 200 1ms
+INF [20160105-17:24:17.163] finatra: GET /world? 200 1ms
+INF [20160105-17:24:17.431] finatra: GET /world? 200 0ms
+INF [20160105-17:24:18.092] finatra: update called ...
+INF [20160105-17:24:18.093] finatra: GET /update/4/2/false 200 1ms
+INF [20160105-17:24:18.137] finatra: GET /world? 200 1ms
+INF [20160105-17:24:18.441] finatra: GET /world? 200 1ms
+INF [20160105-17:24:18.760] finatra: update called ...
+INF [20160105-17:24:18.761] finatra: GET /update/3/3/false 200 1ms
+INF [20160105-17:24:19.210] finatra: GET /world? 200 1ms
+INF [20160105-17:24:19.409] finatra: update called ...
+INF [20160105-17:24:19.409] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:19.519] finatra: GET /world? 200 1ms
+INF [20160105-17:24:20.354] finatra: GET /world? 200 0ms
+INF [20160105-17:24:20.642] finatra: GET /world? 200 10ms
+INF [20160105-17:24:21.451] finatra: GET /world? 200 1ms
+INF [20160105-17:24:21.578] finatra: Starting panel 2 1
+INF [20160105-17:24:21.580] finatra: GET /start/2/1 302 2ms
+INF [20160105-17:24:21.695] finatra: Starting panel 2 2
+INF [20160105-17:24:21.697] finatra: GET /start/2/2 302 2ms
+INF [20160105-17:24:21.715] finatra: update called ...
+INF [20160105-17:24:21.716] finatra: GET /update/2/2/true 200 1ms
+INF [20160105-17:24:21.840] finatra: GET /world? 200 1ms
+INF [20160105-17:24:22.236] finatra: Starting panel 2 3
+INF [20160105-17:24:22.237] finatra: GET /start/2/3 302 1ms
+INF [20160105-17:24:22.247] finatra: GET /world? 200 1ms
+INF [20160105-17:24:22.299] finatra: update called ...
+INF [20160105-17:24:22.300] finatra: GET /update/2/3/true 200 2ms
+INF [20160105-17:24:22.447] finatra: Starting panel 2 4
+INF [20160105-17:24:22.449] finatra: GET /start/2/4 302 2ms
+INF [20160105-17:24:22.547] finatra: GET /world? 200 1ms
+INF [20160105-17:24:23.193] finatra: update called ...
+INF [20160105-17:24:23.194] finatra: GET /update/2/1/true 200 1ms
+INF [20160105-17:24:23.506] finatra: update called ...
+INF [20160105-17:24:23.507] finatra: GET /update/1/3/true 200 1ms
+INF [20160105-17:24:24.133] finatra: GET /world? 200 1ms
+INF [20160105-17:24:24.327] finatra: update called ...
+INF [20160105-17:24:24.327] finatra: GET /update/1/3/false 200 1ms
+INF [20160105-17:24:24.455] finatra: GET /world? 200 0ms
+INF [20160105-17:24:24.666] finatra: update called ...
+INF [20160105-17:24:24.667] finatra: GET /update/2/4/true 200 0ms
+INF [20160105-17:24:24.690] finatra: update called ...
+INF [20160105-17:24:24.691] finatra: GET /update/1/3/true 200 0ms
+INF [20160105-17:24:24.827] finatra: update called ...
+INF [20160105-17:24:24.827] finatra: GET /update/2/2/true 200 1ms
+INF [20160105-17:24:24.838] finatra: GET /world? 200 1ms
+INF [20160105-17:24:24.912] finatra: Starting panel 3 3
+INF [20160105-17:24:24.913] finatra: GET /start/3/3 302 2ms
+INF [20160105-17:24:24.949] finatra: update called ...
+INF [20160105-17:24:24.950] finatra: GET /update/3/3/true 200 1ms
+INF [20160105-17:24:24.987] finatra: update called ...
+INF [20160105-17:24:24.987] finatra: GET /update/1/2/true 200 1ms
+INF [20160105-17:24:25.019] finatra: update called ...
+INF [20160105-17:24:25.019] finatra: GET /update/2/3/true 200 1ms
+INF [20160105-17:24:25.020] finatra: update called ...
+INF [20160105-17:24:25.021] finatra: GET /update/3/3/true 200 2ms
+INF [20160105-17:24:25.078] finatra: update called ...
+INF [20160105-17:24:25.079] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:25.184] finatra: update called ...
+INF [20160105-17:24:25.184] finatra: GET /update/2/4/true 200 1ms
+INF [20160105-17:24:25.223] finatra: update called ...
+INF [20160105-17:24:25.223] finatra: GET /update/1/3/true 200 1ms
+INF [20160105-17:24:25.248] finatra: update called ...
+INF [20160105-17:24:25.248] finatra: GET /update/4/2/true 200 1ms
+INF [20160105-17:24:25.307] finatra: GET /world? 200 1ms
+INF [20160105-17:24:25.312] finatra: update called ...
+INF [20160105-17:24:25.312] finatra: GET /update/3/3/true 200 1ms
+INF [20160105-17:24:25.402] finatra: update called ...
+INF [20160105-17:24:25.403] finatra: GET /update/4/2/true 200 1ms
+INF [20160105-17:24:25.417] finatra: GET /2.jpg 200 1ms
+INF [20160105-17:24:25.703] finatra: update called ...
+INF [20160105-17:24:25.703] finatra: update called ...
+INF [20160105-17:24:25.703] finatra: GET /update/3/2/true 200 1ms
+INF [20160105-17:24:25.703] finatra: GET /update/3/2/true 200 1ms
+INF [20160105-17:24:25.739] finatra: update called ...
+INF [20160105-17:24:25.740] finatra: GET /update/2/3/true 200 2ms
+INF [20160105-17:24:25.814] finatra: update called ...
+INF [20160105-17:24:25.814] finatra: GET /update/3/2/true 200 1ms
+INF [20160105-17:24:26.482] finatra: update called ...
+INF [20160105-17:24:26.483] finatra: GET /update/1/3/false 200 2ms
+INF [20160105-17:24:26.554] finatra: GET /world? 200 1ms
+INF [20160105-17:24:26.666] finatra: update called ...
+INF [20160105-17:24:26.667] finatra: GET /update/4/2/false 200 1ms
+INF [20160105-17:24:26.730] finatra: update called ...
+INF [20160105-17:24:26.731] finatra: GET /update/4/3/true 200 1ms
+INF [20160105-17:24:26.743] finatra: update called ...
+INF [20160105-17:24:26.744] finatra: GET /update/4/3/true 200 1ms
+INF [20160105-17:24:26.770] finatra: update called ...
+INF [20160105-17:24:26.771] finatra: GET /update/3/2/true 200 1ms
+INF [20160105-17:24:26.790] finatra: update called ...
+INF [20160105-17:24:26.790] finatra: GET /update/2/3/true 200 1ms
+INF [20160105-17:24:26.824] finatra: Starting panel 3 1
+INF [20160105-17:24:26.834] finatra: GET /start/3/1 302 10ms
+INF [20160105-17:24:26.846] finatra: Starting panel 4 1
+INF [20160105-17:24:26.848] finatra: GET /start/4/1 302 3ms
+INF [20160105-17:24:26.853] finatra: update called ...
+INF [20160105-17:24:26.853] finatra: GET /update/3/2/true 200 1ms
+INF [20160105-17:24:26.863] finatra: Starting panel 4 2
+INF [20160105-17:24:26.866] finatra: GET /start/4/2 302 4ms
+INF [20160105-17:24:26.926] finatra: update called ...
+INF [20160105-17:24:26.927] finatra: GET /update/4/2/true 200 1ms
+INF [20160105-17:24:26.931] finatra: GET /world? 200 1ms
+INF [20160105-17:24:26.959] finatra: update called ...
+INF [20160105-17:24:26.960] finatra: GET /update/4/3/true 200 1ms
+INF [20160105-17:24:27.042] finatra: Starting panel 4 3
+INF [20160105-17:24:27.044] finatra: GET /start/4/3 302 3ms
+INF [20160105-17:24:27.107] finatra: update called ...
+INF [20160105-17:24:27.108] finatra: GET /update/4/3/true 200 1ms
+INF [20160105-17:24:27.132] finatra: update called ...
+INF [20160105-17:24:27.132] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:27.238] finatra: update called ...
+INF [20160105-17:24:27.239] finatra: GET /update/3/2/true 200 1ms
+INF [20160105-17:24:27.294] finatra: update called ...
+INF [20160105-17:24:27.295] finatra: GET /update/3/3/false 200 1ms
+INF [20160105-17:24:27.334] finatra: update called ...
+INF [20160105-17:24:27.334] finatra: GET /update/4/3/true 200 1ms
+INF [20160105-17:24:27.627] finatra: Starting panel 4 4
+INF [20160105-17:24:27.628] finatra: GET /start/4/4 302 1ms
+INF [20160105-17:24:27.678] finatra: GET /world? 200 0ms
+INF [20160105-17:24:27.869] finatra: update called ...
+INF [20160105-17:24:27.869] finatra: GET /update/4/3/false 200 1ms
+INF [20160105-17:24:27.883] finatra: Starting panel 3 4
+INF [20160105-17:24:27.884] finatra: GET /start/3/4 302 2ms
+INF [20160105-17:24:27.931] finatra: update called ...
+INF [20160105-17:24:27.932] finatra: GET /update/3/3/false 200 1ms
+INF [20160105-17:24:27.963] finatra: update called ...
+INF [20160105-17:24:27.964] finatra: GET /update/4/2/false 200 2ms
+INF [20160105-17:24:28.023] finatra: GET /world? 200 1ms
+INF [20160105-17:24:28.114] finatra: GET /6.jpg 200 1ms
+INF [20160105-17:24:28.127] finatra: GET /4.jpg 200 1ms
+INF [20160105-17:24:28.470] finatra: update called ...
+INF [20160105-17:24:28.471] finatra: GET /update/4/3/false 200 1ms
+INF [20160105-17:24:28.522] finatra: GET /world? 200 0ms
+INF [20160105-17:24:28.531] finatra: update called ...
+INF [20160105-17:24:28.533] finatra: GET /update/3/2/false 200 2ms
+INF [20160105-17:24:28.560] finatra: update called ...
+INF [20160105-17:24:28.561] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:28.579] finatra: update called ...
+INF [20160105-17:24:28.580] finatra: GET /update/4/2/false 200 1ms
+INF [20160105-17:24:28.599] finatra: update called ...
+INF [20160105-17:24:28.599] finatra: GET /update/3/3/false 200 1ms
+INF [20160105-17:24:28.636] finatra: update called ...
+INF [20160105-17:24:28.636] finatra: GET /update/2/2/true 200 1ms
+INF [20160105-17:24:28.752] finatra: update called ...
+INF [20160105-17:24:28.759] finatra: GET /update/3/1/true 200 7ms
+INF [20160105-17:24:28.769] finatra: GET /3.jpg 200 3ms
+INF [20160105-17:24:28.778] finatra: update called ...
+INF [20160105-17:24:28.778] finatra: GET /update/3/1/true 200 1ms
+INF [20160105-17:24:29.063] finatra: update called ...
+INF [20160105-17:24:29.063] finatra: GET /update/4/2/true 200 1ms
+INF [20160105-17:24:29.128] finatra: update called ...
+INF [20160105-17:24:29.129] finatra: GET /update/3/3/true 200 2ms
+INF [20160105-17:24:29.223] finatra: update called ...
+INF [20160105-17:24:29.223] finatra: GET /update/4/3/false 200 1ms
+INF [20160105-17:24:29.229] finatra: update called ...
+INF [20160105-17:24:29.229] finatra: GET /update/2/3/false 200 1ms
+INF [20160105-17:24:29.263] finatra: update called ...
+INF [20160105-17:24:29.263] finatra: GET /update/1/3/false 200 1ms
+INF [20160105-17:24:29.624] finatra: update called ...
+INF [20160105-17:24:29.625] finatra: GET /update/4/1/true 200 1ms
+INF [20160105-17:24:29.813] finatra: GET /world? 200 1ms
+INF [20160105-17:24:29.948] finatra: update called ...
+INF [20160105-17:24:29.948] finatra: GET /update/3/2/false 200 1ms
+INF [20160105-17:24:29.976] finatra: update called ...
+INF [20160105-17:24:29.977] finatra: GET /update/2/4/false 200 2ms
+INF [20160105-17:24:30.056] finatra: update called ...
+INF [20160105-17:24:30.056] finatra: GET /update/4/1/false 200 1ms
+INF [20160105-17:24:30.117] finatra: GET /5.jpg 200 1ms
+INF [20160105-17:24:30.166] finatra: GET /world? 200 1ms
+INF [20160105-17:24:30.412] finatra: update called ...
+INF [20160105-17:24:30.413] finatra: GET /update/4/4/true 200 1ms
+INF [20160105-17:24:30.418] finatra: update called ...
+INF [20160105-17:24:30.418] finatra: GET /update/4/4/true 200 1ms
+INF [20160105-17:24:30.494] finatra: GET /world? 200 1ms
+INF [20160105-17:24:30.547] finatra: update called ...
+INF [20160105-17:24:30.548] finatra: GET /update/3/2/false 200 1ms
+INF [20160105-17:24:30.606] finatra: update called ...
+INF [20160105-17:24:30.607] finatra: GET /update/4/3/false 200 1ms
+INF [20160105-17:24:30.754] finatra: GET /world? 200 0ms
+INF [20160105-17:24:30.843] finatra: update called ...
+INF [20160105-17:24:30.845] finatra: GET /update/3/3/true 200 2ms
+INF [20160105-17:24:30.939] finatra: update called ...
+INF [20160105-17:24:30.939] finatra: GET /update/2/2/true 200 1ms
+INF [20160105-17:24:31.008] finatra: update called ...
+INF [20160105-17:24:31.008] finatra: GET /update/1/1/true 200 1ms
+INF [20160105-17:24:31.064] finatra: update called ...
+INF [20160105-17:24:31.065] finatra: GET /update/3/4/true 200 1ms
+INF [20160105-17:24:31.135] finatra: update called ...
+INF [20160105-17:24:31.135] finatra: GET /update/2/2/true 200 1ms
+INF [20160105-17:24:31.172] finatra: update called ...
+INF [20160105-17:24:31.173] finatra: GET /update/1/1/true 200 1ms
+INF [20160105-17:24:31.205] finatra: update called ...
+INF [20160105-17:24:31.205] finatra: GET /update/2/2/true 200 1ms
+INF [20160105-17:24:31.248] finatra: update called ...
+INF [20160105-17:24:31.248] finatra: GET /update/3/1/true 200 1ms
+INF [20160105-17:24:31.256] finatra: update called ...
+INF [20160105-17:24:31.257] finatra: update called ...
+INF [20160105-17:24:31.257] finatra: GET /update/2/1/false 200 0ms
+INF [20160105-17:24:31.256] finatra: GET /update/3/2/false 200 1ms
+INF [20160105-17:24:31.282] finatra: update called ...
+INF [20160105-17:24:31.282] finatra: GET /update/4/4/false 200 1ms
+INF [20160105-17:24:31.732] finatra: GET /world? 200 1ms
+INF [20160105-17:24:31.926] finatra: update called ...
+INF [20160105-17:24:31.927] finatra: GET /update/2/3/false 200 1ms
+INF [20160105-17:24:32.062] finatra: update called ...
+INF [20160105-17:24:32.063] finatra: GET /update/3/4/false 200 1ms
+INF [20160105-17:24:32.106] finatra: GET /world? 200 0ms
+INF [20160105-17:24:32.362] finatra: GET /world? 200 0ms
+INF [20160105-17:24:32.471] finatra: update called ...
+INF [20160105-17:24:32.472] finatra: GET /update/3/1/false 200 1ms
+INF [20160105-17:24:32.616] finatra: update called ...
+INF [20160105-17:24:32.616] finatra: GET /update/3/2/false 200 1ms
+INF [20160105-17:24:32.937] finatra: GET /world? 200 0ms
+INF [20160105-17:24:33.127] finatra: update called ...
+INF [20160105-17:24:33.127] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:33.193] finatra: GET /world? 200 1ms
+INF [20160105-17:24:33.278] finatra: update called ...
+INF [20160105-17:24:33.279] finatra: GET /update/4/3/false 200 1ms
+INF [20160105-17:24:33.762] finatra: update called ...
+INF [20160105-17:24:33.762] finatra: GET /update/1/1/false 200 0ms
+INF [20160105-17:24:33.901] finatra: update called ...
+INF [20160105-17:24:33.902] finatra: GET /update/3/2/false 200 1ms
+INF [20160105-17:24:34.157] finatra: GET /world? 200 1ms
+INF [20160105-17:24:34.374] finatra: update called ...
+INF [20160105-17:24:34.375] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:34.446] finatra: GET /world? 200 0ms
+INF [20160105-17:24:34.521] finatra: update called ...
+INF [20160105-17:24:34.522] finatra: GET /update/2/3/false 200 0ms
+INF [20160105-17:24:34.992] finatra: update called ...
+INF [20160105-17:24:34.992] finatra: GET /update/1/1/false 200 1ms
+INF [20160105-17:24:35.149] finatra: GET /world? 200 0ms
+INF [20160105-17:24:35.174] finatra: update called ...
+INF [20160105-17:24:35.174] finatra: GET /update/1/2/false 200 1ms
+INF [20160105-17:24:35.406] finatra: GET /world? 200 0ms
+INF [20160105-17:24:35.608] finatra: update called ...
+INF [20160105-17:24:35.609] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:35.799] finatra: update called ...
+INF [20160105-17:24:35.799] finatra: GET /update/2/3/false 200 1ms
+INF [20160105-17:24:36.231] finatra: update called ...
+INF [20160105-17:24:36.231] finatra: GET /update/3/3/false 200 1ms
+INF [20160105-17:24:36.375] finatra: GET /world? 200 1ms
+INF [20160105-17:24:36.680] finatra: GET /world? 200 0ms
+INF [20160105-17:24:36.871] finatra: update called ...
+INF [20160105-17:24:36.871] finatra: GET /update/4/4/false 200 1ms
+INF [20160105-17:24:36.937] finatra: GET /world? 200 0ms
+INF [20160105-17:24:37.490] finatra: update called ...
+INF [20160105-17:24:37.491] finatra: GET /update/3/3/false 200 1ms
+INF [20160105-17:24:37.663] finatra: GET /world? 200 1ms
+INF [20160105-17:24:37.970] finatra: GET /world? 200 1ms
+INF [20160105-17:24:38.118] finatra: update called ...
+INF [20160105-17:24:38.119] finatra: GET /update/4/2/false 200 1ms
+INF [20160105-17:24:38.795] finatra: update called ...
+INF [20160105-17:24:38.796] finatra: GET /update/3/1/false 200 1ms
+INF [20160105-17:24:38.876] finatra: GET /world? 200 1ms
+INF [20160105-17:24:39.178] finatra: GET /world? 200 1ms
+INF [20160105-17:24:39.427] finatra: update called ...
+INF [20160105-17:24:39.428] finatra: GET /update/2/2/false 200 1ms
+INF [20160105-17:24:39.438] finatra: GET /world? 200 0ms
+INF [20160105-17:24:40.050] finatra: update called ...
+INF [20160105-17:24:40.051] finatra: GET /update/3/1/false 200 1ms
+INF [20160105-17:24:40.071] finatra: GET /world? 200 0ms
+INF [20160105-17:24:40.382] finatra: GET /world? 200 1ms
+INF [20160105-17:24:40.641] finatra: GET /world? 200 1ms
+INF [20160105-17:24:41.490] finatra: GET /world? 200 1ms
+INF [20160105-17:24:41.778] finatra: GET /world? 200 1ms
+INF [20160105-17:24:42.523] finatra: GET /world? 200 1ms
+INF [20160105-17:24:42.635] finatra: Starting panel 2 4
+INF [20160105-17:24:42.637] finatra: GET /start/2/4 302 3ms
+INF [20160105-17:24:42.660] finatra: update called ...
+INF [20160105-17:24:42.662] finatra: GET /update/2/4/true 200 2ms
+INF [20160105-17:24:42.713] finatra: Starting panel 2 4
+INF [20160105-17:24:42.714] finatra: GET /start/2/4 302 1ms
+INF [20160105-17:24:42.728] finatra: update called ...
+INF [20160105-17:24:42.728] finatra: GET /update/2/4/true 200 1ms
+INF [20160105-17:24:42.798] finatra: GET /world? 200 1ms
+INF [20160105-17:24:42.974] finatra: Starting panel 2 4
+INF [20160105-17:24:42.975] finatra: GET /start/2/4 302 1ms
+INF [20160105-17:24:43.031] finatra: update called ...
+INF [20160105-17:24:43.032] finatra: GET /update/2/4/true 200 1ms
+INF [20160105-17:24:43.038] finatra: Starting panel 2 4
+INF [20160105-17:24:43.039] finatra: GET /start/2/4 302 1ms
+INF [20160105-17:24:43.051] finatra: update called ...
+INF [20160105-17:24:43.052] finatra: GET /update/2/4/true 200 0ms
+INF [20160105-17:24:43.069] finatra: GET /world? 200 0ms
+INF [20160105-17:24:43.234] finatra: GET /world? 200 0ms
+INF [20160105-17:24:43.871] finatra: update called ...
+INF [20160105-17:24:43.872] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:44.022] finatra: GET /world? 200 0ms
+INF [20160105-17:24:44.117] finatra: Starting panel 2 4
+INF [20160105-17:24:44.118] finatra: GET /start/2/4 302 1ms
+INF [20160105-17:24:44.133] finatra: update called ...
+INF [20160105-17:24:44.133] finatra: GET /update/2/4/true 200 1ms
+INF [20160105-17:24:44.260] finatra: Starting panel 2 4
+INF [20160105-17:24:44.261] finatra: GET /start/2/4 302 1ms
+INF [20160105-17:24:44.293] finatra: update called ...
+INF [20160105-17:24:44.294] finatra: GET /update/2/4/true 200 1ms
+INF [20160105-17:24:44.317] finatra: Starting panel 2 4
+INF [20160105-17:24:44.318] finatra: GET /start/2/4 302 1ms
+INF [20160105-17:24:44.332] finatra: GET /world? 200 1ms
+INF [20160105-17:24:44.338] finatra: update called ...
+INF [20160105-17:24:44.338] finatra: GET /update/2/4/true 200 1ms
+INF [20160105-17:24:44.428] finatra: GET /5.jpg 200 1ms
+INF [20160105-17:24:44.494] finatra: update called ...
+INF [20160105-17:24:44.495] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:44.562] finatra: update called ...
+INF [20160105-17:24:44.563] finatra: GET /update/3/3/true 200 1ms
+INF [20160105-17:24:44.639] finatra: update called ...
+INF [20160105-17:24:44.640] finatra: GET /update/4/2/true 200 1ms
+INF [20160105-17:24:44.721] finatra: update called ...
+INF [20160105-17:24:44.722] finatra: GET /update/3/3/true 200 1ms
+INF [20160105-17:24:44.727] finatra: GET /world? 200 1ms
+INF [20160105-17:24:44.796] finatra: update called ...
+INF [20160105-17:24:44.796] finatra: GET /update/2/4/true 200 1ms
+INF [20160105-17:24:45.104] finatra: update called ...
+INF [20160105-17:24:45.105] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:45.375] finatra: GET /world? 200 1ms
+INF [20160105-17:24:45.650] finatra: GET /world? 200 1ms
+INF [20160105-17:24:45.727] finatra: update called ...
+INF [20160105-17:24:45.728] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:45.756] finatra: update called ...
+INF [20160105-17:24:45.756] finatra: GET /update/1/3/true 200 1ms
+INF [20160105-17:24:46.337] finatra: update called ...
+INF [20160105-17:24:46.337] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:46.839] finatra: GET /world? 200 0ms
+INF [20160105-17:24:46.961] finatra: update called ...
+INF [20160105-17:24:46.964] finatra: GET /update/2/4/false 200 3ms
+INF [20160105-17:24:46.974] finatra: update called ...
+INF [20160105-17:24:46.975] finatra: GET /update/1/3/false 200 1ms
+INF [20160105-17:24:47.102] finatra: GET /world? 200 0ms
+INF [20160105-17:24:47.571] finatra: update called ...
+INF [20160105-17:24:47.571] finatra: GET /update/3/3/false 200 0ms
+INF [20160105-17:24:47.594] finatra: update called ...
+INF [20160105-17:24:47.595] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:47.972] finatra: GET /world? 200 0ms
+INF [20160105-17:24:48.204] finatra: update called ...
+INF [20160105-17:24:48.204] finatra: GET /update/4/2/false 200 1ms
+INF [20160105-17:24:48.253] finatra: GET /world? 200 0ms
+INF [20160105-17:24:48.540] finatra: GET /world? 200 1ms
+INF [20160105-17:24:48.860] finatra: update called ...
+INF [20160105-17:24:48.860] finatra: GET /update/3/3/false 200 0ms
+INF [20160105-17:24:49.191] finatra: GET /world? 200 0ms
+INF [20160105-17:24:49.454] finatra: GET /world? 200 0ms
+INF [20160105-17:24:49.485] finatra: update called ...
+INF [20160105-17:24:49.486] finatra: GET /update/2/4/false 200 1ms
+INF [20160105-17:24:50.164] finatra: GET /world? 200 1ms
+INF [20160105-17:24:50.425] finatra: GET /world? 200 1ms
+INF [20160105-17:24:51.558] finatra: GET /world? 200 1ms
+INF [20160105-17:24:51.853] finatra: GET /world? 200 1ms
+INF [20160105-17:24:52.774] finatra: GET /world? 200 0ms
+INF [20160105-17:24:53.057] finatra: GET /world? 200 0ms
+INF [20160105-17:24:53.749] finatra: GET /world? 200 0ms
+INF [20160105-17:24:54.010] finatra: GET /world? 200 0ms
+INF [20160105-17:24:54.693] finatra: GET /world? 200 1ms
+INF [20160105-17:24:55.255] finatra: GET /world? 200 0ms
+INF [20160105-17:24:55.511] finatra: GET /world? 200 1ms
+INF [20160105-17:24:56.113] finatra: GET /world? 200 1ms
+INF [20160105-17:24:56.412] finatra: GET /world? 200 0ms
+INF [20160105-17:24:57.245] finatra: GET /world? 200 1ms
+INF [20160105-17:24:57.522] finatra: GET /world? 200 1ms
+INF [20160105-17:24:58.268] finatra: GET /world? 200 1ms
+INF [20160105-17:24:58.590] finatra: GET /world? 200 1ms
+INF [20160105-17:24:59.641] finatra: GET /world? 200 1ms
+INF [20160105-17:24:59.912] finatra: GET /world? 200 0ms
+INF [20160105-17:33:54.420] finatra: finatra process 825 started
+INF [20160105-17:33:54.423] finatra: http server started on port: :7070
+INF [20160105-17:33:55.764] finatra: admin http server started on port: :9990
+INF [20160105-17:35:39.796] finatra: finatra process 1000 started
+INF [20160105-17:35:39.799] finatra: http server started on port: :7070
+INF [20160105-17:35:40.920] finatra: admin http server started on port: :9990
+INF [20160105-17:36:00.610] finatra: GET /example 200 74ms
+INF [20160105-17:36:00.946] finatra: GET /world? 200 103ms
+INF [20160105-17:36:01.101] finatra: GET /world? 200 1ms
+INF [20160105-17:36:01.387] finatra: GET /world? 200 1ms
+INF [20160105-17:36:01.644] finatra: GET /world? 200 2ms
+INF [20160105-17:36:01.901] finatra: GET /world? 200 1ms
+INF [20160105-17:36:02.156] finatra: GET /world? 200 1ms
+INF [20160105-17:36:02.412] finatra: GET /world? 200 1ms
+INF [20160105-17:36:02.668] finatra: GET /world? 200 2ms
+INF [20160105-17:36:03.291] finatra: GET /world? 200 1ms
+INF [20160105-17:36:03.557] finatra: GET /world? 200 0ms
+INF [20160105-17:36:04.494] finatra: GET /world? 200 1ms
+INF [20160105-17:36:04.584] finatra: Starting panel 2 1
+INF [20160105-17:36:04.802] finatra: GET /world? 200 2ms
+INF [20160105-17:36:05.051] finatra: GET /world? 200 1ms
+INF [20160105-17:36:05.206] finatra: GET /start/2/1 302 625ms
+INF [20160105-17:36:05.676] finatra: GET /world? 200 1ms
+INF [20160105-17:36:06.051] finatra: GET /world? 200 1ms
+INF [20160105-17:36:06.319] finatra: GET /world? 200 1ms
+INF [20160105-17:36:07.078] finatra: GET /world? 200 3ms
+INF [20160105-17:36:07.362] finatra: GET /world? 200 1ms
+INF [20160105-17:36:08.072] finatra: GET /world? 200 1ms
+INF [20160105-17:36:08.398] finatra: GET /world? 200 3ms
+INF [20160105-17:36:09.217] finatra: GET /world? 200 1ms
+INF [20160105-17:36:09.474] finatra: GET /world? 200 1ms
+INF [20160105-17:36:10.189] finatra: GET /world? 200 5ms
+INF [20160105-17:36:10.507] finatra: GET /world? 200 1ms
+INF [20160105-17:36:11.378] finatra: GET /world? 200 1ms
+INF [20160105-17:36:11.644] finatra: GET /world? 200 1ms
+INF [20160105-17:36:12.395] finatra: GET /world? 200 2ms
+INF [20160105-17:36:12.506] finatra: Starting panel 2 2
+INF [20160105-17:36:12.510] finatra: GET /start/2/2 302 5ms
+INF [20160105-17:36:12.697] finatra: GET /world? 200 2ms
+INF [20160105-17:36:12.932] finatra: GET /world? 200 1ms
+INF [20160105-17:36:13.652] finatra: GET /world? 200 1ms
+INF [20160105-17:36:13.954] finatra: GET /world? 200 1ms
+INF [20160105-17:36:14.092] finatra: Starting panel 2 3
+INF [20160105-17:36:14.093] finatra: GET /start/2/3 302 2ms
+INF [20160105-17:36:14.207] finatra: GET /world? 200 1ms
+INF [20160105-17:36:14.956] finatra: GET /world? 200 1ms
+INF [20160105-17:36:15.239] finatra: GET /world? 200 1ms
+INF [20160105-17:36:15.536] finatra: Starting panel 2 4
+INF [20160105-17:36:15.538] finatra: GET /start/2/4 302 2ms
+INF [20160105-17:36:15.557] finatra: GET /world? 200 1ms
+INF [20160105-17:36:15.735] finatra: GET /world? 200 1ms
+INF [20160105-17:36:16.361] finatra: GET /world? 200 1ms
+INF [20160105-17:36:16.656] finatra: GET /world? 200 1ms
+INF [20160105-17:36:17.507] finatra: GET /world? 200 1ms
+INF [20160105-17:36:17.794] finatra: GET /world? 200 1ms
+INF [20160105-17:36:18.108] finatra: GET /world? 200 1ms
+INF [20160105-17:36:18.747] finatra: GET /world? 200 1ms
+INF [20160105-17:36:18.868] finatra: Starting panel 1 1
+INF [20160105-17:36:18.871] finatra: GET /start/1/1 302 3ms
+INF [20160105-17:36:19.021] finatra: GET /world? 200 1ms
+INF [20160105-17:36:19.222] finatra: GET /world? 200 1ms
+INF [20160105-17:36:19.973] finatra: GET /world? 200 1ms
+INF [20160105-17:36:20.339] finatra: GET /world? 200 1ms
+INF [20160105-17:36:20.594] finatra: GET /world? 200 1ms
+INF [20160105-17:36:21.138] finatra: GET /world? 200 0ms
+INF [20160105-17:36:21.462] finatra: GET /world? 200 0ms
+INF [20160105-17:36:22.297] finatra: GET /world? 200 1ms
+INF [20160105-17:36:22.618] finatra: GET /world? 200 1ms
+INF [20160105-17:36:23.210] finatra: GET /world? 200 0ms
+INF [20160105-17:36:23.504] finatra: GET /world? 200 1ms
+INF [20160105-17:36:23.766] finatra: GET /world? 200 1ms

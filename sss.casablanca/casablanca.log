@@ -1,0 +1,4 @@
+1210 [pool-4-thread-5] INFO  sss.db.Db - DROP TABLE tasks failed, maybe object doesn't exist?!
+1220 [pool-4-thread-5] INFO  sss.db.Db - CREATE TABLE IF NOT EXISTS tasks (parentNode VARCHAR(100), parentTaskId VARCHAR(100), taskId VARCHAR(100), createTime BIGINT, taskType VARCHAR(256), status INTEGER, attemptCount INTEGER, scheduleTime BIGINT, strPayload LONGVARCHAR) Created count 0
+1378 [pool-4-thread-5-ScalaTest-running-TaskManagerSpec] ERROR s.casablanca.util.ProgrammingError - There are 0 taskIds (f6482580-2766-4c5e-b417-83e1a9fc9421) in the database! 
+1378 [pool-4-thread-5-ScalaTest-running-TaskManagerSpec] ERROR s.casablanca.util.ProgrammingError - There are 0 taskIds (f6482580-2766-4c5e-b417-83e1a9fc9421) in the database! 

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+PATH_TO_BIN="$(dirname $(readlink -f $0))"
+cd $PATH_TO_BIN
+  
+LIB="../lib/"
+CONF="../conf"
+CLASSPATH="$CONF/*:$LIB/*"
+
+  
+## Uncomment to set memory requirements 
+#MEM="-Xms1G -Xmx1G"
+  
+MAINCLASS="sss.App"
+CONFFILE=-Dconfig.file="$CONF/production-application.conf" 
+ 
+ROW=7$2
+COL=7$3
+
+echo -Ddemo.restServer.port=$ROW$COL
+
+#REMOTE_DBG="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=40${2}${3},suspend=n"
+#$CONFFILE $MEM
+
+java $REMOTE_DBG -Dpath=$PATH_TO_BIN  -Ddemo.restServer.port=$ROW$COL -cp $CLASSPATH $MAINCLASS "$@" &
+
+echo kill $! >> kill_all_pids
