@@ -28,11 +28,11 @@ As a developer the only code that you need to write is the code to send the emai
  - [demo-app]( ../../tree/master/demo-app "demo-app README.md")
  - [demo-ui]( ../../tree/master/demo-ui "demo-ui README.md")
  
-####[sss-casablanca](./sss.casablanca/README.md "sss.casablanca README.md")
+####[sss-casablanca](../../tree/master/sss.casablanca "sss.casablanca README.md")
 
 This is the core jar. It is depended on by the template app and and demo app.  
  
-####[template-app](./template-app/README.md "template-app README.md")
+####[template-app](../../tree/master/template-app "template-app README.md")
 
 The template app is the starting point for development, it contains a simple main App configured with 2 task handlers...  
   
@@ -44,11 +44,11 @@ The template app is the starting point for development, it contains a simple mai
      
 Use ```sbt run``` to start up an instance which will handle Remote tasks and Mailer tasks. (Update mailer.conf with your gmail credentials at your leisure) The system should print out the tasks and statuses it's configured to handle and wait for tasks to arrive. Write and add more task handler factories... 
 
-####[demo-app](./demo-app/README.md "demo-app README.md")
+####[demo-app](../../tree/master/demo-app "demo-app README.md")
 
 The demo app (demo.sh) runs 16 instances of a casablanca task handler all on separate ports....
  
-####[demo-ui](./demo-ui/README.md "demo-ui README.md")
+####[demo-ui](../../tree/master/demo-ui "demo-ui README.md")
   
 ```sbt run``` and go to ```http://localhost:7070/example``` 
   
