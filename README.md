@@ -23,10 +23,10 @@ As a developer the only code that you need to write is the code to send the emai
        
 ###This repository contains 4 projects
 
- - [sss-casablanca](./sss.casablanca/README.md "sss.casablanca README.md")
- - [template-app](./template-app/README.md "template-app README.md")
- - [demo-app](./demo-app/README.md "demo-app README.md")
- - [demo-ui](./demo-ui/README.md "demo-ui README.md")
+ - [sss-casablanca](../../tree/master/sss.casablanca "sss.casablanca README.md")
+ - [template-app]( ../../tree/master/template-app "template-app README.md")
+ - [demo-app]( ../../tree/master/demo-app "demo-app README.md")
+ - [demo-ui]( ../../tree/master/demo-ui "demo-ui README.md")
  
 ####[sss-casablanca](./sss.casablanca/README.md "sss.casablanca README.md")
 
@@ -46,7 +46,7 @@ Use ```sbt run``` to start up an instance which will handle Remote tasks and Mai
 
 ####[demo-app](./demo-app/README.md "demo-app README.md")
 
-The demo app consists (demo.sh) runs 16 instances of a casablanca task handler all on separate ports....
+The demo app (demo.sh) runs 16 instances of a casablanca task handler all on separate ports....
  
 ####[demo-ui](./demo-ui/README.md "demo-ui README.md")
   
