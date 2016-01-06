@@ -9,3 +9,4 @@ Then take the distribution and unzip it, go to the ```bin``` folder and call ```
 
 This should start all the instances. Then go to the demo-ui and start it... 
 
+*Note this repo also contains some unused code and some Jmeter plans.*
