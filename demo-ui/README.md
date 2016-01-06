@@ -8,4 +8,3 @@ instances, each task started darkens the shade the square, each task finished li
 
 ![demo-ui](https://cloud.githubusercontent.com/assets/6160346/12144817/30a863c8-b482-11e5-9dd3-1cffbf2d0cbe.png)
 
-Note this repo also contains some unused code and some Jmeter plans. 
