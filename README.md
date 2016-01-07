@@ -1,7 +1,8 @@
 # casablanca
 A HTTP microservices framework
 
-[![Build Status](https://travis-ci.org/mcsherrylabs/casablanca.svg?branch=master)](https://travis-ci.org/mcsherrylabs/casablanca)
+[![Build Status](https://travis-ci.org/mcsherrylabs/casablanca.svg?branch=master)](https://travis-ci.org/mcsherrylabs/casablanca) 
+(Compiled for 2.10 only at the moment, contact me @mcsherrylabs for a crosscompile)
 
 There are, rightly, countless 'microservice' architectures. Indeed one of the great strengths of a microservice architecture is freedom from the constraints of a 'framework', just write a service that does a simple thing well in any language you want and have clients access it using the ubiquitous JSON over HTTP.
    
